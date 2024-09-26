@@ -18,6 +18,9 @@ ENDPOINT_EP = '/endpoints'
 ENDPOINT_RESP = 'Available endpoints'
 HELLO_EP = '/hello'
 HELLO_RESP = 'hello'
+TITLE_EP = '/title'
+TITLE_RESP = "Title"
+TITLE = 'Segfault Journal Bimonthly'
 
 
 @api.route(HELLO_EP)
@@ -46,3 +49,15 @@ class Endpoints(Resource):
         """
         endpoints = sorted(rule.rule for rule in api.app.url_map.iter_rules())
         return {"Available endpoints": endpoints}
+
+
+@api.route(TITLE_EP)
+class JournalTitle(Resource):
+    """
+    This class handles CRUD for the journal title
+    """
+    def get(self):
+        """
+        Retrieve the journal title
+        """
+        return {TITLE_RESP: TITLE}
