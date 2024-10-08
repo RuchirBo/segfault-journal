@@ -10,14 +10,23 @@ from flask_cors import CORS
 
 # import werkzeug.exceptions as wz
 
+import data.people as ppl
+
 app = Flask(__name__)
 CORS(app)
 api = Api(app)
 
+DATE = '2024-09-24'
+DATE_RESP = 'Date'
+EDITOR = 'ejc369@nyu.edu'
+EDITOR_RESP = 'Editor'
 ENDPOINT_EP = '/endpoints'
 ENDPOINT_RESP = 'Available endpoints'
 HELLO_EP = '/hello'
 HELLO_RESP = 'hello'
+PEOPLE_EP = '/people'
+PUBLISHER = 'Segfaulters'
+PUBLISHER_RESP = 'Publisher'
 TITLE_EP = '/title'
 TITLE_RESP = "Title"
 TITLE = 'Segfault Journal Bimonthly'
@@ -61,3 +70,9 @@ class JournalTitle(Resource):
         Retrieve the journal title
         """
         return {TITLE_RESP: TITLE}
+
+@api.route(PEOPLE_EP)
+class People(Resource):
+    """
+    This class handles creating, reading, updating, and deleting journal people
+    """
