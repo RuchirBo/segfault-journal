@@ -43,3 +43,12 @@ def update_users(newName: str, affiliation: str, email: str):
     #TO BE UPDATED DEPENDING ON WHAT IS DONE IN CLASS
     TEST_PERSON_DICT[email] = {NAME: newName}
     return email
+
+def create_person(name: str, affiliation: str, email: str):
+    """
+    Our contract:
+        - Takes in a new name, affiliation, and email to create a new person in the people dictionary
+    """
+    if email in TEST_PERSON_DICT:
+        raise ValueError(f'This is a duplicate person{email=}')
+    TEST_PERSON_DICT[email] = {NAME: name, AFFILIATION: affiliation, EMAIL: email}

@@ -84,3 +84,6 @@ class People(Resource):
         - returns the users email when successful
         """
         return ppl.update_users
+    
+    def create_person(name: str, affiliation: str, email: str):
+        return ppl.create_person
