@@ -29,3 +29,12 @@ def get_users():
     """
     
     return
+
+def update_users():
+    """
+    Our contract:
+        - Updates a specific user in our dictionary
+        - Takes in a user name and values to be updated
+    """
+
+    return
