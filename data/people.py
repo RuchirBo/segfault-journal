@@ -30,18 +30,17 @@ def get_users():
     
     return
 
-def update_users(newName: str, affiliation: str, email: str):
+def update_users(newName: str, affiliation: None, email: str):
     """
     Our contract:
-        -TO BE UPDATED DEPENDING ON WHAT IS DONE IN CLASS
-        - Takes in an existing email and a new name and updates the name under ths email
-        - returns the users email when successful
+        -Name can't be blank
+        -Email can't be changed
+        -Affiliation can be blank
     """
     if email not in TEST_PERSON_DICT:
         raise ValueError(f'The email for the person you are trying to update does not exist {email=}')
-    
-    #TO BE UPDATED DEPENDING ON WHAT IS DONE IN CLASS
-    TEST_PERSON_DICT[email] = {NAME: newName}
+
+    TEST_PERSON_DICT[email] = {NAME: newName, AFFILIATION: affiliation, EMAIL: email}
     return email
 
 def create_person(name: str, affiliation: str, email: str):

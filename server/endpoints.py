@@ -77,12 +77,6 @@ class People(Resource):
     This class handles creating, reading, updating, and deleting journal people
     """
     def update_users(newName: str, affiliation: str, email: str):
-        """
-            Our contract:
-        -TO BE UPDATED DEPENDING ON WHAT IS DONE IN CLASS
-        - Takes in an existing email and a new name and updates the name under ths email
-        - returns the users email when successful
-        """
         return ppl.update_users
     
     def create_person(name: str, affiliation: str, email: str):
