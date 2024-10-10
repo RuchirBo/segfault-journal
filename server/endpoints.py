@@ -71,6 +71,7 @@ class JournalTitle(Resource):
         """
         return {TITLE_RESP: TITLE}
 
+
 @api.route(PEOPLE_EP)
 class People(Resource):
     """
@@ -78,6 +79,6 @@ class People(Resource):
     """
     def update_users(newName: str, affiliation: str, email: str):
         return ppl.update_users
-    
+
     def create_person(name: str, affiliation: str, email: str):
         return ppl.create_person
