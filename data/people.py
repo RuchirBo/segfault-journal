@@ -51,3 +51,25 @@ def create_person(name: str, affiliation: str, email: str):
     if email in TEST_PERSON_DICT:
         raise ValueError(f'This is a duplicate person{email=}')
     TEST_PERSON_DICT[email] = {NAME: name, AFFILIATION: affiliation, EMAIL: email}
+
+def read():
+    """
+    Our contract:
+        - No arguments.
+        - Returns a dictionary of users keyed on user email.
+        - Each user email must be the key for another dictionary.
+    """
+    people = TEST_PERSON_DICT
+    return people
+
+def delete_person(_id):
+   """
+   Our contract:
+       - Deleted a person in the people dictionary based on provided ID
+   """
+   people = read()
+   if _id in people:
+       del people[_id]
+       return _id
+   else:
+       return None

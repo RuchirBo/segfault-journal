@@ -82,3 +82,6 @@ class People(Resource):
 
     def create_person(name: str, affiliation: str, email: str):
         return ppl.create_person
+    
+    def delete_person(_id):
+        return ppl.delete_person
