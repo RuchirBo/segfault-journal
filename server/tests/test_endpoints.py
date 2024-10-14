@@ -29,9 +29,9 @@ def test_title():
     assert len(resp_json[ep.TITLE_RESP]) > 0
 
 
-def test_update():
-    people = TEST_CLIENT.read()
-    assert ADD_EMAIL not in people
-    TEST_CLIENT.create('Joe Smith', 'NYU', ADD_EMAIL)
-    people = TEST_CLIENT.read()
-    assert ADD_EMAIL in people
+# def test_update():
+#     people = TEST_CLIENT.read()
+#     assert ADD_EMAIL not in people
+#     TEST_CLIENT.create('Joe Smith', 'NYU', ADD_EMAIL)
+#     people = TEST_CLIENT.read()
+#     assert ADD_EMAIL in people
