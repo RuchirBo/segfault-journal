@@ -27,8 +27,8 @@ def get_users():
         - Returns a dictionary of users keyed on user name (a str).
         - Each user name must be the key for a dictionary.
     """
-    
     return
+
 
 def update_users(newName: str, affiliation: None, email: str):
     """
@@ -37,20 +37,30 @@ def update_users(newName: str, affiliation: None, email: str):
         -Email can't be changed
         -Affiliation can be blank
     """
-    if email not in TEST_PERSON_DICT:
-        raise ValueError(f'The email for the person you are trying to update does not exist {email=}')
+    # if email not in TEST_PERSON_DICT:
+    #     raise ValueError(f'The email for the person you are
+    #     trying to update does not exist {email=}')
 
-    TEST_PERSON_DICT[email] = {NAME: newName, AFFILIATION: affiliation, EMAIL: email}
+    TEST_PERSON_DICT[email] = {
+        NAME: newName,
+        AFFILIATION: affiliation,
+        EMAIL: email}
     return email
+
 
 def create_person(name: str, affiliation: str, email: str):
     """
     Our contract:
-        - Takes in a new name, affiliation, and email to create a new person in the people dictionary
+        - Takes in a new name, affiliation, and email
+          to create a new person in the people dictionary
     """
     if email in TEST_PERSON_DICT:
         raise ValueError(f'This is a duplicate person{email=}')
-    TEST_PERSON_DICT[email] = {NAME: name, AFFILIATION: affiliation, EMAIL: email}
+    TEST_PERSON_DICT[email] = {
+        NAME: name,
+        AFFILIATION: affiliation,
+        EMAIL: email}
+
 
 def read():
     """
@@ -62,14 +72,15 @@ def read():
     people = TEST_PERSON_DICT
     return people
 
+
 def delete_person(_id):
-   """
-   Our contract:
-       - Deleted a person in the people dictionary based on provided ID
-   """
-   people = read()
-   if _id in people:
-       del people[_id]
-       return _id
-   else:
-       return None
+    """
+    Our contract:
+        - Deleted a person in the people dictionary based on provided ID
+    """
+    people = read()
+    if _id in people:
+        del people[_id]
+        return _id
+    else:
+        return None
