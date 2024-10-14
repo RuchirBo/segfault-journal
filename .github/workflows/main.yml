@@ -1,5 +1,4 @@
 # This is a workflow to test and deploy our demo app.
-# test comment from Elizabeth
 name: Demo CI/CD
 
 # Controls when the workflow will run
@@ -13,7 +12,7 @@ on:
   workflow_dispatch:
 
 env:
-  PYTHONPATH: /home/runner/work/segfault-journal/segfault-journal
+  PYTHONPATH: /home/runner/work/segfault-journal/segfault-journal/
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
