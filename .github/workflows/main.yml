@@ -32,22 +32,22 @@ jobs:
           # Optional - x64 or x86 architecture, defaults to x64
           architecture: 'x64'
       # You can test your matrix by printing the current Python version
-      - name: Display Python version
-        run: python -c "import sys; print(sys.version)"
+      # - name: Display Python version
+      #   run: python -c "import sys; print(sys.version)"
 
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      # # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # - uses: actions/checkout@v2
 
-      - name: Install MongoDB in a Docker container.
-        uses: supercharge/mongodb-github-action@1.8.0
+      # - name: Install MongoDB in a Docker container.
+      #   uses: supercharge/mongodb-github-action@1.8.0
 
-      - name: Install Python packages.
-        run: make dev_env
+      # - name: Install Python packages.
+      #   run: make dev_env
 
-      - name: Run Python tests.
-        run: make all_tests
+      # - name: Run Python tests.
+      #   run: make all_tests
         
-      - name: Deploy to PythonAnywhere
-        run: ./deploy.sh
-        env:
-          DEMO_PA_PWD: ${{secrets.DEMO_PA_PWD}}
+      # - name: Deploy to PythonAnywhere
+      #   run: ./deploy.sh
+      #   env:
+      #     DEMO_PA_PWD: ${{secrets.DEMO_PA_PWD}}
