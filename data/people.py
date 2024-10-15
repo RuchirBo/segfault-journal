@@ -37,15 +37,17 @@ def update_users(newName: str, affiliation: None, email: str):
         -Email can't be changed
         -Affiliation can be blank
     """
-    # if email not in TEST_PERSON_DICT:
-    #     raise ValueError(f'The email for the person you are
-    #     trying to update does not exist {email=}')
-
-    TEST_PERSON_DICT[email] = {
-        NAME: newName,
-        AFFILIATION: affiliation,
-        EMAIL: email}
-    return email
+    if email in TEST_PERSON_DICT:
+        TEST_PERSON_DICT[email] = {
+            NAME: newName,
+            AFFILIATION: affiliation,
+            EMAIL: email}
+        return email
+    else:
+        raise ValueError(
+            f'The email for the person you are trying '
+            f'to update does not exist {email=}'
+        )
 
 
 def create_person(name: str, affiliation: str, email: str):
