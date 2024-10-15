@@ -6,6 +6,14 @@ def test_create_person():
     people = ppl.get_users()
     assert ADD_EMAIL in people
 
+# def test_get_people():
+#     people = ppl.get_people()
+#     assert isinstance(people)
+#     assert len(people) > 0
+#     #check for string ID's
+#     for _id, person in people.items():
+#         assert isinstance(_id, str)
+#         assert ppl.NAME in person
 
 # def test_update():
 #     people = ppl.read()

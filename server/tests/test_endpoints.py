@@ -28,6 +28,14 @@ def test_title():
     assert isinstance(resp_json[ep.TITLE_RESP], str)
     assert len(resp_json[ep.TITLE_RESP]) > 0
 
+# def test_get_people():
+#     resp = TEST_CLIENT.get(ep.PEOPLE_EP)
+#     print(f'{id(resp)=}')
+#     print(f'{ep.PEOPLE_EP=}')
+#     resp_json = resp.get_json()
+#     for _id in resp_json:
+#         pass
+#     assert False
 
 # def test_update():
 #     people = TEST_CLIENT.read()
