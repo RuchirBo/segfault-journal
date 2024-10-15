@@ -27,7 +27,8 @@ def get_users():
         - Returns a dictionary of users keyed on user name (a str).
         - Each user name must be the key for a dictionary.
     """
-    return
+    ppl = TEST_PERSON_DICT
+    return ppl
 
 
 def update_users(newName: str, affiliation: None, email: str):
@@ -62,6 +63,8 @@ def create_person(name: str, affiliation: str, email: str):
         NAME: name,
         AFFILIATION: affiliation,
         EMAIL: email}
+
+    return email
 
 
 def read():
