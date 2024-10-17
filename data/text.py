@@ -47,6 +47,7 @@ def read_one(key: str) -> dict:
         result = text_dict[key]
     return result
 
+
 def create(title: str, text: str, key: str):
     """
     Our contract:
@@ -60,6 +61,7 @@ def create(title: str, text: str, key: str):
         TEXT: text,
     }
     return key
+
 
 def main():
     print(read())
