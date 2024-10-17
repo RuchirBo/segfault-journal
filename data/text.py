@@ -46,6 +46,19 @@ def read_one(key: str) -> dict:
         result = text_dict[key]
     return result
 
+def create(title: str, text: str, key: str):
+    """
+    Our contract:
+       - Adds a new entry to the text_dict
+       - The entry includes a title and text
+    """
+    if key in text_dict:
+        raise ValueError(f'This is a duplicate{key=}')
+    text_dict[key] = {
+        TITLE: title,
+        TEXT: text,
+    }
+    return key
 
 def main():
     print(read())
