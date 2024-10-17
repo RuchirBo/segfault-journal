@@ -19,7 +19,6 @@ TEST_PERSON_DICT = {
     }
 }
 
-
 def get_users():
     """
     Our contract:
