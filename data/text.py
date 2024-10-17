@@ -38,6 +38,7 @@ def read():
     text = text_dict
     return text
 
+
 def read_one(key: str) -> dict:
     # This should take a key and return the page dictionary
     # for that key. Return an empty dictionary if key not found.
