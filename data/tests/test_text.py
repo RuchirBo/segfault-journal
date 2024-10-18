@@ -45,3 +45,11 @@ def test_delete():
     text = tx.read()
     assert len(text) < old_len
     assert tx.DEL_KEY not in text
+
+def test_create():
+    new_title = "Journal Entry Update"
+    new_text = "This is my updated journal entry."
+    tx.update(tx.TEST_KEY, title=new_title, text=new_text)
+    updated_entry = tx.read_one(tx.TEST_KEY)
+    assert updated_entry[tx.TITLE] == new_title
+    assert updated_entry[tx.TEXT] == new_text
