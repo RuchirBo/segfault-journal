@@ -34,3 +34,13 @@ def test_title():
 #     TEST_CLIENT.create('Joe Smith', 'NYU', ADD_EMAIL)
 #     people = TEST_CLIENT.read()
 #     assert ADD_EMAIL in people
+
+
+# def test_get_people():
+#     resp = TEST_CLIENT.get(ep.PEOPLE_EP)
+#     print(f'{id(resp)=}')
+#     print(f'{ep.PEOPLE_EP=}')
+#     resp_json = resp.get_json()
+#     for _id in resp_json:
+#         pass
+#     assert False
