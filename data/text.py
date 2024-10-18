@@ -76,6 +76,23 @@ def delete(_id):
         return None
 
 
+def update(key: str, title: str = None, text: str = None):
+    """
+    Our contract:
+        - Updates the title or text of an entry in text_dict
+        - Only updates if the key is in the text_dict
+    """
+    if key not in text_dict:
+        raise ValueError(
+            f"Key '{key}' not found in text_dict."
+        )
+    if title is not None:
+        text_dict[key][TITLE] = title
+    if text is not None:
+        text_dict[key][TEXT] = text
+    return key
+
+
 def main():
     print(read())
 
