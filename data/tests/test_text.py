@@ -38,3 +38,10 @@ def test_create():
     assert text_data[key]['title'] == ADD_TITLE
     assert text_data[key]['text'] == ADD_TEXT
 
+def test_delete():
+    text = tx.read()
+    old_len = len(text)
+    tx.delete(tx.DEL_KEY)
+    text = tx.read()
+    assert len(text) < old_len
+    assert tx.DEL_KEY not in text
