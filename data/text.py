@@ -63,6 +63,19 @@ def create(title: str, text: str, key: str):
     return key
 
 
+def delete(_id):
+    """
+    Our contract:
+        - Deletes an entry from text_dict
+    """
+    text = read()
+    if _id in text:
+        del text[_id]
+        return _id
+    else:
+        return None
+
+
 def main():
     print(read())
 
