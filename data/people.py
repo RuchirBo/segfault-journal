@@ -3,6 +3,7 @@ This module interfaces to our user data.
 """
 
 import re
+from data import roles #importing functions from roles.py
 
 MIN_USER_NAME_LEN = 2
 # fields
@@ -61,18 +62,27 @@ def update_users(newName: str, affiliation: None, email: str):
         )
 
 
-def create_person(name: str, affiliation: str, email: str):
+def create_person(name: str, affiliation: str, email: str, roles_list: list = None):
     """
     Our contract:
-        - Takes in a new name, affiliation, and email
+        - Takes in a new name, affiliation, email, and role(s)
           to create a new person in the people dictionary
     """
     if email in TEST_PERSON_DICT:
         raise ValueError(f'This is a duplicate person{email=}')
+    
+    valid_roles = []
+    if roles_list:
+        for role in roles_list:
+            if roles.is_valid(role):
+                valid_roles.append(role)
+            else:
+                raise ValueError(f'Invalid role: {role}')
     TEST_PERSON_DICT[email] = {
         NAME: name,
         AFFILIATION: affiliation,
-        EMAIL: email}
+        EMAIL: email,
+        ROLES: valid_roles}
 
     return email
 
