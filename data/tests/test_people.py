@@ -1,4 +1,5 @@
 import data.people as ppl
+import data.roles as roles
 
 # Invalid Test Emails:
 NO_AT = 'jkajsd'
@@ -18,14 +19,24 @@ TOO_LONG_EMAIL = "12345678901234567890123456789012345678901234567890123456789012
 VALID_LONG = "long.email-address-with-hyphens@and.subdomains.example.com"
 SLASH_CHAR = "name/surname@example.com"
 
+# Valid Roles
+VALID_ROLES = [roles.AUTHOR_CODE, 'ED']  # Author and Editor
 
 
+# ADD_EMAIL = "john.smith@nyu.edu"
+# def test_create_person():
+#     ppl.create_person("John Smith", "NYU", ADD_EMAIL)
+#     people = ppl.get_users()
+#     assert ADD_EMAIL in people
 
-ADD_EMAIL = "john.smith@nyu.edu"
-def test_create_person():
-    ppl.create_person("John Smith", "NYU", ADD_EMAIL)
+
+ADD_EMAIL = "jon.smore@nyu.edu"
+def test_create_person_with_roles():
+    ppl.create_person("Jon Smore", "NYU", ADD_EMAIL, VALID_ROLES)
     people = ppl.get_users()
     assert ADD_EMAIL in people
+    person_roles = people[ADD_EMAIL][ppl.ROLES]
+    assert set(person_roles) == set(VALID_ROLES)
 
 
 # def test_is_valid_email_at():
