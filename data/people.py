@@ -62,7 +62,7 @@ def update_users(newName: str, affiliation: None, email: str):
         )
 
 
-def create_person(name: str, affiliation: str, email: str, 
+def create_person(name: str, affiliation: str, email: str,
                   roles_list: list = None):
     """
     Our contract:
