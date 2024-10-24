@@ -32,15 +32,26 @@ def is_valid_email(email: str) -> bool:
 
 
 def is_valid_person(name: str, affiliation: str,
-                    email: str, role: str) -> bool:
+                    email: str, roles_list: list = None) -> bool:
     ppl = TEST_PERSON_DICT
     if email in ppl:
         raise ValueError(f'Adding duplicate {email=}')
     if not is_valid_email(email):
         raise ValueError(f'Invalid email {email}')
-    if not roles.is_valid(role):
-        raise ValueError(f'Invalid role {role}')
+    if is_valid_roles(roles_list) is None:
+        raise ValueError(f'Invalid roles {roles_list}')
     return True
+
+
+def is_valid_roles(roles_list: list = None) -> list:
+    valid_roles = []
+    if roles_list:
+        for role in roles_list:
+            if roles.is_valid(role):
+                valid_roles.append(role)
+            else:
+                raise ValueError(f'Invalid role: {role}')
+    return valid_roles
 
 
 def get_users():
@@ -54,18 +65,21 @@ def get_users():
     return ppl
 
 
-def update_users(newName: str, affiliation: None, email: str):
+def update_users(newName: str, affiliation: None,
+                 email: str, roles_list: list = None):
     """
     Our contract:
         -Name can't be blank
         -Email can't be changed
         -Affiliation can be blank
     """
-    if email in TEST_PERSON_DICT:
+    if is_valid_person(newName, affiliation, email, roles_list):
+        valid_roles = is_valid_roles(roles_list)
         TEST_PERSON_DICT[email] = {
             NAME: newName,
             AFFILIATION: affiliation,
-            EMAIL: email}
+            EMAIL: email,
+            ROLES: valid_roles}
         return email
     else:
         raise ValueError(
@@ -81,14 +95,9 @@ def create_person(name: str, affiliation: str, email: str,
         - Takes in a new name, affiliation, email, and role(s)
           to create a new person in the people dictionary
     """
-    valid_roles = []
-    if roles_list:
-        for role in roles_list:
-            if roles.is_valid(role):
-                valid_roles.append(role)
-            else:
-                raise ValueError(f'Invalid role: {role}')
-    if is_valid_person(name, affiliation, email, role):
+
+    if is_valid_person(name, affiliation, email, roles_list):
+        valid_roles = is_valid_roles(roles_list)
         TEST_PERSON_DICT[email] = {
             NAME: name,
             AFFILIATION: affiliation,
