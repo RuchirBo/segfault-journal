@@ -85,3 +85,15 @@ class People(Resource):
 
     def delete_person(_id):
         return ppl.delete_person
+
+
+MASTHEAD = 'Masthead'
+
+
+@api.route(f'{PEOPLE_EP}/masthead')
+class Masthead(Resource):
+    """
+    Get a journal's masthead.
+    """
+    def get(self):
+        return {MASTHEAD: ppl.get_masthead()}
