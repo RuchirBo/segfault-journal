@@ -3,7 +3,6 @@
 """
 This module manages person roles for a journal.
 """
-from copy import deepcopy
 
 AUTHOR_CODE = 'AU'
 TEST_CODE = AUTHOR_CODE
