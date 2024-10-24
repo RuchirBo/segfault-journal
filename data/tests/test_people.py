@@ -13,7 +13,10 @@ FIRST_HYPHEN = "me@-myemail"
 LAST_HYPHEN = "me@myemail-"
 DOMAIN_UNDERSCORE = "i.like.underscores@but_they_are_not_allowed_here"
 # Local-Part is longer than 64 characters
-TOO_LONG_EMAIL = "1234567890123456789012345678901234567890123456789012345678901234+x@example.com"
+TOO_LONG_EMAIL = (
+    "123456789012345678901234567890123"
+    "4567890123456789012345678901234+x@example.com"
+)
 
 # Valid Test Emails:
 VALID_LONG = "long.email-address-with-hyphens@and.subdomains.example.com"
@@ -31,6 +34,8 @@ VALID_ROLES = [roles.AUTHOR_CODE, 'ED']  # Author and Editor
 
 
 ADD_EMAIL = "jon.smore@nyu.edu"
+
+
 def test_create_person_with_roles():
     ppl.create_person("Jon Smore", "NYU", ADD_EMAIL, VALID_ROLES)
     people = ppl.get_users()
@@ -80,7 +85,7 @@ def test_create_person_with_roles():
 #     assert ADD_EMAIL in people
 #     ppl.update_users("John Smith", ADD_EMAIL)
 #     people = ppl.update_users()
-    
+
 # def test_delete_person():
 #     people = ppl.read()
 #     old_len = len(people)
