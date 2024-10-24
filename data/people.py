@@ -31,6 +31,18 @@ def is_valid_email(email: str) -> bool:
     return re.match(f"{CHAR_OR_DIGIT}.*@{CHAR_OR_DIGIT}.*", email)
 
 
+def is_valid_person(name: str, affiliation: str,
+                    email: str, role: str) -> bool:
+    ppl = TEST_PERSON_DICT
+    if email in ppl:
+        raise ValueError(f'Adding duplicate {email=}')
+    if not is_valid_email(email):
+        raise ValueError(f'Invalid email {email}')
+    if not roles.is_valid(role):
+        raise ValueError(f'Invalid role {role}')
+    return True
+
+
 def get_users():
     """
     Our contract:
@@ -69,8 +81,6 @@ def create_person(name: str, affiliation: str, email: str,
         - Takes in a new name, affiliation, email, and role(s)
           to create a new person in the people dictionary
     """
-    if email in TEST_PERSON_DICT:
-        raise ValueError(f'This is a duplicate person{email=}')
     valid_roles = []
     if roles_list:
         for role in roles_list:
@@ -78,12 +88,12 @@ def create_person(name: str, affiliation: str, email: str,
                 valid_roles.append(role)
             else:
                 raise ValueError(f'Invalid role: {role}')
-    TEST_PERSON_DICT[email] = {
-        NAME: name,
-        AFFILIATION: affiliation,
-        EMAIL: email,
-        ROLES: valid_roles}
-
+    if is_valid_person(name, affiliation, email, role):
+        TEST_PERSON_DICT[email] = {
+            NAME: name,
+            AFFILIATION: affiliation,
+            EMAIL: email,
+            ROLES: valid_roles}
     return email
 
 
