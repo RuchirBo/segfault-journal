@@ -25,9 +25,9 @@ TEST_PERSON_DICT = {
 
 
 pattern = (
-        r'[A-Za-z0-9\-\.]{1,64}@[A-Za-z0-9\-]+'
-        r'(\.[A-Za-z0-9\-]+)+$'
-    )
+    r'^[A-Za-z0-9\-\/](?!.*\.\.)[A-Za-z0-9\-\/\.]{0,63}@[A-Za-z0-9\-]+'
+    r'(\.[A-Za-z0-9\-]+)+$'
+)
 
 
 def is_valid_email(email: str) -> bool:

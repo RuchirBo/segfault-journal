@@ -71,7 +71,7 @@ def test_is_valid_no_domain():
 
 
 def test_is_valid_dots():
-    # assert not ppl.is_valid_email(DOUBLE_DOT)
+    assert not ppl.is_valid_email(DOUBLE_DOT)
     assert not ppl.is_valid_email(FIRST_DOT)
     assert not ppl.is_valid_email(LAST_DOT)
 
@@ -90,8 +90,8 @@ def test_is_valid_length():
     assert ppl.is_valid_email(VALID_LONG)
 
 
-# def test_is_valid_slash():
-#     assert ppl.is_valid_email(SLASH_CHAR)
+def test_is_valid_slash():
+    assert ppl.is_valid_email(SLASH_CHAR)
 
 
 # def test_update():
