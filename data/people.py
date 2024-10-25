@@ -24,11 +24,14 @@ TEST_PERSON_DICT = {
 }
 
 
-CHAR_OR_DIGIT = '[A-Za-z0-9]'
+pattern = (
+        r'[A-Za-z0-9\-\.]{1,64}@[A-Za-z0-9\-]+'
+        r'(\.[A-Za-z0-9\-]+)+$'
+    )
 
 
 def is_valid_email(email: str) -> bool:
-    return re.match(f"{CHAR_OR_DIGIT}.*@{CHAR_OR_DIGIT}.*", email)
+    return re.match(pattern, email)
 
 
 def is_valid_person(name: str, affiliation: str,
