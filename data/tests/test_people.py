@@ -14,6 +14,7 @@ FIRST_DOT = ".me@myemail"
 LAST_DOT = "me.@myemail"
 FIRST_HYPHEN = "me@-myemail"
 LAST_HYPHEN = "me@myemail-"
+INVALID_CHAR = "me!@myemail"
 DOMAIN_UNDERSCORE = "i.like.underscores@but_they_are_not_allowed_here"
 # Local-Part is longer than 64 characters
 TOO_LONG_EMAIL = '12345678901234567890123456789012345678901'\
@@ -96,6 +97,10 @@ def test_is_valid_length():
 
 def test_is_valid_slash():
     assert ppl.is_valid_email(SLASH_CHAR)
+
+
+def test_is_valid_char():
+    assert not ppl.is_valid_email(INVALID_CHAR)
 
 
 @pytest.fixture(scope='function')
