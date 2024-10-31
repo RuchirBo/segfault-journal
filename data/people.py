@@ -152,15 +152,23 @@ def delete_person(_id):
         return None
 
 
+def has_role(person, role) -> bool:
+    if role in person.get(ROLES):
+        return True
+    return False
+
+
 def get_masthead() -> dict:
     masthead = {}
     mh_roles = rls.get_masthead_roles()
     for mh_role, text in mh_roles.items():
-        people_w_role = {}
-        for person in read():
-            pass
-            # if has_role(person):
-            #     put their record in people_w_role
+        people_w_role = []
+        people = read()
+        for _id, person in people.items():
+            if has_role(person, mh_role):
+                pass
+                # rec = create_mh_rec(person)
+                # people_w_role.append(rec)
         masthead[text] = people_w_role
     return masthead
 

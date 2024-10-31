@@ -2,6 +2,8 @@ import pytest
 import data.people as ppl
 import data.roles as roles
 
+from data.roles import TEST_CODE as TEST_ROLE_CODE
+
 # Invalid Test Emails:
 NO_AT = 'jkajsd'
 DOUBLE_AT = "a@b@c@example.com"
@@ -98,7 +100,7 @@ def test_is_valid_slash():
 
 @pytest.fixture(scope='function')
 def temp_person():
-    ret = ppl.create('Joe Smith', 'NYU', TEMP_EMAIL, roles)
+    ret = ppl.create_person('Joe Smith', 'NYU', TEMP_EMAIL, TEST_ROLE_CODE)
     yield ret
     ppl.delete(ret)
 
@@ -109,3 +111,13 @@ def temp_person():
 #     assert ADD_EMAIL in people
 #     ppl.update_users("John Smith", ADD_EMAIL)
 #     people = ppl.update_users()
+
+
+# def test_has_role(temp_person):
+#     person_rec = ppl.read_one(temp_person)
+#     assert ppl.has_role(person_rec, TEST_ROLE_CODE)
+
+
+def test_get_masthead():
+    mh = ppl.get_masthead()
+    assert isinstance(mh, dict)
