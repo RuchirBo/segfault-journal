@@ -1,3 +1,4 @@
+import pytest
 import data.people as ppl
 import data.roles as roles
 
@@ -13,9 +14,9 @@ FIRST_HYPHEN = "me@-myemail"
 LAST_HYPHEN = "me@myemail-"
 DOMAIN_UNDERSCORE = "i.like.underscores@but_they_are_not_allowed_here"
 # Local-Part is longer than 64 characters
-TOO_LONG_EMAIL = (
-    "1234567890123456789012345678901234567890123456789012345678901234+x@example.com"
-)
+TOO_LONG_EMAIL = '12345678901234567890123456789012345678901'\
+    + '23456789012345678901234+x@example.com'
+
 
 # Valid Test Emails:
 VALID_LONG = "long.email-address-with-hyphens@and.subdomains.example.com"
@@ -27,6 +28,9 @@ VALID_ROLES = [roles.AUTHOR_CODE, 'ED']  # Author and Editor
 
 
 ADD_EMAIL = "john.smith@nyu.edu"
+
+TEMP_EMAIL = 'temp_person@temp.org'
+
 
 def test_create_person():
     ppl.create_person("John Smith", "NYU", ADD_EMAIL)
@@ -41,8 +45,6 @@ def test_delete_person():
     people = ppl.read()
     assert len(people) < old_len
     assert ADD_EMAIL not in people
-
-ADD_EMAIL = "jon.smore@nyu.edu"
 
 
 def test_create_person_with_roles():
@@ -93,6 +95,12 @@ def test_is_valid_length():
 def test_is_valid_slash():
     assert ppl.is_valid_email(SLASH_CHAR)
 
+
+@pytest.fixture(scope='function')
+def temp_person():
+    ret = ppl.create('Joe Smith', 'NYU', TEMP_EMAIL, roles)
+    yield ret
+    ppl.delete(ret)
 
 # def test_update():
 #     people = ppl.read()
