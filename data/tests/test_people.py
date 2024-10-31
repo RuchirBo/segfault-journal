@@ -31,7 +31,7 @@ VALID_ROLES = [roles.AUTHOR_CODE, 'ED']  # Author and Editor
 
 ADD_EMAIL = "john.smith@nyu.edu"
 
-TEMP_EMAIL = 'temp_person@temp.org'
+TEMP_EMAIL = 'tempperson@temp.org'
 
 
 def test_create_person():
@@ -100,9 +100,9 @@ def test_is_valid_slash():
 
 @pytest.fixture(scope='function')
 def temp_person():
-    ret = ppl.create_person('Joe Smith', 'NYU', TEMP_EMAIL, TEST_ROLE_CODE)
+    ret = ppl.create_person('Joe Smith', 'NYU', TEMP_EMAIL, [TEST_ROLE_CODE])
     yield ret
-    ppl.delete(ret)
+    ppl.delete_person(ret)
 
 
 
@@ -113,9 +113,9 @@ def temp_person():
 #     people = ppl.update_users()
 
 
-# def test_has_role(temp_person):
-#     person_rec = ppl.read_one(temp_person)
-#     assert ppl.has_role(person_rec, TEST_ROLE_CODE)
+def test_has_role(temp_person):
+    person_rec = ppl.read_one(temp_person)
+    assert ppl.has_role(person_rec, TEST_ROLE_CODE)
 
 
 def test_get_masthead():
