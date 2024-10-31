@@ -23,6 +23,7 @@ TEST_PERSON_DICT = {
     }
 }
 
+MH_FIELDS = [NAME, AFFILIATION]
 
 pattern = (
     r'^[A-Za-z0-9\-\/](?!.*\.\.)[A-Za-z0-9\-\/\.]{0,63}@[A-Za-z0-9\-]+'
@@ -158,6 +159,13 @@ def has_role(person, role) -> bool:
     return False
 
 
+def create_mh_rec(person: dict) -> dict:
+    mh_rec = {}
+    for field in MH_FIELDS:
+        mh_rec[field] = person.get(field, '')
+    return mh_rec
+
+
 def get_masthead() -> dict:
     masthead = {}
     mh_roles = rls.get_masthead_roles()
@@ -166,9 +174,9 @@ def get_masthead() -> dict:
         people = read()
         for _id, person in people.items():
             if has_role(person, mh_role):
-                pass
-                # rec = create_mh_rec(person)
-                # people_w_role.append(rec)
+                # pass
+                rec = create_mh_rec(person)
+                people_w_role.append(rec)
         masthead[text] = people_w_role
     return masthead
 
