@@ -105,7 +105,6 @@ def temp_person():
     ppl.delete_person(ret)
 
 
-
 # def test_update():
 #     people = ppl.read()
 #     assert ADD_EMAIL in people
