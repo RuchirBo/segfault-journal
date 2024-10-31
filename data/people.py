@@ -57,6 +57,25 @@ def is_valid_roles(roles_list: list = None) -> list:
     return valid_roles
 
 
+def read() -> dict:
+    """
+    Our contract:
+        - No arguments.
+        - Returns a dictionary of users keyed on user email.
+        - Each user email must be the key for another dictionary.
+    """
+    people = TEST_PERSON_DICT
+    return people
+
+
+def read_one(email: str) -> dict:
+    """
+    Return a person record if email present in DB,
+    else None.
+    """
+    return TEST_PERSON_DICT.get(email)
+
+
 def get_users():
     """
     Our contract:
@@ -109,15 +128,15 @@ def create_person(name: str, affiliation: str, email: str,
     return email
 
 
-def read():
-    """
-    Our contract:
-        - No arguments.
-        - Returns a dictionary of users keyed on user email.
-        - Each user email must be the key for another dictionary.
-    """
-    people = TEST_PERSON_DICT
-    return people
+# def read():
+#     """
+#     Our contract:
+#         - No arguments.
+#         - Returns a dictionary of users keyed on user email.
+#         - Each user email must be the key for another dictionary.
+#     """
+#     people = TEST_PERSON_DICT
+#     return people
 
 
 def delete_person(_id):
