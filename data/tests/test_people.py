@@ -120,3 +120,17 @@ def test_has_role(temp_person):
 def test_get_masthead():
     mh = ppl.get_masthead()
     assert isinstance(mh, dict)
+
+def test_create_masthead():
+    person = {
+        ppl.NAME: "Jane Smith",
+        ppl.AFFILIATION: "NYU",
+        ppl.EMAIL: "janesmith@nyu.com",
+        ppl.ROLES: ["AUTHOR"]
+    }
+    mh_rec = ppl.create_mh_rec(person)
+    assert ppl.NAME in mh_rec
+    assert ppl.AFFILIATION in mh_rec
+    assert ppl.EMAIL not in mh_rec  
+    assert mh_rec[ppl.NAME] == "Jane Smith"
+    assert mh_rec[ppl.AFFILIATION] == "NYU"
