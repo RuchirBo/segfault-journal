@@ -3,7 +3,7 @@ This module interfaces to our user data.
 """
 
 import re
-from data import roles  # importing functions from roles.py
+import data.roles as rls  # importing functions from roles.py
 
 MIN_USER_NAME_LEN = 2
 # fields
@@ -50,7 +50,7 @@ def is_valid_roles(roles_list: list = None) -> list:
     valid_roles = []
     if roles_list:
         for role in roles_list:
-            if roles.is_valid(role):
+            if rls.is_valid(role):
                 valid_roles.append(role)
             else:
                 raise ValueError(f'Invalid role: {role}')
@@ -150,3 +150,24 @@ def delete_person(_id):
         return _id
     else:
         return None
+
+
+def get_masthead() -> dict:
+    masthead = {}
+    mh_roles = rls.get_masthead_roles()
+    for mh_role, text in mh_roles.items():
+        people_w_role = {}
+        for person in read():
+            pass
+            # if has_role(person):
+            #     put their record in people_w_role
+        masthead[text] = people_w_role
+    return masthead
+
+
+def main():
+    print(get_masthead())
+
+
+if __name__ == '__main__':
+    main()
