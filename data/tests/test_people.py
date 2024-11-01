@@ -15,7 +15,8 @@ LAST_DOT = "me.@myemail"
 FIRST_HYPHEN = "me@-myemail"
 LAST_HYPHEN = "me@myemail-"
 INVALID_CHAR = "me!@myemail"
-DOMAIN_UNDERSCORE = "i.like.underscores@but_they_are_not_allowed_here"
+INVALID_DOMAIN_UNDERSCORE = "i.like.underscores@but_they_are_not_allowed_here"
+VALID_UNDERSCORE = "temp_person@example.org"
 # Local-Part is longer than 64 characters
 TOO_LONG_EMAIL = '12345678901234567890123456789012345678901'\
     + '23456789012345678901234+x@example.com'
@@ -86,8 +87,8 @@ def test_is_valid_hyphens():
     assert not ppl.is_valid_email(LAST_HYPHEN)
 
 
-def test_is_valid_domain_underscore():
-    assert not ppl.is_valid_email(DOMAIN_UNDERSCORE)
+def test_is_invalid_domain_underscore():
+    assert not ppl.is_valid_email(INVALID_DOMAIN_UNDERSCORE)
 
 
 def test_is_valid_length():
