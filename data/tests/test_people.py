@@ -91,6 +91,10 @@ def test_is_invalid_domain_underscore():
     assert not ppl.is_valid_email(INVALID_DOMAIN_UNDERSCORE)
 
 
+def test_is_valid_domain_underscore():
+    assert ppl.is_valid_email(VALID_UNDERSCORE)
+
+
 def test_is_valid_length():
     assert not ppl.is_valid_email(TOO_LONG_EMAIL)
     assert ppl.is_valid_email(VALID_LONG)

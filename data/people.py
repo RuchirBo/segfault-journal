@@ -26,7 +26,7 @@ TEST_PERSON_DICT = {
 MH_FIELDS = [NAME, AFFILIATION]
 
 pattern = (
-    r'^[A-Za-z0-9\-\/](?!.*\.\.)[A-Za-z0-9\-\/\.]{0,63}@[A-Za-z0-9\-]+'
+    r'^[A-Za-z0-9\-\/_](?!.*\.\.)[A-Za-z0-9\-\/_\.]{0,63}@[A-Za-z0-9\-]+'
     r'(\.[A-Za-z0-9\-]+)+$'
 )
 
