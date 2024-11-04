@@ -35,6 +35,7 @@ VALID_ROLES = [roles.AUTHOR_CODE, 'ED']  # Author and Editor
 ADD_EMAIL = "john.smith@nyu.edu"
 
 TEMP_EMAIL = 'tempperson@temp.org'
+TEMP_EMAIL2 = 'temp2person@temp.org'
 
 
 def test_create_person():
@@ -135,7 +136,7 @@ def test_get_masthead():
 
 @pytest.fixture(scope='function')
 def ed_person():
-    ret = ppl.create_person('Jane Smith', 'NYU', TEMP_EMAIL, TEST_ED_CODE)
+    ret = ppl.create_person('Jane Smith', 'NYU', TEMP_EMAIL2, TEST_ED_CODE)
     yield ret
     ppl.delete_person(ret)
 
@@ -146,3 +147,10 @@ def test_create_masthead(ed_person):
     assert isinstance(mh_rec, dict)
     for field in ppl.MH_FIELDS:
         assert field in mh_rec
+
+
+def test_has_masthead_role(temp_person, ed_person):
+    editor = ppl.read_one(ed_person)
+    normal = ppl.read_one(temp_person)
+    assert ppl.has_masthead_role(editor)
+    assert not ppl.has_masthead_role(normal)

@@ -166,6 +166,14 @@ def has_role(person, role) -> bool:
     return False
 
 
+def has_masthead_role(person) -> bool:
+    print("ROLES", person.get(ROLES))
+    for role in person.get(ROLES):
+        if rls.is_masthead_role(role):
+            return True
+    return False
+
+
 def create_mh_rec(person: dict) -> dict:
     mh_rec = {}
     for field in MH_FIELDS:
