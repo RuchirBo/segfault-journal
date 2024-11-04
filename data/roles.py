@@ -3,6 +3,7 @@
 """
 This module manages person roles for a journal.
 """
+from copy import deepcopy
 
 AUTHOR_CODE = 'AU'
 TEST_CODE = AUTHOR_CODE
@@ -22,7 +23,7 @@ MH_ROLES = [CE_CODE, ED_CODE, ME_CODE]
 
 
 def get_roles() -> dict:
-    return ROLES
+    return deepcopy(ROLES)
 
 
 def get_masthead_roles() -> dict:

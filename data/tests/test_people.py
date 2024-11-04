@@ -3,6 +3,7 @@ import data.people as ppl
 import data.roles as roles
 
 from data.roles import TEST_CODE as TEST_ROLE_CODE
+from data.roles import ED_CODE as TEST_ED_CODE
 
 # Invalid Test Emails:
 NO_AT = 'jkajsd'
@@ -108,18 +109,18 @@ def test_is_valid_char():
     assert not ppl.is_valid_email(INVALID_CHAR)
 
 
-@pytest.fixture(scope='function')
-def temp_person():
-    ret = ppl.create_person('Joe Smith', 'NYU', TEMP_EMAIL, TEST_ROLE_CODE)
-    yield ret
-    ppl.delete_person(ret)
-
-
 # def test_update():
 #     people = ppl.read()
 #     assert ADD_EMAIL in people
 #     ppl.update_users("John Smith", ADD_EMAIL)
 #     people = ppl.update_users()
+
+
+@pytest.fixture(scope='function')
+def temp_person():
+    ret = ppl.create_person('Joe Smith', 'NYU', TEMP_EMAIL, TEST_ROLE_CODE)
+    yield ret
+    ppl.delete_person(ret)
 
 
 def test_has_role(temp_person):
@@ -131,16 +132,17 @@ def test_get_masthead():
     mh = ppl.get_masthead()
     assert isinstance(mh, dict)
 
-def test_create_masthead():
-    person = {
-        ppl.NAME: "Jane Smith",
-        ppl.AFFILIATION: "NYU",
-        ppl.EMAIL: "janesmith@nyu.com",
-        ppl.ROLES: ["AUTHOR"]
-    }
-    mh_rec = ppl.create_mh_rec(person)
-    assert ppl.NAME in mh_rec
-    assert ppl.AFFILIATION in mh_rec
-    assert ppl.EMAIL not in mh_rec  
-    assert mh_rec[ppl.NAME] == "Jane Smith"
-    assert mh_rec[ppl.AFFILIATION] == "NYU"
+
+@pytest.fixture(scope='function')
+def ed_person():
+    ret = ppl.create_person('Jane Smith', 'NYU', TEMP_EMAIL, TEST_ED_CODE)
+    yield ret
+    ppl.delete_person(ret)
+
+
+def test_create_masthead(ed_person):
+    person_rec = ppl.read_one(ed_person)
+    mh_rec = ppl.create_mh_rec(person_rec)
+    assert isinstance(mh_rec, dict)
+    for field in ppl.MH_FIELDS:
+        assert field in mh_rec
