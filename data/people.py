@@ -36,32 +36,17 @@ def is_valid_email(email: str) -> bool:
 
 
 def is_valid_person(name: str, affiliation: str,
-                    email: str, role: str = None,
-                    roles_list: list = None) -> bool:
+                    email: str,
+                    roles_list: list = []) -> None:
     ppl = TEST_PERSON_DICT
     if email in ppl:
         raise ValueError(f'Adding duplicate {email=}')
     if not is_valid_email(email):
         raise ValueError(f'Invalid email {email}')
-    if role:
-        if not rls.is_valid(role):
-            raise ValueError(f'Invalid role: {role}')
     elif roles_list:
         for role in roles_list:
             if not rls.is_valid(role):
                 raise ValueError(f'Invalid role: {role}')
-    return True
-
-
-'''def is_valid_roles(roles_list: list = None) -> list:
-    valid_roles = []
-    if roles_list:
-        for role in roles_list:
-            if rls.is_valid(role):
-                valid_roles.append(role)
-            else:
-                raise ValueError(f'Invalid role: {role}')
-    return valid_roles'''
 
 
 def read() -> dict:
@@ -102,18 +87,12 @@ def update_users(newName: str, affiliation: None,
         -Email can't be changed
         -Affiliation can be blank
     """
-    if is_valid_person(newName, affiliation, email, roles_list):
-        TEST_PERSON_DICT[email] = {
-            NAME: newName,
-            AFFILIATION: affiliation,
-            EMAIL: email,
-            ROLES: roles_list}
-        return email
-    else:
-        raise ValueError(
-            f'The email for the person you are trying '
-            f'to update does not exist {email=}'
-        )
+    is_valid_person(newName, affiliation, email, roles_list)
+    TEST_PERSON_DICT[email] = {
+        NAME: newName,
+        AFFILIATION: affiliation,
+        EMAIL: email,
+        ROLES: roles_list}
 
 
 def create_person(name: str, affiliation: str, email: str,
@@ -124,10 +103,10 @@ def create_person(name: str, affiliation: str, email: str,
           to create a new person in the people dictionary
     """
 
-    if is_valid_person(name, affiliation, email, role):
-        valid_roles = []
-        if role:
-            valid_roles.append(role)
+    is_valid_person(name, affiliation, email, [role])
+    valid_roles = []
+    if role:
+        valid_roles.append(role)
         TEST_PERSON_DICT[email] = {
             NAME: name,
             AFFILIATION: affiliation,

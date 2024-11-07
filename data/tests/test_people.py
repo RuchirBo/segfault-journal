@@ -39,7 +39,7 @@ TEMP_EMAIL2 = 'temp2person@temp.org'
 
 
 def test_create_person():
-    ppl.create_person("John Smith", "NYU", ADD_EMAIL)
+    ppl.create_person("John Smith", "NYU", ADD_EMAIL, 'AU')
     people = ppl.get_users()
     assert ADD_EMAIL in people
 
