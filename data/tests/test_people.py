@@ -36,6 +36,8 @@ ADD_EMAIL = "john.smith@nyu.edu"
 
 TEMP_EMAIL = 'tempperson@temp.org'
 TEMP_EMAIL2 = 'temp2person@temp.org'
+TEMP_EMAIL3 = 'temp3person@temp.org'
+BOB_EMAIL = 'bob.ross@nyu.edu'
 
 
 def test_create_person():
@@ -154,3 +156,17 @@ def test_has_masthead_role(temp_person, ed_person):
     normal = ppl.read_one(temp_person)
     assert ppl.has_masthead_role(editor)
     assert not ppl.has_masthead_role(normal)
+
+
+def test_is_valid_person():
+    ppl.is_valid_person(
+        'Bob Ross',
+        'NYU',
+        BOB_EMAIL,
+        [TEST_ED_CODE])
+    
+
+def test_is_invalid_role_person():
+    with pytest.raises(ValueError, match = 'Invalid role'):
+        ppl.is_valid_person('Joe Smith', 'NYU', TEMP_EMAIL3, ['SOMETHING'])
+
