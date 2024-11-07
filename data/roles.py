@@ -27,14 +27,13 @@ def get_roles() -> dict:
 
 
 def get_masthead_roles() -> dict:
-    mh_roles = get_roles()
-    del_mh_roles = []
-    for role in mh_roles:
-        if not is_masthead_role(role):
-            del_mh_roles.append(role)
-    for del_role in del_mh_roles:
-        del mh_roles[del_role]
-    return mh_roles
+    roles = get_roles()
+    masthead_roles = {
+        role: value
+        for role, value in roles.items()
+        if role in MH_ROLES
+    }
+    return masthead_roles
 
 
 def is_valid(code: str) -> bool:
@@ -43,6 +42,10 @@ def is_valid(code: str) -> bool:
 
 def is_masthead_role(code: str) -> bool:
     return is_valid(code) and code in MH_ROLES
+
+
+def get_role_codes() -> list:
+    return list(ROLES.keys())
 
 
 def main():
