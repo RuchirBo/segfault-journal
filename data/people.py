@@ -80,7 +80,7 @@ def get_users():
 
 
 def update_users(newName: str, affiliation: None,
-                 email: str, roles_list: list = None):
+                 email: str, roles_list: list):
     """
     Our contract:
         -Name can't be blank

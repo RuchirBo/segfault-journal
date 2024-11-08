@@ -113,13 +113,6 @@ def test_is_valid_char():
     assert not ppl.is_valid_email(INVALID_CHAR)
 
 
-# def test_update():
-#     people = ppl.read()
-#     assert ADD_EMAIL in people
-#     ppl.update_users("John Smith", ADD_EMAIL)
-#     people = ppl.update_users()
-
-
 @pytest.fixture(scope='function')
 def temp_person():
     ret = ppl.create_person('Joe Smith', 'NYU', TEMP_EMAIL, TEST_ROLE_CODE)
@@ -196,3 +189,11 @@ def temp2_person():
 def test_get_person_roles(temp2_person):
     roles = ppl.get_person_roles(TEMP_EMAIL)
     assert roles == VALID_ROLES
+
+
+@pytest.mark.skip("Skipping this test because user doesn't exist in people dict")
+def test_update():
+    people = ppl.read()
+    assert ADD_EMAIL in people
+    ppl.update_users("John Smith", "test affiliation", ADD_EMAIL, [TEST_ED_CODE])
+    people = ppl.update_users()
