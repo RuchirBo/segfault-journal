@@ -30,6 +30,7 @@ VALID_EMAIL = "john.smith@nyu.edu"
 
 # Valid Roles
 VALID_ROLES = [roles.AUTHOR_CODE, 'ED']  # Author and Editor
+INVALID_ROLE = "INVALID"
 
 
 ADD_EMAIL = "john.smith@nyu.edu"
@@ -170,3 +171,28 @@ def test_is_invalid_role_person():
     with pytest.raises(ValueError, match = 'Invalid role'):
         ppl.is_valid_person('Joe Smith', 'NYU', TEMP_EMAIL3, ['SOMETHING'])
 
+
+def test_add_role_to_person(temp_person):
+    new_role = roles.AUTHOR_CODE
+    ppl.add_role_to_person(TEMP_EMAIL, new_role)
+    person_roles = ppl.get_person_roles(TEMP_EMAIL)
+    assert new_role in person_roles
+
+
+def test_add_role_to_person_invalid_role(temp_person):
+    with pytest.raises(ValueError, match="Invalid Role"):
+        ppl.add_role_to_person(TEMP_EMAIL, INVALID_ROLE)
+
+
+@pytest.fixture(scope='function')
+def temp2_person():
+    "Another fixture test to test specficially adding another role"
+    ret = ppl.create_person('Joe Smith', 'NYU', TEMP_EMAIL, roles.AUTHOR_CODE)
+    ppl.add_role_to_person(TEMP_EMAIL, roles.ED_CODE) 
+    yield ret
+    ppl.delete_person(ret)
+
+
+def test_get_person_roles(temp2_person):
+    roles = ppl.get_person_roles(TEMP_EMAIL)
+    assert roles == VALID_ROLES
