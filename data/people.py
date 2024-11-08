@@ -87,12 +87,14 @@ def update_users(newName: str, affiliation: None,
         -Email can't be changed
         -Affiliation can be blank
     """
-    is_valid_person(newName, affiliation, email, roles_list)
-    TEST_PERSON_DICT[email] = {
-        NAME: newName,
-        AFFILIATION: affiliation,
-        EMAIL: email,
-        ROLES: roles_list}
+    if email in TEST_PERSON_DICT:
+        TEST_PERSON_DICT[email] = {
+            NAME: newName,
+            AFFILIATION: affiliation,
+            EMAIL: email,
+            ROLES: roles_list}
+    else:
+        raise ValueError(f'User not found with {email=}')
 
 
 def create_person(name: str, affiliation: str, email: str,

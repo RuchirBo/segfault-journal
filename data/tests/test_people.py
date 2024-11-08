@@ -34,6 +34,7 @@ INVALID_ROLE = "INVALID"
 
 
 ADD_EMAIL = "john.smith@nyu.edu"
+NEW_EMAIL = "new_email@nyu.edu"
 
 TEMP_EMAIL = 'tempperson@temp.org'
 TEMP_EMAIL2 = 'temp2person@temp.org'
@@ -191,9 +192,11 @@ def test_get_person_roles(temp2_person):
     assert roles == VALID_ROLES
 
 
-@pytest.mark.skip("Skipping this test because user doesn't exist in people dict")
-def test_update():
-    people = ppl.read()
-    assert ADD_EMAIL in people
-    ppl.update_users("John Smith", "test affiliation", ADD_EMAIL, [TEST_ED_CODE])
-    people = ppl.update_users()
+@pytest.mark.skip("Skipping this test because we can't access user's information other than email")
+def test_update(temp_person):
+    ppl.update_users("John Smith", "test affiliation", temp_person, temp_person)
+
+
+def test_invalid_update():
+    with pytest.raises(ValueError, match=rf"User not found with email='{NEW_EMAIL}'"):
+        ppl.update_users("Janet Jackson", "test affiliation", NEW_EMAIL, roles.ED_CODE)
