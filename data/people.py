@@ -175,6 +175,22 @@ def get_masthead() -> dict:
     return masthead
 
 
+def add_role_to_person(email: str, role: str) -> None:
+    if not rls.is_valid(role):
+        raise ValueError(f"Invalid Role: {role}")
+    person = read_one(email)
+    if person:
+        if role not in person[ROLES]:
+            person[ROLES].append(role)
+    else:
+        raise ValueError(f"No person for this email: {email}")
+
+
+def get_person_roles(email: str) -> list:
+    person = read_one(email)
+    return person.get(ROLES, []) if person else []
+
+
 def main():
     print(get_masthead())
 
