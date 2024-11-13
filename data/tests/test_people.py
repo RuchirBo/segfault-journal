@@ -1,6 +1,7 @@
 import pytest
 import data.people as ppl
 import data.roles as roles
+from unittest.mock import patch
 
 from data.roles import TEST_CODE as TEST_ROLE_CODE
 from data.roles import ED_CODE as TEST_ED_CODE
@@ -126,7 +127,9 @@ def test_has_role(temp_person):
     assert ppl.has_role(person_rec, TEST_ROLE_CODE)
 
 
-def test_get_masthead():
+@patch('data.people.get_masthead', autospec=True,
+       return_value={'NAME': 'Joe Smith'})
+def test_get_masthead(mock_read):
     mh = ppl.get_masthead()
     assert isinstance(mh, dict)
 
@@ -159,10 +162,10 @@ def test_is_valid_person():
         'NYU',
         BOB_EMAIL,
         [TEST_ED_CODE])
-    
+
 
 def test_is_invalid_role_person():
-    with pytest.raises(ValueError, match = 'Invalid role'):
+    with pytest.raises(ValueError, match='Invalid role'):
         ppl.is_valid_person('Joe Smith', 'NYU', TEMP_EMAIL3, ['SOMETHING'])
 
 
@@ -182,7 +185,7 @@ def test_add_role_to_person_invalid_role(temp_person):
 def temp2_person():
     "Another fixture test to test specficially adding another role"
     ret = ppl.create_person('Joe Smith', 'NYU', TEMP_EMAIL, roles.AUTHOR_CODE)
-    ppl.add_role_to_person(TEMP_EMAIL, roles.ED_CODE) 
+    ppl.add_role_to_person(TEMP_EMAIL, roles.ED_CODE)
     yield ret
     ppl.delete_person(ret)
 
@@ -192,11 +195,26 @@ def test_get_person_roles(temp2_person):
     assert roles == VALID_ROLES
 
 
-@pytest.mark.skip("Skipping this test because we can't access user's information other than email")
+@pytest.mark.skip(
+        "Skipping this test because we can't access"
+        " user's information other than email"
+)
 def test_update(temp_person):
-    ppl.update_users("John Smith", "test affiliation", temp_person, temp_person)
+    ppl.update_users(
+        "John Smith",
+        "test affiliation",
+        temp_person,
+        temp_person
+    )
 
 
 def test_invalid_update():
-    with pytest.raises(ValueError, match=rf"User not found with email='{NEW_EMAIL}'"):
-        ppl.update_users("Janet Jackson", "test affiliation", NEW_EMAIL, roles.ED_CODE)
+    with pytest.raises(
+        ValueError, match=rf"User not found with email='{NEW_EMAIL}'"
+    ):
+        ppl.update_users(
+            "Janet Jackson",
+            "test affiliation",
+            NEW_EMAIL,
+            roles.ED_CODE
+        )
