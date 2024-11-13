@@ -26,6 +26,10 @@ def get_roles() -> dict:
     return deepcopy(ROLES)
 
 
+def get_noncopy_roles() -> dict:
+    return ROLES
+
+
 def get_masthead_roles() -> dict:
     roles = get_roles()
     masthead_roles = {
@@ -49,7 +53,7 @@ def get_role_codes() -> list:
 
 
 def delete_roles(_id):
-    all_roles = get_roles()
+    all_roles = get_noncopy_roles()
     if _id in all_roles:
         del all_roles[_id]
         return _id
@@ -58,7 +62,7 @@ def delete_roles(_id):
 
 
 def create_roles(code, name) -> dict:
-    all_roles = get_roles()
+    all_roles = get_noncopy_roles()
     if is_valid(code):
         return None
     else:
