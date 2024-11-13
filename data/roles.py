@@ -48,13 +48,22 @@ def get_role_codes() -> list:
     return list(ROLES.keys())
 
 
-def delete(_id):
+def delete_roles(_id):
     all_roles = get_roles()
     if _id in all_roles:
         del all_roles[_id]
         return _id
     else:
         return None
+
+
+def create_roles(code, name):
+    all_roles = get_roles()
+    if is_valid(code):
+        return None
+    else:
+        all_roles[code] = name
+        return all_roles
 
 
 def main():
