@@ -57,7 +57,7 @@ def delete_roles(_id):
         return None
 
 
-def create_roles(code, name):
+def create_roles(code, name) -> dict:
     all_roles = get_roles()
     if is_valid(code):
         return None
