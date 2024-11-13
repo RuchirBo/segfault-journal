@@ -48,6 +48,15 @@ def get_role_codes() -> list:
     return list(ROLES.keys())
 
 
+def delete(_id):
+    all_roles = get_roles()
+    if _id in all_roles:
+        del all_roles[_id]
+        return _id
+    else:
+        return None
+
+
 def main():
     print(get_roles())
     print(get_masthead_roles())
