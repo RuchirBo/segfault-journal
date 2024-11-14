@@ -218,3 +218,15 @@ def test_invalid_update():
             NEW_EMAIL,
             roles.ED_CODE
         )
+
+
+def test_delete_role_from_person(temp_person):
+    role = roles.AUTHOR_CODE
+    ppl.add_role_to_person(TEMP_EMAIL, role)
+    person_roles = ppl.get_person_roles(TEMP_EMAIL)
+    assert role in person_roles
+
+    ppl.delete_role_from_person(TEMP_EMAIL, role)
+    person_roles = ppl.get_person_roles(TEMP_EMAIL)
+    assert not role in person_roles
+

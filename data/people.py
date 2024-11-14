@@ -198,7 +198,7 @@ def delete_role_from_person(email: str, role: str) -> None:
         raise ValueError(f"Invalid Role: {role}")
     person_roles = get_person_roles(email)
     if role in person_roles:
-        person_roles[ROLES].remove(role)
+        person_roles.remove(role)
     else:
         raise ValueError(f"Invalid role for this person: {role}")
 
