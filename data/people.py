@@ -193,6 +193,16 @@ def get_person_roles(email: str) -> list:
     return person.get(ROLES, []) if person else []
 
 
+def delete_role_from_person(email: str, role: str) -> None:
+    if not rls.is_valid(role):
+        raise ValueError(f"Invalid Role: {role}")
+    person_roles = get_person_roles(email)
+    if role in person_roles:
+        person_roles[ROLES].remove(role)
+    else:
+        raise ValueError(f"Invalid role for this person: {role}")
+
+
 def main():
     print(get_masthead())
 
