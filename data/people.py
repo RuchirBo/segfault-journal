@@ -203,6 +203,23 @@ def delete_role_from_person(email: str, role: str) -> None:
         raise ValueError(f"Invalid role for this person: {role}")
 
 
+def update_person_role(
+        name: str,
+        affiliation: str,
+        email: str,
+        role_to_remove: str,
+        new_role: str) -> None:
+    if rls.is_valid(new_role):
+        people = read()
+        if email in people:
+            delete_role_from_person(email, role_to_remove)
+            add_role_to_person(email, new_role)
+        else:
+            raise ValueError(f"Person does not exist: {name}")
+    else:
+        raise ValueError(f"Role does not exist: {new_role}")
+
+
 def main():
     print(get_masthead())
 
