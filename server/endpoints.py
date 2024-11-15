@@ -4,7 +4,7 @@ The endpoint called `endpoints` will return all available endpoints.
 """
 # from http import HTTPStatus
 
-from flask import Flask  # , request
+from flask import Flask, request  # , request
 from flask_restx import Resource, Api  # Namespace, fields
 from flask_cors import CORS
 
@@ -46,7 +46,7 @@ class HelloWorld(Resource):
         return {HELLO_RESP: 'world'}
 
 
-@api.route('/endpoints')
+@api.route(ENDPOINT_EP)
 class Endpoints(Resource):
     """
     This class will serve as live, fetchable documentation of what endpoints
@@ -77,14 +77,20 @@ class People(Resource):
     """
     This class handles creating, reading, updating, and deleting journal people
     """
-    def update_users(newName: str, affiliation: str, email: str):
-        return ppl.update_users
+    def get(self):
+        """
+        Retrieve the journal people.
+        """
+        return ppl.read()
 
-    def create_person(name: str, affiliation: str, email: str):
-        return ppl.create_person
+    def update_users(self, new_name: str, affiliation: str, email: str):
+        return ppl.update_users(new_name, affiliation, email)
 
-    def delete_person(_id):
-        return ppl.delete_person
+    def create_person(self, name: str, affiliation: str, email: str):
+        return ppl.create_person(name, affiliation, email)
+
+    def delete_person(self, _id):
+        return ppl.delete_person(_id)
 
 
 MASTHEAD = 'Masthead'
@@ -97,3 +103,40 @@ class Masthead(Resource):
     """
     def get(self):
         return {MASTHEAD: ppl.get_masthead()}
+
+
+@api.route(f"{PEOPLE_EP}/<string:email>/roles")
+class PersonRoles(Resource):
+    def post(self, email):
+        try:
+            role = request.json.get("role")
+            if not role:
+                return {"message": "Role is required."}, 400
+            person = ppl.read_one(email)
+            if not person:
+                return {
+                    "message": f"Person with email {email} not found."
+                }, 404
+            ppl.add_role_to_person(email, role)
+            return {
+                "message": f"Role '{role}' added to {email}."
+            }, 200
+        except ValueError as e:
+            return {"message": str(e)}, 400
+
+    def delete(self, email):
+        try:
+            role = request.json.get("role")
+            if not role:
+                return {"message": "Role is required."}, 400
+            person = ppl.read_one(email)
+            if not person:
+                return {
+                    "message": f"Person with email {email} not found."
+                }, 404
+            ppl.delete_role_from_person(email, role)
+            return {
+                "message": f"Role '{role}' removed from {email}."
+            }, 200
+        except ValueError as e:
+            return {"message": str(e)}, 400
