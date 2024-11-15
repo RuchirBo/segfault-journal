@@ -8,6 +8,7 @@ from copy import deepcopy
 AUTHOR_CODE = 'AU'
 TEST_CODE = AUTHOR_CODE
 ED_CODE = 'ED'
+TEST_NEW_CODE = ED_CODE
 ME_CODE = 'ME'
 CE_CODE = 'CE'
 

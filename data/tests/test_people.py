@@ -4,6 +4,7 @@ import data.roles as roles
 from unittest.mock import patch
 
 from data.roles import TEST_CODE as TEST_ROLE_CODE
+from data.roles import TEST_NEW_CODE as TEST_NEW_ROLE_CODE
 from data.roles import ED_CODE as TEST_ED_CODE
 
 # Invalid Test Emails:
@@ -40,6 +41,7 @@ NEW_EMAIL = "new_email@nyu.edu"
 TEMP_EMAIL = 'tempperson@temp.org'
 TEMP_EMAIL2 = 'temp2person@temp.org'
 TEMP_EMAIL3 = 'temp3person@temp.org'
+TEMP_EMAIL4 = 'temp4person@temp.org'
 BOB_EMAIL = 'bob.ross@nyu.edu'
 
 
@@ -57,6 +59,12 @@ def test_delete_person():
     assert len(people) < old_len
     assert ADD_EMAIL not in people
 
+def test_update_person_role():
+    ppl.create_person('Joe Smith', 'NYU', TEMP_EMAIL4, TEST_ROLE_CODE)
+    ppl.update_person_role('Joe Smith', 'NYU', TEMP_EMAIL4, TEST_ROLE_CODE, TEST_NEW_ROLE_CODE)
+    person_roles = ppl.get_person_roles(TEMP_EMAIL4)
+    assert not TEST_ROLE_CODE in person_roles
+    assert TEST_NEW_ROLE_CODE in person_roles 
 
 # def test_create_person_with_roles():
 #    ppl.create_person("Jon Smore", "NYU", ADD_EMAIL, VALID_ROLES)
