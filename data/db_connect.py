@@ -68,6 +68,23 @@ def update_doc(collection, filters, update_dict, db=GAME_DB):
     return client[db][collection].update_one(filters, {'$set': update_dict})
 
 
+def read(collection, db=GAME_DB, no_id=True) -> list:
+    ret = []
+    for doc in client[db][collection].find():
+        if no_id:
+            del doc[MONGO_ID]
+        ret.append(doc)
+    return ret
+
+
+def read_dict(collection, key, db=GAME_DB, no_id=True) -> dict:
+    recs = read(collection, db=db, no_id=no_id)
+    recs_as_dict = {}
+    for rec in recs:
+        recs_as_dict[rec[key]] = rec
+    return recs_as_dict
+
+
 def fetch_all(collection, db=GAME_DB):
     ret = []
     for doc in client[db][collection].find():
