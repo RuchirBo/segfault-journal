@@ -4,6 +4,9 @@ This module interfaces to our user data.
 
 import re
 import data.roles as rls  # importing functions from roles.py
+import data.db_connect as dbc
+
+PEOPLE_COLLECT = 'people'
 
 MIN_USER_NAME_LEN = 2
 # fields
@@ -30,6 +33,8 @@ pattern = (
     r'(\.[A-Za-z0-9\-]+)+$'
 )
 
+client = dbc.connect_db()
+print(f'{client=}')
 
 def is_valid_email(email: str) -> bool:
     return re.match(pattern, email)
@@ -56,7 +61,8 @@ def read() -> dict:
         - Returns a dictionary of users keyed on user email.
         - Each user email must be the key for another dictionary.
     """
-    people = TEST_PERSON_DICT
+    people = dbc.read_dict(PEOPLE_COLLECT, EMAIL)
+    print(f'{people=}')
     return people
 
 
@@ -104,17 +110,16 @@ def create_person(name: str, affiliation: str, email: str,
         - Takes in a new name, affiliation, email, and role(s)
           to create a new person in the people dictionary
     """
-
-    is_valid_person(name, affiliation, email, [role])
-    valid_roles = []
-    if role:
-        valid_roles.append(role)
-        TEST_PERSON_DICT[email] = {
-            NAME: name,
-            AFFILIATION: affiliation,
-            EMAIL: email,
-            ROLES: valid_roles}
-    return email
+    
+    if is_valid_person(name, affiliation, email, [role]):
+        roles = []
+        if role:
+            roles.append(role)
+            person = {NAME: name, AFFILIATION: affiliation,
+                  EMAIL: email, ROLES: roles}
+            print(person)
+            dbc.create(PEOPLE_COLLECT, person)
+            return email
 
 
 # def read():
