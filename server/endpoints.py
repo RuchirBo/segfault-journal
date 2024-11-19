@@ -2,13 +2,13 @@
 This is the file containing all of the endpoints for our flask app.
 The endpoint called `endpoints` will return all available endpoints.
 """
-# from http import HTTPStatus
+from http import HTTPStatus
 
 from flask import Flask, request  # , request
-from flask_restx import Resource, Api  # Namespace, fields
+from flask_restx import Resource, Api, fields  # Namespace, fields
 from flask_cors import CORS
 
-# import werkzeug.exceptions as wz
+import werkzeug.exceptions as wz
 
 import data.people as ppl
 
@@ -24,11 +24,13 @@ ENDPOINT_EP = '/endpoints'
 ENDPOINT_RESP = 'Available endpoints'
 HELLO_EP = '/hello'
 HELLO_RESP = 'hello'
+MESSAGE = 'Message'
 PEOPLE_EP = '/people'
 PUBLISHER = 'Segfaulters'
 PUBLISHER_RESP = 'Publisher'
 TITLE_EP = '/title'
 TITLE_RESP = "Title"
+RETURN = 'return'
 TITLE = 'Segfault Journal Bimonthly'
 
 
@@ -83,14 +85,49 @@ class People(Resource):
         """
         return ppl.read()
 
-    def update_users(self, new_name: str, affiliation: str, email: str):
-        return ppl.update_users(new_name, affiliation, email)
+    # def update_users(self, new_name: str, affiliation: str, email: str):
+    #     return ppl.update_users(new_name, affiliation, email)
 
-    def create_person(self, name: str, affiliation: str, email: str):
-        return ppl.create_person(name, affiliation, email)
+    # def create_person(self, name: str, affiliation: str, email: str):
+    #     return ppl.create_person(name, affiliation, email)
 
-    def delete_person(self, _id):
-        return ppl.delete_person(_id)
+    # def delete_person(self, _id):
+    #     return ppl.delete_person(_id)
+
+
+PEOPLE_CREATE_FLDS = api.model('AddNewPeopleEntry', {
+    ppl.NAME: fields.String,
+    ppl.EMAIL: fields.String,
+    ppl.AFFILIATION: fields.String,
+    ppl.ROLES: fields.String,
+})
+
+
+@api.route(f'{PEOPLE_EP}/create')
+class PeopleCreate(Resource):
+    """
+    Add a person to the journal db.
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'Not acceptable')
+    @api.expect(PEOPLE_CREATE_FLDS)
+    def put(self):
+        """
+        Add a person.
+        """
+        try:
+            name = request.json.get(ppl.NAME)
+            affiliation = request.json.get(ppl.AFFILIATION)
+            email = request.json.get(ppl.EMAIL)
+            role = request.json.get(ppl.ROLES)
+            ret = ppl.create_person(name, affiliation, email, role)
+        except Exception as err:
+            raise wz.NotAcceptable(f'Could not add person: '
+                                   f'{err=}')
+        return {
+            MESSAGE: 'Person added!',
+            RETURN: ret,
+        }
 
 
 MASTHEAD = 'Masthead'

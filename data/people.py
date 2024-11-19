@@ -52,6 +52,7 @@ def is_valid_person(name: str, affiliation: str,
         for role in roles_list:
             if not rls.is_valid(role):
                 raise ValueError(f'Invalid role: {role}')
+    return True
 
 
 def read() -> dict:
@@ -61,7 +62,7 @@ def read() -> dict:
         - Returns a dictionary of users keyed on user email.
         - Each user email must be the key for another dictionary.
     """
-    people = dbc.read_dict(PEOPLE_COLLECT, EMAIL)
+    people = dbc.read_dict(EMAIL, PEOPLE_COLLECT)
     print(f'{people=}')
     return people
 
