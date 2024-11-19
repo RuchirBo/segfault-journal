@@ -142,11 +142,26 @@ class Masthead(Resource):
         return {MASTHEAD: ppl.get_masthead()}
 
 
+@api.route(f'{PEOPLE_EP}/<string:email>')
+class Person(Resource):
+    def get(self, email):
+        """Retrieve a specific person by email."""
+        person = ppl.read_one(email)
+        if person:
+            return person
+        else:
+            raise wz.NotFound(f"No such person: {email}")
+
+
 @api.route(f"{PEOPLE_EP}/<string:email>/roles")
 class PersonRoles(Resource):
+    @api.doc(params={'role': 'Role to add'})
     def post(self, email):
+        """
+        Add a role to a person by email and role as query parameters.
+        """
         try:
-            role = request.json.get("role")
+            role = request.args.get('role')
             if not role:
                 return {"message": "Role is required."}, 400
             person = ppl.read_one(email)
@@ -161,9 +176,13 @@ class PersonRoles(Resource):
         except ValueError as e:
             return {"message": str(e)}, 400
 
+    @api.doc(params={'role': 'Role to remove'})
     def delete(self, email):
+        """
+        Remove a role from a person by email and role as query parameters.
+        """
         try:
-            role = request.json.get("role")
+            role = request.args.get('role')
             if not role:
                 return {"message": "Role is required."}, 400
             person = ppl.read_one(email)

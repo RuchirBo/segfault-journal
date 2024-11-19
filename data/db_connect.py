@@ -58,15 +58,8 @@ def fetch_one(collection, filt, db=SEGFAULT_DB):
         return doc
 
 
-def del_one(collection, filt, db=SEGFAULT_DB):
-    """
-    Find with a filter and return on the first doc found.
-    """
-    client[db][collection].delete_one(filt)
-
-
 def update_doc(collection, filters, update_dict, db=SEGFAULT_DB):
-    return client[db][collection].update_one(filters, {'$set': update_dict})
+    return client[db][collection].update_one(filters, update_dict)
 
 
 def read(collection, db=SEGFAULT_DB, no_id=True) -> list:
@@ -86,16 +79,10 @@ def read_dict(collection, key, db=SEGFAULT_DB, no_id=True) -> dict:
     return recs_as_dict
 
 
-def read(collection, db=SEGFAULT_DB):
-    ret = []
-    for doc in client[db][collection].find():
-        ret.append(doc)
-    return ret
-
-
-def read_dict(key, collection, db=SEGFAULT_DB):
-    ret = {}
-    for doc in client[db][collection].find():
-        del doc[MONGO_ID]
-        ret[doc[key]] = doc
-    return ret
+def delete(collection, filt, db=SEGFAULT_DB):
+    """
+    Delete a document from the collection.
+    """
+    print(f'{filt=}')
+    del_result = client[db][collection].delete_one(filt)
+    return del_result.deleted_count

@@ -36,19 +36,17 @@ pattern = (
 client = dbc.connect_db()
 print(f'{client=}')
 
+
 def is_valid_email(email: str) -> bool:
     return re.match(pattern, email)
 
 
 def is_valid_person(name: str, affiliation: str,
                     email: str,
-                    roles_list: list = []) -> None:
-    ppl = TEST_PERSON_DICT
-    if email in ppl:
-        raise ValueError(f'Adding duplicate {email=}')
+                    roles_list: list = []) -> bool:
     if not is_valid_email(email):
-        raise ValueError(f'Invalid email {email}')
-    elif roles_list:
+        raise ValueError(f'Invalid email: {email}')
+    if roles_list:
         for role in roles_list:
             if not rls.is_valid(role):
                 raise ValueError(f'Invalid role: {role}')
@@ -62,21 +60,21 @@ def read() -> dict:
         - Returns a dictionary of users keyed on user email.
         - Each user email must be the key for another dictionary.
     """
-    people = dbc.read_dict(EMAIL, PEOPLE_COLLECT)
+    people = dbc.read_dict(PEOPLE_COLLECT, EMAIL)
     print(f'{people=}')
     return people
 
 
 def read_one(email: str) -> dict:
     """
-    Return a person record if email present in DB,
-    else None.
+    Return a person record if email present in DB by email.
     """
-    return TEST_PERSON_DICT.get(email)
+    return dbc.fetch_one(PEOPLE_COLLECT, {EMAIL: email})
 
 
 def get_users():
     """
+    Note: I am not sure if this fx is being used /is needed
     Our contract:
         - No arguments.
         - Returns a dictionary of users keyed on user name (a str).
@@ -86,7 +84,7 @@ def get_users():
     return ppl
 
 
-def update_users(newName: str, affiliation: None,
+def update_users(new_name: str, affiliation: str,
                  email: str, roles_list: list):
     """
     Our contract:
@@ -96,7 +94,7 @@ def update_users(newName: str, affiliation: None,
     """
     if email in TEST_PERSON_DICT:
         TEST_PERSON_DICT[email] = {
-            NAME: newName,
+            NAME: new_name,
             AFFILIATION: affiliation,
             EMAIL: email,
             ROLES: roles_list}
@@ -111,27 +109,18 @@ def create_person(name: str, affiliation: str, email: str,
         - Takes in a new name, affiliation, email, and role(s)
           to create a new person in the people dictionary
     """
-    
-    if is_valid_person(name, affiliation, email, [role]):
-        roles = []
-        if role:
-            roles.append(role)
-            person = {NAME: name, AFFILIATION: affiliation,
-                  EMAIL: email, ROLES: roles}
-            print(person)
-            dbc.create(PEOPLE_COLLECT, person)
-            return email
-
-
-# def read():
-#     """
-#     Our contract:
-#         - No arguments.
-#         - Returns a dictionary of users keyed on user email.
-#         - Each user email must be the key for another dictionary.
-#     """
-#     people = TEST_PERSON_DICT
-#     return people
+    if read_one(email):
+        raise ValueError(f'Adding duplicate {email=}')
+    roles = [role] if role else []
+    is_valid_person(name, affiliation, email, roles)
+    person = {
+        NAME: name,
+        AFFILIATION: affiliation,
+        EMAIL: email,
+        ROLES: roles,
+    }
+    dbc.create(PEOPLE_COLLECT, person)
+    return email
 
 
 def delete_person(_id):
@@ -147,10 +136,8 @@ def delete_person(_id):
         return None
 
 
-def has_role(person, role) -> bool:
-    if role in person.get(ROLES):
-        return True
-    return False
+def has_role(person: dict, role: str) -> bool:
+    return role in person.get(ROLES, [])
 
 
 def has_masthead_role(person) -> bool:
@@ -162,6 +149,9 @@ def has_masthead_role(person) -> bool:
 
 
 def create_mh_rec(person: dict) -> dict:
+    """
+    Creates a masthead record for a person.
+    """
     mh_rec = {}
     for field in MH_FIELDS:
         mh_rec[field] = person.get(field, '')
@@ -169,17 +159,19 @@ def create_mh_rec(person: dict) -> dict:
 
 
 def get_masthead() -> dict:
+    """
+    Retrieves the masthead by roles from MongoDB.
+    """
     masthead = {}
     mh_roles = rls.get_masthead_roles()
     for mh_role, text in mh_roles.items():
-        people_w_role = []
-        people = read()
-        for _id, person in people.items():
+        people_with_role = []
+        people = dbc.read(PEOPLE_COLLECT)
+        for person in people:
             if has_role(person, mh_role):
-                pass
-                # rec = create_mh_rec(person)
-                # people_w_role.append(rec)
-        masthead[text] = people_w_role
+                rec = create_mh_rec(person)
+                people_with_role.append(rec)
+        masthead[text] = people_with_role
     return masthead
 
 
@@ -187,11 +179,16 @@ def add_role_to_person(email: str, role: str) -> None:
     if not rls.is_valid(role):
         raise ValueError(f"Invalid Role: {role}")
     person = read_one(email)
-    if person:
-        if role not in person[ROLES]:
-            person[ROLES].append(role)
+    if not person:
+        raise ValueError(f"No person found with {email=}")
+    if role not in person.get(ROLES, []):
+        dbc.update_doc(
+            PEOPLE_COLLECT,
+            {EMAIL: email},
+            {"$addToSet": {ROLES: role}},
+        )
     else:
-        raise ValueError(f"No person for this email: {email}")
+        raise ValueError(f"Role {role} already exists for {email}")
 
 
 def get_person_roles(email: str) -> list:
@@ -202,11 +199,17 @@ def get_person_roles(email: str) -> list:
 def delete_role_from_person(email: str, role: str) -> None:
     if not rls.is_valid(role):
         raise ValueError(f"Invalid Role: {role}")
-    person_roles = get_person_roles(email)
-    if role in person_roles:
-        person_roles.remove(role)
+    person = read_one(email)
+    if not person:
+        raise ValueError(f"No person found with {email=}")
+    if role in person.get(ROLES, []):
+        dbc.update_doc(
+            PEOPLE_COLLECT,
+            {EMAIL: email},
+            {"$pull": {ROLES: role}},
+        )
     else:
-        raise ValueError(f"Invalid role for this person: {role}")
+        raise ValueError(f"Role {role} does not exist for {email}")
 
 
 def update_person_role(
@@ -215,15 +218,10 @@ def update_person_role(
         email: str,
         role_to_remove: str,
         new_role: str) -> None:
-    if rls.is_valid(new_role):
-        people = read()
-        if email in people:
-            delete_role_from_person(email, role_to_remove)
-            add_role_to_person(email, new_role)
-        else:
-            raise ValueError(f"Person does not exist: {name}")
-    else:
+    if not rls.is_valid(new_role):
         raise ValueError(f"Role does not exist: {new_role}")
+    delete_role_from_person(email, role_to_remove)
+    add_role_to_person(email, new_role)
 
 
 def main():
