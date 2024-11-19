@@ -46,9 +46,14 @@ BOB_EMAIL = 'bob.ross@nyu.edu'
 
 
 def test_create_person():
+    if ppl.read_one(ADD_EMAIL):
+        ppl.delete_person(ADD_EMAIL)
+
     ppl.create_person("John Smith", "NYU", ADD_EMAIL, 'AU')
     people = ppl.get_users()
     assert ADD_EMAIL in people
+
+    ppl.delete_person(ADD_EMAIL)
 
 
 def test_delete_person():

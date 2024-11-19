@@ -123,17 +123,14 @@ def create_person(name: str, affiliation: str, email: str,
     return email
 
 
-def delete_person(_id):
+def delete_person(email: str):
     """
     Our contract:
         - Deleted a person in the people dictionary based on provided ID
     """
-    people = read()
-    if _id in people:
-        del people[_id]
-        return _id
-    else:
-        return None
+    result = dbc.delete(PEOPLE_COLLECT, {EMAIL: email})
+    if result is None:
+        raise ValueError(f"No person found with {email=}")
 
 
 def has_role(person: dict, role: str) -> bool:
