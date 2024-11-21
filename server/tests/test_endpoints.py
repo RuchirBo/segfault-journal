@@ -70,3 +70,24 @@ def test_remove_role_success(mock_delete_role, mock_read_one):
     }
     mock_read_one.assert_called_once_with("testdoe@example.com")
     mock_delete_role.assert_called_once_with("testdoe@example.com", "Editor")
+
+@patch(
+    "data.people.read_one",
+    return_value={
+        "name": "Raiya",
+        "roles": ["AU"],
+        "email": "rsh9689@nyu.edu",
+    },
+)
+@patch("data.people.delete_person")
+def test_delete_person_success(mock_delete_person, mock_read_one):
+    resp = TEST_CLIENT.delete(
+        "/people/rsh9689@nyu.edu/delete",
+    )
+    assert resp.status_code == 200
+    assert resp.get_json() == {
+        "message": 'Person with email rsh9689@nyu.edu was removed.'
+    }
+    mock_read_one.assert_called_once_with("rsh9689@nyu.edu")
+    mock_delete_person.assert_called_once_with("rsh9689@nyu.edu")
+
