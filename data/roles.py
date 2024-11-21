@@ -64,7 +64,7 @@ def delete_roles(_id):
 
 def create_roles(code, name) -> dict:
     all_roles = get_noncopy_roles()
-    if is_valid(code):
+    if code in all_roles:
         return None
     else:
         all_roles[code] = name
