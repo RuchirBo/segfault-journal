@@ -46,7 +46,7 @@ def create(collection, doc, db=SEGFAULT_DB):
     return client[db][collection].insert_one(doc)
 
 
-def read_one(collection, filt, db=SEGFAULT_DB):
+def fetch_one(collection, filt, db=SEGFAULT_DB):
     """
     Find with a filter and return on the first doc found.
     Return None if not found.

@@ -109,7 +109,7 @@ def create_person(name: str, affiliation: str, email: str,
         - Takes in a new name, affiliation, email, and role(s)
           to create a new person in the people dictionary
     """
-    if read_one(email):
+    if exists(email):
         raise ValueError(f'Adding duplicate {email=}')
     roles = [role] if role else []
     is_valid_person(name, affiliation, email, roles)
@@ -186,6 +186,10 @@ def add_role_to_person(email: str, role: str) -> None:
         )
     else:
         raise ValueError(f"Role {role} already exists for {email}")
+
+
+def exists(email: str) -> bool:
+    return read_one(email) is not None
 
 
 def get_person_roles(email: str) -> list:
