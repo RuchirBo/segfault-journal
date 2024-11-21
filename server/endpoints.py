@@ -130,6 +130,25 @@ class PeopleCreate(Resource):
         }
 
 
+@api.route(f'{PEOPLE_EP}/<string:email>/delete')
+class PeopleDelete(Resource):
+    """
+    Delete a person from the journal db.
+    """
+    @api.doc(params={'email': 'Email of person to delete'})
+    def delete(self, email):
+        try:
+            person = ppl.read_one(email)
+            if not person:
+                raise wz.NotFound(f"No such person: {email}")
+            ppl.delete_person(email)
+            return {
+                "message": f"Person with email {email} was removed."
+            }, 200
+        except ValueError as e:
+            return {"message": str(e)}, 400
+
+
 MASTHEAD = 'Masthead'
 
 
