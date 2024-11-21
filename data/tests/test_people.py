@@ -243,3 +243,9 @@ def test_delete_role_from_person(temp_person):
     person_roles = ppl.get_person_roles(TEMP_EMAIL)
     assert not role in person_roles
 
+
+def test_update_not_there(temp_person):
+    with pytest.raises(ValueError):
+        ppl.update('Will Fail', 'University of the Void',
+                   'Non-existent email', VALID_ROLES)
+

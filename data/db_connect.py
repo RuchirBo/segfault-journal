@@ -46,19 +46,23 @@ def create(collection, doc, db=SEGFAULT_DB):
     return client[db][collection].insert_one(doc)
 
 
-def fetch_one(collection, filt, db=SEGFAULT_DB):
+def read_one(collection, filt, db=SEGFAULT_DB):
     """
     Find with a filter and return on the first doc found.
     Return None if not found.
     """
     for doc in client[db][collection].find(filt):
-        if MONGO_ID in doc:
-            # Convert mongo ID to a string so it works as JSON
-            doc[MONGO_ID] = str(doc[MONGO_ID])
+        convert_mongo_id(doc)
         return doc
 
 
-def update_doc(collection, filters, update_dict, db=SEGFAULT_DB):
+def convert_mongo_id(doc: dict):
+    if MONGO_ID in doc:
+        # Convert mongo ID to a string so it works as JSON
+        doc[MONGO_ID] = str(doc[MONGO_ID])
+
+
+def update(collection, filters, update_dict, db=SEGFAULT_DB):
     return client[db][collection].update_one(filters, update_dict)
 
 
@@ -67,6 +71,8 @@ def read(collection, db=SEGFAULT_DB, no_id=True) -> list:
     for doc in client[db][collection].find():
         if no_id:
             del doc[MONGO_ID]
+        else:
+            convert_mongo_id(doc)
         ret.append(doc)
     return ret
 
