@@ -249,3 +249,6 @@ def test_update_not_there(temp_person):
         ppl.update('Will Fail', 'University of the Void',
                    'Non-existent email', VALID_ROLES)
 
+
+def test_exists(temp_person):
+    assert ppl.exists(temp_person)
