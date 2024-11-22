@@ -152,7 +152,7 @@ class PeopleUpdate(Resource):
             name = request.json.get(ppl.NAME)
             affiliation = request.json.get(ppl.AFFILIATION)
             email = request.json.get(ppl.EMAIL)
-            roles = list(request.json.get(ppl.ROLES))
+            roles = request.json.get(ppl.ROLES)
             ppl.update_users(name, affiliation, email, roles)
         except Exception as err:
             raise wz.NotAcceptable(f'Could not update person: '
