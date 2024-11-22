@@ -91,3 +91,17 @@ def test_delete_person_success(mock_delete_person, mock_read_one):
     mock_read_one.assert_called_once_with("rsh9689@nyu.edu")
     mock_delete_person.assert_called_once_with("rsh9689@nyu.edu")
 
+
+
+@patch("data.people.update_users")
+def test_update_person_success(mock_update_users):
+    resp = TEST_CLIENT.put(
+        "/people/update",
+        json={
+            "name": "Theresa Updated",
+            "email": "theresa@nyu.edu",
+            "affiliation": "NYU",
+            "roles": "ED",
+        }
+    )
+    assert resp.status_code == 200
