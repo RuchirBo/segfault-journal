@@ -92,14 +92,17 @@ def update_users(new_name: str, affiliation: str,
         -Email can't be changed
         -Affiliation can be blank
     """
-    if email in TEST_PERSON_DICT:
-        TEST_PERSON_DICT[email] = {
-            NAME: new_name,
-            AFFILIATION: affiliation,
-            EMAIL: email,
-            ROLES: roles_list}
-    else:
-        raise ValueError(f'User not found with {email=}')
+    dbc.update(
+        PEOPLE_COLLECT,
+        {EMAIL: email},
+        {
+            "$set": {
+                NAME: new_name,
+                AFFILIATION: affiliation,
+                ROLES: roles_list,
+            }
+        },
+    )
 
 
 def create_person(name: str, affiliation: str, email: str,

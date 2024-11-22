@@ -85,9 +85,6 @@ class People(Resource):
         """
         return ppl.read()
 
-    # def update_users(self, new_name: str, affiliation: str, email: str):
-    #     return ppl.update_users(new_name, affiliation, email)
-
     # def create_person(self, name: str, affiliation: str, email: str):
     #     return ppl.create_person(name, affiliation, email)
 
@@ -127,6 +124,41 @@ class PeopleCreate(Resource):
         return {
             MESSAGE: 'Person added!',
             RETURN: ret,
+        }
+
+
+# testing
+PEOPLE_UPDATE_FIELDS = api.model('UpdatePersonEntry', {
+    ppl.NAME: fields.String,
+    ppl.EMAIL: fields.String,
+    ppl.AFFILIATION: fields.String,
+    ppl.ROLES: fields.String,
+})
+
+
+@api.route(f'{PEOPLE_EP}/update')
+class PeopleUpdate(Resource):
+    """
+    Update a person in the journal db.
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'Not acceptable')
+    @api.expect(PEOPLE_UPDATE_FIELDS)
+    def put(self):
+        """
+        Update a person.
+        """
+        try:
+            name = request.json.get(ppl.NAME)
+            affiliation = request.json.get(ppl.AFFILIATION)
+            email = request.json.get(ppl.EMAIL)
+            roles = list(request.json.get(ppl.ROLES))
+            ppl.update_users(name, affiliation, email, roles)
+        except Exception as err:
+            raise wz.NotAcceptable(f'Could not update person: '
+                                   f'{err=}')
+        return {
+            MESSAGE: 'Person updated!',
         }
 
 
