@@ -46,10 +46,21 @@ BOB_EMAIL = 'bob.ross@nyu.edu'
 
 
 def test_create_person():
+    print("CREATING:", ppl.read())
     ppl.create_person("John Smith", "NYU", ADD_EMAIL, 'AU')
     assert ppl.exists(ADD_EMAIL)
     ppl.delete_person(ADD_EMAIL)
 
+
+@pytest.fixture(scope='function')
+def temp_person():
+    print(ppl.read())
+    email = ppl.create_person('Joe Smith', 'NYU', TEMP_EMAIL, TEST_ROLE_CODE)
+    yield email
+    try:
+        ppl.delete_person(email)
+    except:
+        print('Person already deleted.')
 
 def test_delete_person(temp_person):
     ppl.delete_person(temp_person)
@@ -119,16 +130,6 @@ def test_is_valid_char():
     assert not ppl.is_valid_email(INVALID_CHAR)
 
 
-@pytest.fixture(scope='function')
-def temp_person():
-    email = ppl.create('Joe Smith', 'NYU', TEMP_EMAIL, TEST_ROLE_CODE)
-    yield email
-    try:
-        ppl.delete(email)
-    except:
-        print('Person already deleted.')
-
-
 def test_has_role(temp_person):
     person_rec = ppl.read_one(temp_person)
     assert ppl.has_role(person_rec, TEST_ROLE_CODE)
@@ -177,7 +178,7 @@ def test_is_invalid_role_person():
 
 
 def test_add_role_to_person(temp_person):
-    new_role = roles.AUTHOR_CODE
+    new_role = TEST_ED_CODE
     ppl.add_role_to_person(TEMP_EMAIL, new_role)
     person_roles = ppl.get_person_roles(TEMP_EMAIL)
     assert new_role in person_roles
@@ -229,7 +230,6 @@ def test_invalid_update():
 
 def test_delete_role_from_person(temp_person):
     role = roles.AUTHOR_CODE
-    ppl.add_role_to_person(TEMP_EMAIL, role)
     person_roles = ppl.get_person_roles(TEMP_EMAIL)
     assert role in person_roles
 
@@ -240,7 +240,7 @@ def test_delete_role_from_person(temp_person):
 
 def test_update_not_there(temp_person):
     with pytest.raises(ValueError):
-        ppl.update('Will Fail', 'University of the Void',
+        ppl.update_users('Will Fail', 'University of the Void',
                    'Non-existent email', VALID_ROLES)
 
 

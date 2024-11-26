@@ -209,7 +209,7 @@ def delete_role_from_person(email: str, role: str) -> None:
     if not person:
         raise ValueError(f"No person found with {email=}")
     if role in person.get(ROLES, []):
-        dbc.update_doc(
+        dbc.update(
             PEOPLE_COLLECT,
             {EMAIL: email},
             {"$pull": {ROLES: role}},
