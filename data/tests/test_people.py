@@ -46,30 +46,21 @@ BOB_EMAIL = 'bob.ross@nyu.edu'
 
 
 def test_create_person():
-    if ppl.read_one(ADD_EMAIL):
-        ppl.delete_person(ADD_EMAIL)
-
     ppl.create_person("John Smith", "NYU", ADD_EMAIL, 'AU')
-    people = ppl.get_users()
-    assert ADD_EMAIL in people
-
+    assert ppl.exists(ADD_EMAIL)
     ppl.delete_person(ADD_EMAIL)
 
 
-def test_delete_person():
-    people = ppl.read()
-    old_len = len(people)
-    ppl.delete_person(ADD_EMAIL)
-    people = ppl.read()
-    assert len(people) < old_len
-    assert ADD_EMAIL not in people
+def test_delete_person(temp_person):
+    ppl.delete_person(temp_person)
+    assert not ppl.exists(temp_person)
 
-def test_update_person_role():
-    ppl.create_person('Joe Smith', 'NYU', TEMP_EMAIL4, TEST_ROLE_CODE)
-    ppl.update_person_role('Joe Smith', 'NYU', TEMP_EMAIL4, TEST_ROLE_CODE, TEST_NEW_ROLE_CODE)
-    person_roles = ppl.get_person_roles(TEMP_EMAIL4)
-    assert not TEST_ROLE_CODE in person_roles
-    assert TEST_NEW_ROLE_CODE in person_roles 
+# Commenting Out Because it seems redundant
+# def test_update_person_role(temp_person):
+#     ppl.add_role_to_person(temp)
+#     person_roles = ppl.get_person_roles(TEMP_EMAIL4)
+#     assert not TEST_ROLE_CODE in person_roles
+#     assert TEST_NEW_ROLE_CODE in person_roles 
 
 # def test_create_person_with_roles():
 #    ppl.create_person("Jon Smore", "NYU", ADD_EMAIL, VALID_ROLES)
@@ -130,9 +121,12 @@ def test_is_valid_char():
 
 @pytest.fixture(scope='function')
 def temp_person():
-    ret = ppl.create_person('Joe Smith', 'NYU', TEMP_EMAIL, TEST_ROLE_CODE)
-    yield ret
-    ppl.delete_person(ret)
+    email = ppl.create('Joe Smith', 'NYU', TEMP_EMAIL, TEST_ROLE_CODE)
+    yield email
+    try:
+        ppl.delete(email)
+    except:
+        print('Person already deleted.')
 
 
 def test_has_role(temp_person):
@@ -223,7 +217,7 @@ def test_update(temp_person):
 
 def test_invalid_update():
     with pytest.raises(
-        ValueError, match=rf"User not found with email='{NEW_EMAIL}'"
+        ValueError, match=rf"Updating non-existent person: email='{NEW_EMAIL}'"
     ):
         ppl.update_users(
             "Janet Jackson",

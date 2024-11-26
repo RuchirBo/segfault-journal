@@ -92,6 +92,8 @@ def update_users(new_name: str, affiliation: str,
         -Email can't be changed
         -Affiliation can be blank
     """
+    if not exists(email):
+        raise ValueError(f'Updating non-existent person: {email=}')
     dbc.update(
         PEOPLE_COLLECT,
         {EMAIL: email},
@@ -182,7 +184,7 @@ def add_role_to_person(email: str, role: str) -> None:
     if not person:
         raise ValueError(f"No person found with {email=}")
     if role not in person.get(ROLES, []):
-        dbc.update_doc(
+        dbc.update(
             PEOPLE_COLLECT,
             {EMAIL: email},
             {"$addToSet": {ROLES: role}},
@@ -215,17 +217,18 @@ def delete_role_from_person(email: str, role: str) -> None:
     else:
         raise ValueError(f"Role {role} does not exist for {email}")
 
-
-def update_person_role(
-        name: str,
-        affiliation: str,
-        email: str,
-        role_to_remove: str,
-        new_role: str) -> None:
-    if not rls.is_valid(new_role):
-        raise ValueError(f"Role does not exist: {new_role}")
-    delete_role_from_person(email, role_to_remove)
-    add_role_to_person(email, new_role)
+# Commented Out Because It Seemed Unncessary
+# def update_person_role(
+#         name: str,
+#         affiliation: str,
+#         email: str,
+#         role_to_remove: str,
+#         new_role: str) -> None:
+#     if not rls.is_valid(new_role):
+#         raise ValueError(f"Role does not exist: {new_role}")
+#     if role
+#     delete_role_from_person(email, role_to_remove)
+#     add_role_to_person(email, new_role)
 
 
 def main():
