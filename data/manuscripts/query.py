@@ -1,3 +1,4 @@
+AUTHOR_REV = 'AUREV'
 COPY_EDIT = 'CED'
 IN_REF_REV = 'REV'
 REJECTED = 'REJ'
@@ -35,3 +36,26 @@ def get_actions() -> list:
 def is_valid_action(action: str) -> bool:
     return action in VALID_ACTIONS
 
+
+def handle_action(curr_state, action) -> str:
+    if not is_valid_state(curr_state):
+        raise ValueError(f'Invalid state: {curr_state}')
+    if not is_valid_action(action):
+        raise ValueError(f'Invalid action: {action}')
+    new_state = curr_state
+    if curr_state == SUBMITTED:
+        if action == ASSIGN_REF:
+            new_state = IN_REF_REV
+        elif action == REJECT:
+            new_state = REJECTED
+    elif curr_state == IN_REF_REV:
+        if action == ACCEPT:
+            new_state = COPY_EDIT
+        elif action == REJECT:
+            new_state = REJECTED
+    elif curr_state == COPY_EDIT:
+        if action == DONE:
+            new_state = AUTHOR_REV
+        elif action == REJECT:
+            new_state = REJECTED
+    return new_state

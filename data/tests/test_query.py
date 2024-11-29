@@ -23,5 +23,3 @@ def test_is_valid_action():
 def test_is_invalid_action():
     for i in range(10):
         assert not mqry.is_valid_action(gen_random_not_valid_str())
-
-
