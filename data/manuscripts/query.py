@@ -44,6 +44,66 @@ VALID_ACTIONS = [
     REJECT,
 ]
 
+FUNC = 'FUNC'
+
+STATE_TABLE = {
+    SUBMITTED: {
+        ASSIGN_REF: {
+            'FUNC': lambda _: IN_REF_REV,
+        },
+        REJECT: {
+            'FUNC': lambda _: REJECTED,
+        },
+    },
+    IN_REF_REV: {
+        ACCEPT: {
+            'FUNC': lambda _: COPY_EDIT,
+        },
+        REJECT: {
+            'FUNC': lambda _: REJECTED,
+        },
+    },
+    COPY_EDIT: {
+        DONE: {
+            'FUNC': lambda _: AUTHOR_REVIEW,
+        },
+        REJECT: {
+            'FUNC': lambda _: REJECTED,
+        },
+    },
+    AUTHOR_REVIEW: {
+        DONE: {
+            'FUNC': lambda _: FORMATTING,
+        },
+        REJECT: {
+            'FUNC': lambda _: REJECTED,
+        },
+    },
+    FORMATTING: {
+        DONE: {
+            'FUNC': lambda _: FORMATTING,
+        },
+        REJECT: {
+            'FUNC': lambda _: REJECTED,
+        },
+    },
+    AUTHOR_REVISIONS: {
+        DONE: {
+            'FUNC': lambda _: EDITOR_REVIEW,
+        },
+        REJECT: {
+            'FUNC': lambda _: REJECTED,
+        },
+    },
+    EDITOR_REVIEW: {
+        DONE: {
+            'FUNC': lambda _: COPY_EDIT,
+        },
+        REJECT: {
+            'FUNC': lambda _: REJECTED,
+        },
+    }
+}
 
 def get_actions() -> list:
     return VALID_ACTIONS
@@ -58,40 +118,6 @@ def handle_action(curr_state, action) -> str:
         raise ValueError(f'Invalid state: {curr_state}')
     if not is_valid_action(action):
         raise ValueError(f'Invalid action: {action}')
-    new_state = curr_state
-    if curr_state == SUBMITTED:
-        if action == ASSIGN_REF:
-            new_state = IN_REF_REV
-        elif action == REJECT:
-            new_state = REJECTED
-    elif curr_state == IN_REF_REV:
-        if action == ACCEPT:
-            new_state = COPY_EDIT
-        elif action == REJECT:
-            new_state = REJECTED
-    elif curr_state == COPY_EDIT:
-        if action == DONE:
-            new_state = AUTHOR_REVIEW
-        elif action == REJECT:
-            new_state = REJECTED
-    elif curr_state == AUTHOR_REVIEW:
-        if action == DONE:
-            new_state = FORMATTING
-        elif action == REJECT:
-            new_state = REJECTED
-    elif curr_state == FORMATTING:
-        if action == DONE:
-            new_state = PUBLISHED
-        elif action == REJECT:
-            new_state = REJECTED
-    elif curr_state == AUTHOR_REVISIONS:
-        if action == DONE:
-            new_state = EDITOR_REVIEW
-        elif action == REJECT:
-            new_state = REJECTED
-    elif curr_state == EDITOR_REVIEW:
-        if action == ACCEPT:
-            new_state = COPY_EDIT
-        elif action == REJECT:
-            new_state = REJECTED
-    return new_state
+    if curr_state not in STATE_TABLE or action not in STATE_TABLE[curr_state]:
+        raise ValueError(f'Invalid action {action} for state {curr_state}')
+    return STATE_TABLE[curr_state][action][FUNC](None)
