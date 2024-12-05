@@ -41,3 +41,15 @@ def test_handle_action_valid_return():
         for action in actions:
             new_state = mqry.handle_action(state, action)
             assert mqry.is_valid_state(new_state)
+
+
+def test_handle_action_valid_return():
+    for state in mqry.get_states():
+        for action in mqry.get_actions():
+            new_state = mqry.handle_action(state, action)
+        for action in mqry.get_valid_actions_by_state(state):
+            print(f'{action=}')
+            new_state = mqry.handle_action(state, action,
+                                           mqry.SAMPLE_MANU)
+            print(f'{new_state=}')
+            assert mqry.is_valid_state(new_state)
