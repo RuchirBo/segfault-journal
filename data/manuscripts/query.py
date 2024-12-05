@@ -1,3 +1,4 @@
+import data.manuscripts.fields as flds
 SUBMITTED = 'SUB'
 IN_REF_REV = 'REV'
 COPY_EDIT = 'CED'
@@ -113,6 +114,13 @@ def is_valid_action(action: str) -> bool:
     return action in VALID_ACTIONS
 
 
+SAMPLE_MANU = {
+    flds.TITLE: 'Test Title',
+    flds.AUTHOR: 'Test Person',
+    flds.REFEREES: [],
+}
+
+
 def handle_action(curr_state, action) -> str:
     if not is_valid_state(curr_state):
         raise ValueError(f'Invalid state: {curr_state}')
@@ -121,3 +129,9 @@ def handle_action(curr_state, action) -> str:
     if curr_state not in STATE_TABLE or action not in STATE_TABLE[curr_state]:
         raise ValueError(f'Invalid action {action} for state {curr_state}')
     return STATE_TABLE[curr_state][action][FUNC](None)
+
+
+def get_valid_actions_by_state(state: str):
+    valid_actions = STATE_TABLE[state].keys()
+    print(f'{valid_actions=}')
+    return valid_actions
