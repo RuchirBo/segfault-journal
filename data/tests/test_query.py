@@ -37,7 +37,7 @@ def test_handle_action_bad_action():
                            gen_random_not_valid_str())
 
 def test_handle_action_valid_return():
-    for state in mqry.get_states():
-        for action in mqry.get_actions():
+    for state, actions in mqry.STATE_TABLE.items():
+        for action in actions:
             new_state = mqry.handle_action(state, action)
             assert mqry.is_valid_state(new_state)
