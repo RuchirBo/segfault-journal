@@ -84,7 +84,7 @@ STATE_TABLE = {
         },
         REMOVE_REF: {
             'FUNC': lambda m: IN_REF_REV,
-        }
+        },
         REJECT: {
             'FUNC': lambda m: REJECTED,
         },
