@@ -32,6 +32,19 @@ def test_handle_action_bad_state():
                            mqry.SAMPLE_MANU)
 
 
+def test_reject_action():
+    for state in mqry.get_states():
+        if state in {mqry.SUBMITTED, mqry.IN_REF_REV}:
+            new_state = mqry.handle_action(state, mqry.REJECT, mqry.SAMPLE_MANU)
+            assert new_state == mqry.REJECTED, f"Failed for state {state}"
+
+
+def test_rejected_state_no_actions():
+    for action in mqry.get_actions():
+        with pytest.raises(ValueError, match="Invalid action"):
+            mqry.handle_action(mqry.REJECTED, action, mqry.SAMPLE_MANU)
+
+            
 def test_handle_action_bad_action():
     with pytest.raises(ValueError):
         mqry.handle_action(mqry.TEST_STATE,

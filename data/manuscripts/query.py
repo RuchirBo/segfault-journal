@@ -14,9 +14,6 @@ WITHDRAWN = 'WITH'
 
 TEST_STATE = SUBMITTED
 
-# TO BE DELETED WHEN UPDATED IN THE STATE TABLE
-NOT_TESTED = {REJECTED}
-
 VALID_STATES = [
     SUBMITTED,
     IN_REF_REV,
@@ -157,8 +154,6 @@ def handle_action(curr_state, action, manuscript) -> str:
         raise ValueError(f'Invalid state: {curr_state}')
     if not is_valid_action(action):
         raise ValueError(f'Invalid action: {action}')
-    if curr_state in NOT_TESTED:
-        raise ValueError(f'Cannot perform actions on terminal state: {curr_state}')
     if curr_state not in STATE_TABLE or action not in STATE_TABLE[curr_state]:
         raise ValueError(f'Invalid action {action} for state {curr_state}')
     return STATE_TABLE[curr_state][action][FUNC](manuscript)
