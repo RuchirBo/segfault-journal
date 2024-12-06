@@ -47,3 +47,16 @@ def test_handle_action_valid_return():
                                            mqry.SAMPLE_MANU)
             print(f'{new_state=}')
             assert mqry.is_valid_state(new_state)
+
+
+def test_withdraw_action():
+    for state in mqry.get_states():
+        if state not in {mqry.REJECTED, mqry.WITHDRAWN}:
+            new_state = mqry.handle_action(state, mqry.WITHDRAW, mqry.SAMPLE_MANU)
+            assert new_state == mqry.WITHDRAWN, f"Failed for state {state}"
+
+
+def test_withdrawn_state_no_actions():
+    for action in mqry.get_actions():
+        with pytest.raises(ValueError, match="Invalid action"):
+            mqry.handle_action(mqry.WITHDRAWN, action, mqry.SAMPLE_MANU)
