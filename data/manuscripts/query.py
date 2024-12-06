@@ -37,9 +37,12 @@ def is_valid_state(state: str) -> bool:
 
 
 ACCEPT = 'ACC'
+ACCEPT_WITH_REV = 'ACCWITHREV'
+SUBMIT_REV = 'SUBREV'
 ASSIGN_REF = 'ARF'
 DONE = 'DON'
 REJECT = 'REJ'
+REMOVE_REF = 'REMREF'
 TEST_ACTION = ACCEPT
 VALID_ACTIONS = [
     ACCEPT,
@@ -47,6 +50,9 @@ VALID_ACTIONS = [
     DONE,
     REJECT,
     WITHDRAW,
+    ACCEPT_WITH_REV,
+    SUBMIT_REV,
+    REMOVE_REF
 ]
 
 FUNC = 'FUNC'
@@ -54,89 +60,79 @@ FUNC = 'FUNC'
 STATE_TABLE = {
     SUBMITTED: {
         ASSIGN_REF: {
-            'FUNC': lambda _: IN_REF_REV,
+            'FUNC': lambda m: IN_REF_REV,
         },
         REJECT: {
-            'FUNC': lambda _: REJECTED,
+            'FUNC': lambda m: REJECTED,
         },
         WITHDRAW: {
-            'FUNC': lambda _: WITHDRAWN,
+            'FUNC': lambda m: WITHDRAWN,
         },
     },
     IN_REF_REV: {
         ACCEPT: {
-            'FUNC': lambda _: COPY_EDIT,
+            'FUNC': lambda m: COPY_EDIT,
         },
+        ACCEPT_WITH_REV: {
+            'FUNC': lambda m: AUTHOR_REVISIONS,
+        },
+        ASSIGN_REF: {
+            'FUNC': lambda m: IN_REF_REV,
+        },
+        SUBMIT_REV: {
+            'FUNC': lambda m: IN_REF_REV,
+        },
+        REMOVE_REF: {
+            'FUNC': lambda m: IN_REF_REV,
+        }
         REJECT: {
-            'FUNC': lambda _: REJECTED,
+            'FUNC': lambda m: REJECTED,
         },
         WITHDRAW: {
-            'FUNC': lambda _: WITHDRAWN,
+            'FUNC': lambda m: WITHDRAWN,
         },
     },
     COPY_EDIT: {
         DONE: {
-            'FUNC': lambda _: AUTHOR_REVIEW,
-        },
-        REJECT: {
-            'FUNC': lambda _: REJECTED,
+            'FUNC': lambda m: AUTHOR_REVIEW,
         },
         WITHDRAW: {
-            'FUNC': lambda _: WITHDRAWN,
+            'FUNC': lambda m: WITHDRAWN,
         },
     },
     AUTHOR_REVIEW: {
         DONE: {
-            'FUNC': lambda _: FORMATTING,
-        },
-        REJECT: {
-            'FUNC': lambda _: REJECTED,
+            'FUNC': lambda m: FORMATTING,
         },
         WITHDRAW: {
-            'FUNC': lambda _: WITHDRAWN,
+            'FUNC': lambda m: WITHDRAWN,
         },
     },
     FORMATTING: {
         DONE: {
-            'FUNC': lambda _: FORMATTING,
-        },
-        REJECT: {
-            'FUNC': lambda _: REJECTED,
+            'FUNC': lambda m: FORMATTING,
         },
         WITHDRAW: {
-            'FUNC': lambda _: WITHDRAWN,
+            'FUNC': lambda m: WITHDRAWN,
         },
     },
     AUTHOR_REVISIONS: {
         DONE: {
-            'FUNC': lambda _: EDITOR_REVIEW,
-        },
-        REJECT: {
-            'FUNC': lambda _: REJECTED,
+            'FUNC': lambda m: EDITOR_REVIEW,
         },
         WITHDRAW: {
-            'FUNC': lambda _: WITHDRAWN,
+            'FUNC': lambda m: WITHDRAWN,
         },
     },
     EDITOR_REVIEW: {
-        DONE: {
-            'FUNC': lambda _: COPY_EDIT,
-        },
-        REJECT: {
-            'FUNC': lambda _: REJECTED,
+        ACCEPT: {
+            'FUNC': lambda m: COPY_EDIT,
         },
         WITHDRAW: {
-            'FUNC': lambda _: WITHDRAWN,
+            'FUNC': lambda m: WITHDRAWN,
         },
     },
-    PUBLISHED: {
-        DONE: {
-            'FUNC': lambda _: PUBLISHED,
-        },
-        WITHDRAW: {
-            'FUNC': lambda _: WITHDRAWN,
-        }
-    },
+    PUBLISHED: {},
     REJECTED:{},
     WITHDRAWN:{}
 }
