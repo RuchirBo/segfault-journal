@@ -6,6 +6,7 @@ AUTHOR_REVIEW = 'AUREVIEW'
 FORMATTING = 'FORM'
 PUBLISHED = 'PUB'
 REJECTED = 'REJ'
+WITHDRAW = 'WITHDRAW'
 
 AUTHOR_REVISIONS = 'AUTHREVISION'
 EDITOR_REVIEW = 'EDREV'
@@ -45,6 +46,7 @@ VALID_ACTIONS = [
     ASSIGN_REF,
     DONE,
     REJECT,
+    WITHDRAW,
 ]
 
 FUNC = 'FUNC'
@@ -57,6 +59,9 @@ STATE_TABLE = {
         REJECT: {
             'FUNC': lambda _: REJECTED,
         },
+        WITHDRAW: {
+            'FUNC': lambda _: WITHDRAWN,
+        },
     },
     IN_REF_REV: {
         ACCEPT: {
@@ -64,6 +69,9 @@ STATE_TABLE = {
         },
         REJECT: {
             'FUNC': lambda _: REJECTED,
+        },
+        WITHDRAW: {
+            'FUNC': lambda _: WITHDRAWN,
         },
     },
     COPY_EDIT: {
@@ -73,6 +81,9 @@ STATE_TABLE = {
         REJECT: {
             'FUNC': lambda _: REJECTED,
         },
+        WITHDRAW: {
+            'FUNC': lambda _: WITHDRAWN,
+        },
     },
     AUTHOR_REVIEW: {
         DONE: {
@@ -80,6 +91,9 @@ STATE_TABLE = {
         },
         REJECT: {
             'FUNC': lambda _: REJECTED,
+        },
+        WITHDRAW: {
+            'FUNC': lambda _: WITHDRAWN,
         },
     },
     FORMATTING: {
@@ -89,6 +103,9 @@ STATE_TABLE = {
         REJECT: {
             'FUNC': lambda _: REJECTED,
         },
+        WITHDRAW: {
+            'FUNC': lambda _: WITHDRAWN,
+        },
     },
     AUTHOR_REVISIONS: {
         DONE: {
@@ -96,6 +113,9 @@ STATE_TABLE = {
         },
         REJECT: {
             'FUNC': lambda _: REJECTED,
+        },
+        WITHDRAW: {
+            'FUNC': lambda _: WITHDRAWN,
         },
     },
     EDITOR_REVIEW: {
@@ -105,10 +125,16 @@ STATE_TABLE = {
         REJECT: {
             'FUNC': lambda _: REJECTED,
         },
+        WITHDRAW: {
+            'FUNC': lambda _: WITHDRAWN,
+        },
     },
     PUBLISHED: {
         DONE: {
             'FUNC': lambda _: PUBLISHED,
+        },
+        WITHDRAW: {
+            'FUNC': lambda _: WITHDRAWN,
         }
     },
     REJECTED:{},
