@@ -13,6 +13,8 @@ WITHDRAWN = 'WITH'
 
 TEST_STATE = SUBMITTED
 
+# TO BE DELETED WHEN UPDATED IN THE STATE TABLE
+NOT_TESTED = {REJECTED, WITHDRAWN}
 
 VALID_STATES = [
     SUBMITTED,
@@ -103,7 +105,14 @@ STATE_TABLE = {
         REJECT: {
             'FUNC': lambda _: REJECTED,
         },
-    }
+    },
+    PUBLISHED: {
+        DONE: {
+            'FUNC': lambda _: PUBLISHED,
+        }
+    },
+    REJECTED:{},
+    WITHDRAWN:{}
 }
 
 def get_actions() -> list:
@@ -121,14 +130,16 @@ SAMPLE_MANU = {
 }
 
 
-def handle_action(curr_state, action) -> str:
+def handle_action(curr_state, action, manuscript) -> str:
     if not is_valid_state(curr_state):
         raise ValueError(f'Invalid state: {curr_state}')
     if not is_valid_action(action):
         raise ValueError(f'Invalid action: {action}')
+    if curr_state in NOT_TESTED:
+        raise ValueError(f'Cannot perform actions on terminal state: {curr_state}')
     if curr_state not in STATE_TABLE or action not in STATE_TABLE[curr_state]:
         raise ValueError(f'Invalid action {action} for state {curr_state}')
-    return STATE_TABLE[curr_state][action][FUNC](None)
+    return STATE_TABLE[curr_state][action][FUNC](manuscript)
 
 
 def get_valid_actions_by_state(state: str):
