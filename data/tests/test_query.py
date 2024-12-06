@@ -24,6 +24,12 @@ def test_is_invalid_action():
     for i in range(10):
         assert not mqry.is_valid_action(gen_random_not_valid_str())
 
+def test_is_invalid_action_for_state():
+    with pytest.raises(ValueError):
+        mqry.handle_action(mqry.REJECTED,
+                           mqry.REJECT,
+                           mqry.SAMPLE_MANU)
+                           
 
 def test_handle_action_bad_state():
     with pytest.raises(ValueError):
@@ -44,7 +50,7 @@ def test_rejected_state_no_actions():
         with pytest.raises(ValueError, match="Invalid action"):
             mqry.handle_action(mqry.REJECTED, action, mqry.SAMPLE_MANU)
 
-            
+
 def test_handle_action_bad_action():
     with pytest.raises(ValueError):
         mqry.handle_action(mqry.TEST_STATE,
