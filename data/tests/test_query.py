@@ -26,10 +26,10 @@ def test_is_invalid_action():
 
 def test_is_invalid_action_for_state():
     with pytest.raises(ValueError):
-        mqry.handle_action(mqry.REJECTED,
+        mqry.handle_action(mqry.SUBMITTED,
                            mqry.REJECT,
                            mqry.SAMPLE_MANU)
-                           
+
 
 def test_handle_action_bad_state():
     with pytest.raises(ValueError):
