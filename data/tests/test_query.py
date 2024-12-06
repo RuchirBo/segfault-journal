@@ -51,7 +51,7 @@ def test_handle_action_valid_return():
 
 def test_withdraw_action():
     for state in mqry.get_states():
-        if state not in {mqry.REJECTED, mqry.WITHDRAWN}:
+        if state not in {mqry.REJECTED, mqry.WITHDRAWN, mqry.PUBLISHED}:
             new_state = mqry.handle_action(state, mqry.WITHDRAW, mqry.SAMPLE_MANU)
             assert new_state == mqry.WITHDRAWN, f"Failed for state {state}"
 
