@@ -26,7 +26,7 @@ def test_is_invalid_action():
 
 def test_is_invalid_action_for_state():
     with pytest.raises(ValueError):
-        mqry.handle_action(mqry.SUBMITTED,
+        mqry.handle_action(mqry.REJECTED,
                            mqry.REJECT,
                            mqry.SAMPLE_MANU)
 
