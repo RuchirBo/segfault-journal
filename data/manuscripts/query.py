@@ -98,16 +98,16 @@ STATE_TABLE = {
     },
     IN_REF_REV: {
         ACCEPT: {
-            'FUNC': lambda m: COPY_EDIT,
+            'FUNC': lambda **kwargs: COPY_EDIT,
         },
         ACCEPT_WITH_REV: {
-            'FUNC': lambda m: AUTHOR_REVISIONS,
+            'FUNC': lambda **kwargs: AUTHOR_REVISIONS,
         },
         ASSIGN_REF: {
             FUNC: assign_ref,
         },
         SUBMIT_REV: {
-            'FUNC': lambda m: IN_REF_REV,
+            'FUNC': lambda **kwargs: IN_REF_REV,
         },
         DELETE_REF: {
             FUNC: delete_ref,
@@ -125,25 +125,25 @@ STATE_TABLE = {
     },
     AUTHOR_REVIEW: {
         DONE: {
-            'FUNC': lambda m: FORMATTING,
+            'FUNC': lambda **kwargs: FORMATTING,
         },
         **COMMON_ACTIONS,
     },
     FORMATTING: {
         DONE: {
-            'FUNC': lambda m: FORMATTING,
+            'FUNC': lambda **kwargs: FORMATTING,
         },
         **COMMON_ACTIONS,
     },
     AUTHOR_REVISIONS: {
         DONE: {
-            'FUNC': lambda m: EDITOR_REVIEW,
+            'FUNC': lambda **kwargs: EDITOR_REVIEW,
         },
         **COMMON_ACTIONS,
     },
     EDITOR_REVIEW: {
         ACCEPT: {
-            'FUNC': lambda m: COPY_EDIT,
+            'FUNC': lambda **kwargs: COPY_EDIT,
         },
         **COMMON_ACTIONS,
     },
@@ -161,8 +161,6 @@ def handle_action(curr_state, action, **kwargs) -> str:
         raise ValueError(f'Invalid action: {action}')
     if curr_state not in STATE_TABLE or action not in STATE_TABLE[curr_state]:
         raise ValueError(f'Invalid action {action} for state {curr_state}')
-    print(STATE_TABLE[curr_state][action][FUNC])
-    print(kwargs)
     return STATE_TABLE[curr_state][action][FUNC](**kwargs)
 
 
