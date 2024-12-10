@@ -45,7 +45,7 @@ SUBMIT_REV = 'SUBREV'
 ASSIGN_REF = 'ARF'
 DONE = 'DON'
 REJECT = 'REJ'
-REMOVE_REF = 'REMREF'
+DELETE_REF = 'DRF'
 TEST_ACTION = ACCEPT
 
 VALID_ACTIONS = [
@@ -56,7 +56,7 @@ VALID_ACTIONS = [
     WITHDRAW,
     ACCEPT_WITH_REV,
     SUBMIT_REV,
-    REMOVE_REF
+    DELETE_REF
 ]
 
 def get_actions() -> list:
@@ -80,17 +80,21 @@ def delete_ref(manu: dict, ref: str) -> str:
 
 FUNC = 'FUNC'
 
+COMMON_ACTIONS = {
+    WITHDRAW: {
+        FUNC: lambda **kwargs: WITHDRAWN,
+    },
+}
+
 STATE_TABLE = {
     SUBMITTED: {
         ASSIGN_REF: {
-            'FUNC': lambda m: IN_REF_REV,
+            FUNC: assign_ref,
         },
         REJECT: {
-            'FUNC': lambda m: REJECTED,
+            FUNC: lambda **kwargs: REJECTED,
         },
-        WITHDRAW: {
-            'FUNC': lambda m: WITHDRAWN,
-        },
+        **COMMON_ACTIONS,
     },
     IN_REF_REV: {
         ACCEPT: {
@@ -100,60 +104,48 @@ STATE_TABLE = {
             'FUNC': lambda m: AUTHOR_REVISIONS,
         },
         ASSIGN_REF: {
-            'FUNC': lambda m: IN_REF_REV,
+            FUNC: assign_ref,
         },
         SUBMIT_REV: {
             'FUNC': lambda m: IN_REF_REV,
         },
-        REMOVE_REF: {
-            'FUNC': lambda m: IN_REF_REV,
+        DELETE_REF: {
+            FUNC: delete_ref,
         },
         REJECT: {
-            'FUNC': lambda m: REJECTED,
+            FUNC: lambda **kwargs: REJECTED,
         },
-        WITHDRAW: {
-            'FUNC': lambda m: WITHDRAWN,
-        },
+        **COMMON_ACTIONS,
     },
     COPY_EDIT: {
         DONE: {
-            'FUNC': lambda m: AUTHOR_REVIEW,
+            FUNC: lambda **kwargs: AUTHOR_REVIEW,
         },
-        WITHDRAW: {
-            'FUNC': lambda m: WITHDRAWN,
-        },
+        **COMMON_ACTIONS,
     },
     AUTHOR_REVIEW: {
         DONE: {
             'FUNC': lambda m: FORMATTING,
         },
-        WITHDRAW: {
-            'FUNC': lambda m: WITHDRAWN,
-        },
+        **COMMON_ACTIONS,
     },
     FORMATTING: {
         DONE: {
             'FUNC': lambda m: FORMATTING,
         },
-        WITHDRAW: {
-            'FUNC': lambda m: WITHDRAWN,
-        },
+        **COMMON_ACTIONS,
     },
     AUTHOR_REVISIONS: {
         DONE: {
             'FUNC': lambda m: EDITOR_REVIEW,
         },
-        WITHDRAW: {
-            'FUNC': lambda m: WITHDRAWN,
-        },
+        **COMMON_ACTIONS,
     },
     EDITOR_REVIEW: {
         ACCEPT: {
             'FUNC': lambda m: COPY_EDIT,
         },
-        WITHDRAW: {
-            'FUNC': lambda m: WITHDRAWN,
-        },
+        **COMMON_ACTIONS,
     },
     PUBLISHED: {},
     REJECTED:{},
@@ -162,14 +154,16 @@ STATE_TABLE = {
 
 
 
-def handle_action(curr_state, action, manuscript) -> str:
+def handle_action(curr_state, action, **kwargs) -> str:
     if not is_valid_state(curr_state):
         raise ValueError(f'Invalid state: {curr_state}')
     if not is_valid_action(action):
         raise ValueError(f'Invalid action: {action}')
     if curr_state not in STATE_TABLE or action not in STATE_TABLE[curr_state]:
         raise ValueError(f'Invalid action {action} for state {curr_state}')
-    return STATE_TABLE[curr_state][action][FUNC](manuscript)
+    print(STATE_TABLE[curr_state][action][FUNC])
+    print(kwargs)
+    return STATE_TABLE[curr_state][action][FUNC](**kwargs)
 
 
 def get_valid_actions_by_state(state: str):
