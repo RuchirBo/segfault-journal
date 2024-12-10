@@ -27,6 +27,12 @@ VALID_STATES = [
     WITHDRAWN,
 ]
 
+SAMPLE_MANU = {
+    flds.TITLE: 'Test Title',
+    flds.AUTHOR: 'Test Person',
+    flds.REFEREES: [],
+}
+
 def get_states() -> list:
     return VALID_STATES
 def is_valid_state(state: str) -> bool:
@@ -41,6 +47,7 @@ DONE = 'DON'
 REJECT = 'REJ'
 REMOVE_REF = 'REMREF'
 TEST_ACTION = ACCEPT
+
 VALID_ACTIONS = [
     ACCEPT,
     ASSIGN_REF,
@@ -51,6 +58,25 @@ VALID_ACTIONS = [
     SUBMIT_REV,
     REMOVE_REF
 ]
+
+def get_actions() -> list:
+    return VALID_ACTIONS
+
+def is_valid_action(action: str) -> bool:
+    return action in VALID_ACTIONS
+
+def assign_ref(manu: dict, ref: str, extra=None) -> str:
+    print(extra)
+    manu[flds.REFEREES].append(ref)
+    return IN_REF_REV
+
+def delete_ref(manu: dict, ref: str) -> str:
+    if len(manu[flds.REFEREES]) > 0:
+        manu[flds.REFEREES].remove(ref)
+    if len(manu[flds.REFEREES]) > 0:
+        return IN_REF_REV
+    else:
+        return SUBMITTED
 
 FUNC = 'FUNC'
 
@@ -134,19 +160,6 @@ STATE_TABLE = {
     WITHDRAWN:{}
 }
 
-def get_actions() -> list:
-    return VALID_ACTIONS
-
-
-def is_valid_action(action: str) -> bool:
-    return action in VALID_ACTIONS
-
-
-SAMPLE_MANU = {
-    flds.TITLE: 'Test Title',
-    flds.AUTHOR: 'Test Person',
-    flds.REFEREES: [],
-}
 
 
 def handle_action(curr_state, action, manuscript) -> str:
