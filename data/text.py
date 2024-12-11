@@ -28,7 +28,7 @@ text_dict = {
         TITLE: 'Delete Page',
         TEXT: 'This is a text to delete.',
     },
-    UPD_KEY:{
+    UPD_KEY: {
         TITLE: 'Update Page',
         TEXT: 'This is a text to update.',
     }

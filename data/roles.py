@@ -11,13 +11,14 @@ ED_CODE = 'ED'
 TEST_NEW_CODE = ED_CODE
 ME_CODE = 'ME'
 CE_CODE = 'CE'
+RE_CODE = 'RE'
 
 ROLES = {
     AUTHOR_CODE: 'Author',
     CE_CODE: 'Consulting Editor',
     ED_CODE: 'Editor',
     ME_CODE: 'Managing Editor',
-    'RE': 'Referee',
+    RE_CODE: 'Referee',
 }
 
 MH_ROLES = [CE_CODE, ED_CODE, ME_CODE]
@@ -69,6 +70,15 @@ def create_roles(code, name) -> dict:
     else:
         all_roles[code] = name
         return all_roles
+
+
+def update(code: str, name: str) -> dict:
+    all_roles = get_noncopy_roles()
+    if code in all_roles:
+        all_roles[code] = name
+        return all_roles
+    else:
+        return None
 
 
 def main():

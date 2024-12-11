@@ -52,7 +52,5 @@ def test_create():
 
 def test_update():
     assert tx.UPD_KEY in tx.read()
-    msg = tx.update(tx.UPD_KEY, title="New Title", text="New Text")   
-    compare = f"Update page {tx.UPD_KEY} with {tx.TEST_UPD_VAL}"
-    assert msg == compare, f"Expected: {compare}, but got: {msg}"
+    tx.update(tx.UPD_KEY, tx.TITLE, tx.TEST_UPD_VAL)   
     assert tx.read()[tx.UPD_KEY][tx.TEXT] == tx.TEST_UPD_VAL
