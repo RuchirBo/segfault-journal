@@ -32,14 +32,6 @@ def test_read_one_invalid():
     assert text_data == {}
 
 
-# def test_create():
-#     key = tx.create(ADD_TITLE, ADD_TEXT, ADD_KEY)
-#     text_data = tx.read()
-#     assert key in text_data
-#     assert text_data[key]['title'] == ADD_TITLE
-#     assert text_data[key]['text'] == ADD_TEXT
-
-
 def test_delete():
     text = tx.read()
     old_len = len(text)
@@ -56,3 +48,11 @@ def test_create():
     updated_entry = tx.read_one(tx.TEST_KEY)
     assert updated_entry[tx.TITLE] == new_title
     assert updated_entry[tx.TEXT] == new_text
+
+
+def test_update():
+    assert tx.UPD_KEY in tx.read()
+    msg = tx.update(tx.UPD_KEY, title="New Title", text="New Text")   
+    compare = f"Update page {tx.UPD_KEY} with {tx.TEST_UPD_VAL}"
+    assert msg == compare, f"Expected: {compare}, but got: {msg}"
+    assert tx.read()[tx.UPD_KEY][tx.TEXT] == tx.TEST_UPD_VAL

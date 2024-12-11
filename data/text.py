@@ -11,6 +11,9 @@ EMAIL = 'email'
 TEST_KEY = 'HomePage'
 SUBM_KEY = 'SubmissionsPage'
 DEL_KEY = 'DeletePage'
+UPD_KEY = 'UpdatePage'
+
+TEST_UPD_VAL = 'Test update value'
 
 text_dict = {
     TEST_KEY: {
@@ -22,9 +25,13 @@ text_dict = {
         TEXT: "All submissions must be original work in Word format"
     },
     DEL_KEY: {
-        TITLE: 'Home Page',
+        TITLE: 'Delete Page',
         TEXT: 'This is a text to delete.',
     },
+    UPD_KEY:{
+        TITLE: 'Update Page',
+        TEXT: 'This is a text to update.',
+    }
 }
 
 
