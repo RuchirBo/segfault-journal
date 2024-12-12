@@ -168,3 +168,13 @@ def get_valid_actions_by_state(state: str):
     valid_actions = STATE_TABLE[state].keys()
     print(f'{valid_actions=}')
     return valid_actions
+
+
+MANUSCRIPTS = []
+
+def create_manuscript(manuscript: dict):
+    all_fields = [flds.TITLE, flds.AUTHOR, flds.REFEREES]
+    for key in all_fields:
+        if key not in manuscript:
+            raise ValueError("Missing required field for manuscript: {key}")
+    MANUSCRIPTS.append(manuscript)
