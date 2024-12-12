@@ -12,6 +12,8 @@ import werkzeug.exceptions as wz
 
 import data.people as ppl
 import data.manuscripts.query as manu
+import data.manuscripts.fields as flds
+
 
 app = Flask(__name__)
 CORS(app)
@@ -256,3 +258,40 @@ class Manuscripts(Resource):
     def get(self):
         manuscripts = manu.get_all_manuscripts()
         return {'manuscripts': manuscripts}
+
+
+MANU_CREATE_FLDS = api.model('AddNewManuscriptEntry', {
+    flds.TITLE: fields.String,
+    flds.AUTHOR: fields.String,
+    flds.REFEREES: fields.List(fields.String),
+})
+
+
+@api.route(f'{MANU_EP}/create')
+class ManuscriptsCreate(Resource):
+    """
+    Add a manuscript to the journal db.
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'Not acceptable manuscript data')
+    @api.expect(MANU_CREATE_FLDS)
+    def put(self):
+        """
+        Add a manuscript.
+        """
+        try:
+            title = request.json.get(flds.TITLE)
+            author = request.json.get(flds.AUTHOR)
+            referees = request.json.get(flds.REFEREES, [])
+            manuscript = {
+                flds.TITLE: title,
+                flds.AUTHOR: author,
+                flds.REFEREES: referees,
+            }
+            manu.create_manuscript(manuscript)
+        except Exception as err:
+            raise wz.NotAcceptable(f'Could not add manuscript: '
+                                   f'{err=}')
+        return {
+            MESSAGE: 'Manuscript added!',
+        }
