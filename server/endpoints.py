@@ -11,6 +11,7 @@ from flask_cors import CORS
 import werkzeug.exceptions as wz
 
 import data.people as ppl
+import data.manuscripts.query as manu
 
 app = Flask(__name__)
 CORS(app)
@@ -248,3 +249,10 @@ class PersonRoles(Resource):
             }, 200
         except ValueError as e:
             return {"message": str(e)}, 400
+
+
+@api.route(f"{MANU_EP}")
+class Manuscripts(Resource):
+    def get(self):
+        manuscripts = manu.get_all_manuscripts()
+        return {'manuscripts': manuscripts}

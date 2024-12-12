@@ -10,6 +10,9 @@ TEST_SAMPLE_MANU = {
     flds.REFEREES: [],
 }
 
+TEST_TITLE = 'First Title'
+NOT_TITLE = 'Not Title'
+
 TEST_SAMPLE_INVALID_MANU = {
     flds.TITLE: 'Test Title',
     flds.AUTHOR: 'Test Person',
@@ -109,8 +112,17 @@ def test_create_manuscript_invalid():
         mqry.create_manuscript(TEST_SAMPLE_INVALID_MANU)
 
 
-def test_get_manuscript():
-    codes = mqry.get_manuscripts()
-    assert isinstance(codes, list)
-    for code in codes:
-        assert isinstance(code, str)
+def test_get_all_manuscripts():
+    manu = mqry.get_all_manuscripts()
+    assert isinstance(manu, list)
+    for script in manu:
+        assert isinstance(manu, dict)
+
+
+def test_get_manuscript_by_title(title):
+    manu = mqry.get_manuscript_by_title(TEST_TITLE)
+    assert isinstance(manu, dict)
+    assert manu["title"] == TEST_TITLE 
+
+    manu = mqry.get_manuscript_by_title(NOT_TITLE)
+    assert manu is None

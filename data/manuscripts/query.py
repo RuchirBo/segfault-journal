@@ -170,7 +170,11 @@ def get_valid_actions_by_state(state: str):
     return valid_actions
 
 
-MANUSCRIPTS = []
+MANUSCRIPTS = [{
+    flds.TITLE: 'First Title',
+    flds.AUTHOR: 'First Person',
+    flds.REFEREES: [],
+}]
 
 def create_manuscript(manuscript: dict):
     all_fields = [flds.TITLE, flds.AUTHOR, flds.REFEREES]
@@ -180,5 +184,12 @@ def create_manuscript(manuscript: dict):
     MANUSCRIPTS.append(manuscript)
 
 
-def get_manuscripts():
+def get_all_manuscripts():
     return MANUSCRIPTS
+
+
+def get_manuscript_by_title(title):
+    for manuscript in MANUSCRIPTS:
+        if manuscript["title"].lower() == title.lower():
+            return manuscript
+    return None
