@@ -1,6 +1,19 @@
 import random
 import pytest
 import data.manuscripts.query as mqry
+import data.manuscripts.fields as flds
+
+
+TEST_SAMPLE_MANU = {
+    flds.TITLE: 'Test Title',
+    flds.AUTHOR: 'Test Person',
+    flds.REFEREES: [],
+}
+
+TEST_SAMPLE_INVALID_MANU = {
+    flds.TITLE: 'Test Title',
+    flds.AUTHOR: 'Test Person',
+}
 
 
 def gen_random_not_valid_str() -> str:
@@ -82,3 +95,16 @@ def test_withdrawn_state_no_actions():
     for action in mqry.get_actions():
         with pytest.raises(ValueError, match="Invalid action"):
             mqry.handle_action(mqry.WITHDRAWN, action,manu=mqry.SAMPLE_MANU)
+
+
+def test_create_manuscript_valid():
+    mqry.MANUSCRIPTS.clear()
+    mqry.create_manuscript(TEST_SAMPLE_MANU)
+    assert TEST_SAMPLE_MANU in mqry.MANUSCRIPTS, f"Manuscript was not succesfully added"
+
+
+def test_create_manuscript_invalid():
+    mqry.MANUSCRIPTS.clear()
+    with pytest.raises(ValueError, match="Missing required field for manuscript: referees"):
+        mqry.create_manuscript(TEST_SAMPLE_INVALID_MANU)
+
