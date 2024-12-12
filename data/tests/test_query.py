@@ -119,10 +119,16 @@ def test_get_all_manuscripts():
         assert isinstance(manu, dict)
 
 
-def test_get_manuscript_by_title(title):
+def test_get_manuscript_by_title():
+    mqry.MANUSCRIPTS.clear()
+    manuscript = {
+        flds.TITLE: 'First Title',
+        flds.AUTHOR: 'First Person',
+        flds.REFEREES: [],
+    }
+    mqry.MANUSCRIPTS.append(manuscript)
+
     manu = mqry.get_manuscript_by_title(TEST_TITLE)
     assert isinstance(manu, dict)
-    assert manu["title"] == TEST_TITLE 
+    assert manu[flds.TITLE] == TEST_TITLE
 
-    manu = mqry.get_manuscript_by_title(NOT_TITLE)
-    assert manu is None

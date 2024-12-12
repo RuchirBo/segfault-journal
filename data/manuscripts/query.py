@@ -190,6 +190,6 @@ def get_all_manuscripts():
 
 def get_manuscript_by_title(title):
     for manuscript in MANUSCRIPTS:
-        if manuscript["title"].lower() == title.lower():
+        if manuscript[flds.TITLE].lower() == title.lower():
             return manuscript
-    return None
+    raise ValueError(f"No matching manuscript for {title}")
