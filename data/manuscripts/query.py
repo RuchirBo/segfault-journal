@@ -178,3 +178,7 @@ def create_manuscript(manuscript: dict):
         if key not in manuscript:
             raise ValueError(f"Missing required field for manuscript: {key}")
     MANUSCRIPTS.append(manuscript)
+
+
+def get_manuscripts():
+    return MANUSCRIPTS

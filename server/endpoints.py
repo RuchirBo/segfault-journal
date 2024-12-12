@@ -32,6 +32,7 @@ TITLE_EP = '/title'
 TITLE_RESP = "Title"
 RETURN = 'return'
 TITLE = 'Segfault Journal Bimonthly'
+MANU_EP = '/manuscripts'
 
 
 @api.route(HELLO_EP)

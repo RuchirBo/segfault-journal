@@ -108,3 +108,9 @@ def test_create_manuscript_invalid():
     with pytest.raises(ValueError, match="Missing required field for manuscript: referees"):
         mqry.create_manuscript(TEST_SAMPLE_INVALID_MANU)
 
+
+def test_get_manuscript():
+    codes = mqry.get_manuscripts()
+    assert isinstance(codes, list)
+    for code in codes:
+        assert isinstance(code, str)
