@@ -11,6 +11,7 @@ from flask_cors import CORS
 import werkzeug.exceptions as wz
 
 import data.people as ppl
+import data.manuscripts.query as query
 
 app = Flask(__name__)
 CORS(app)
