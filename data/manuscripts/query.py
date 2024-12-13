@@ -203,3 +203,12 @@ def get_manuscript_by_title(title):
         if manuscript[flds.TITLE].lower() == title.lower():
             return manuscript
     raise ValueError(f"No matching manuscript for {title}")
+
+
+def delete_manuscript(title: str, author: str):
+    for i, manuscript in enumerate(MANUSCRIPTS):
+            if (manuscript[flds.TITLE].lower() == title.lower()
+                    and manuscript[flds.AUTHOR].lower() == author.lower()):
+                del MANUSCRIPTS[i]
+                return
+    raise ValueError(f"Manuscript not found for Title: {title}, Author: {author}")
