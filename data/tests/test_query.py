@@ -161,3 +161,17 @@ def test_get_manuscript_by_title():
     assert isinstance(manu, dict)
     assert manu[flds.TITLE] == TEST_TITLE
 
+
+def test_delete_manuscript_valid():
+    mqry.MANUSCRIPTS.clear()
+    mqry.create_manuscript(TEST_SAMPLE_MANU)
+    assert TEST_SAMPLE_MANU in mqry.MANUSCRIPTS, "Manuscript not added"
+    mqry.delete_manuscript(TEST_SAMPLE_MANU[flds.TITLE], TEST_SAMPLE_MANU[flds.AUTHOR])
+    assert TEST_SAMPLE_MANU not in mqry.MANUSCRIPTS, "Manuscript not deleted"
+
+
+def test_delete_manuscript_invalid():
+    mqry.MANUSCRIPTS.clear()
+    mqry.create_manuscript(TEST_SAMPLE_MANU)
+    with pytest.raises(ValueError, match="Manuscript not found"):
+        mqry.delete_manuscript(TEST_OLD_INVALID_MANU[flds.TITLE], TEST_OLD_INVALID_MANU[flds.AUTHOR])
