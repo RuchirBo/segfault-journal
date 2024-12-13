@@ -328,3 +328,40 @@ class ManuscriptsUpdate(Resource):
         return {
             MESSAGE: 'Manuscript updated!',
         }
+
+
+MANU_DELETE_FIELDS = api.model('DeleteManuscriptEntry', {
+    flds.TITLE: fields.String,
+    flds.AUTHOR: fields.String,
+})
+
+
+@api.route(f'{MANU_EP}/delete')
+class ManuscriptsDelete(Resource):
+    """
+    Delete a manuscript from the journal db.
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'Not acceptable')
+    @api.expect(MANU_DELETE_FIELDS)
+    def delete(self):
+        try:
+            del_manuscript = request.get_json()
+            if not del_manuscript:
+                raise ValueError('Missing valid manuscript to delete.')
+            title = del_manuscript.get(flds.TITLE)
+            author = del_manuscript.get(flds.AUTHOR)
+
+            if not title or not author:
+                raise wz.NotAcceptable('Both title and author \
+                                       are required for manuscript \
+                                       to be deleted.')
+
+            manu.delete_manuscript(title, author)
+
+        except Exception as err:
+            raise wz.NotAcceptable(f'Could not delete manuscript: '
+                                   f'{err=}')
+        return {
+            MESSAGE: 'Manuscript deleted!',
+        }
