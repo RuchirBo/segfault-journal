@@ -18,6 +18,18 @@ TEST_SAMPLE_INVALID_MANU = {
     flds.AUTHOR: 'Test Person',
 }
 
+TEST_NEW_VALID_MANU = {
+    flds.TITLE: 'New Title',
+    flds.AUTHOR: 'New Person',
+    flds.REFEREES: [],
+}
+
+TEST_OLD_INVALID_MANU = {
+    flds.TITLE: 'Non-existent Title',
+    flds.AUTHOR: 'Non-existent Person',
+    flds.REFEREES: [],
+}
+
 
 def gen_random_not_valid_str() -> str:
     BIG_NUM = 50_000_000_000
@@ -112,11 +124,28 @@ def test_create_manuscript_invalid():
         mqry.create_manuscript(TEST_SAMPLE_INVALID_MANU)
 
 
+def test_update_manuscript_valid():
+    mqry.MANUSCRIPTS.clear()
+    mqry.create_manuscript(TEST_SAMPLE_MANU)
+    mqry.update_manuscript(TEST_SAMPLE_MANU, TEST_NEW_VALID_MANU)
+    updated_manuscript_found = False
+    for manu in mqry.MANUSCRIPTS:
+        if manu[flds.TITLE] == TEST_NEW_VALID_MANU[flds.TITLE]:
+            updated_manuscript_found = True
+    assert updated_manuscript_found
+
+def test_update_manuscript_invalid():
+    mqry.MANUSCRIPTS.clear()
+    mqry.create_manuscript(TEST_SAMPLE_MANU)
+    with pytest.raises(ValueError, match=f"Manuscript not found: {TEST_OLD_INVALID_MANU[flds.TITLE]}"):
+        mqry.update_manuscript(TEST_OLD_INVALID_MANU, TEST_NEW_VALID_MANU)
+
+
 def test_get_all_manuscripts():
     manu = mqry.get_all_manuscripts()
     assert isinstance(manu, list)
     for script in manu:
-        assert isinstance(manu, dict)
+        assert isinstance(script, dict)
 
 
 def test_get_manuscript_by_title():
