@@ -30,7 +30,11 @@ def connect_db():
                     '&appName=SWE',
                     tls=True,
                     tlsAllowInvalidCertificates=True,
-                    serverSelectionTimeoutMS=5000
+                    serverSelectionTimeoutMS=5000,
+                    connectTimeoutMS=30000,
+                    socketTimeoutMS=None,
+                    connect=False,
+                    maxPoolsize=1
                 )
                 client.admin.command('ping')
                 print("Successfully connected to MongoDB!")
