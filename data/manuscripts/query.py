@@ -1,4 +1,8 @@
 import data.manuscripts.fields as flds
+import data.db_connect as dbc
+
+MANU_COLLECT = 'manuscripts'
+
 SUBMITTED = 'SUB'
 IN_REF_REV = 'REV'
 COPY_EDIT = 'CED'
@@ -32,6 +36,10 @@ SAMPLE_MANU = {
     flds.AUTHOR: 'Test Person',
     flds.REFEREES: [],
 }
+
+client = dbc.connect_db()
+print(f'{client=}')
+
 
 def get_states() -> list:
     return VALID_STATES
@@ -170,45 +178,53 @@ def get_valid_actions_by_state(state: str):
     return valid_actions
 
 
-MANUSCRIPTS = [{
-    flds.TITLE: 'First Title',
-    flds.AUTHOR: 'First Person',
-    flds.REFEREES: [],
-}]
+#MANUSCRIPTS = [{
+#    flds.TITLE: 'First Title',
+#    flds.AUTHOR: 'First Person',
+#    flds.REFEREES: [],
+#}]
 
 def create_manuscript(manuscript: dict):
     all_fields = [flds.TITLE, flds.AUTHOR, flds.REFEREES]
     for key in all_fields:
         if key not in manuscript:
             raise ValueError(f"Missing required field for manuscript: {key}")
-    MANUSCRIPTS.append(manuscript)
+    dbc.create(MANU_COLLECT, manuscript)
+    return f"Manuscript created successfully."
 
 
 def update_manuscript(old_manuscript: dict, new_manuscript: dict):
-    for manu in MANUSCRIPTS:
-        if manu[flds.TITLE] == old_manuscript[flds.TITLE] and manu[flds.AUTHOR] == old_manuscript[flds.AUTHOR] and manu[flds.REFEREES] == old_manuscript[flds.REFEREES]:
-            manu[flds.TITLE] = new_manuscript[flds.TITLE]
-            manu[flds.AUTHOR] = new_manuscript[flds.AUTHOR]
-            # manu[flds.REFEREE] = new_manuscript[flds.REFEREE]
-        else:
-            raise ValueError(f"Manuscript not found: {old_manuscript[flds.TITLE]}")
+    old_manu = {
+        flds.TITLE: old_manuscript[flds.TITLE],
+        flds.AUTHOR: old_manuscript[flds.AUTHOR],
+        flds.REFEREES: old_manuscript[flds.REFEREES] 
+    }
+    result = dbc.update(
+        MANU_COLLECT,
+        old_manu,
+        {
+            "$set": new_manuscript
+        },
+    )
+    if not result:
+        raise ValueError(f"Manuscript not found: {old_manuscript[flds.TITLE]}")
+    return result
 
 
 def get_all_manuscripts():
-    return MANUSCRIPTS
+    return dbc.read(MANU_COLLECT)
 
 
 def get_manuscript_by_title(title):
-    for manuscript in MANUSCRIPTS:
-        if manuscript[flds.TITLE].lower() == title.lower():
-            return manuscript
-    raise ValueError(f"No matching manuscript for {title}")
+    result = dbc.fetch_one(MANU_COLLECT, {flds.TITLE: title})
+    if not result:
+        raise ValueError(f"No matching manuscript for {title}")
+    return result
 
 
 def delete_manuscript(title: str, author: str):
-    for i, manuscript in enumerate(MANUSCRIPTS):
-            if (manuscript[flds.TITLE].lower() == title.lower()
-                    and manuscript[flds.AUTHOR].lower() == author.lower()):
-                del MANUSCRIPTS[i]
-                return
-    raise ValueError(f"Manuscript not found for Title: {title}, Author: {author}")
+    result = dbc.delete(MANU_COLLECT, {flds.TITLE: title, flds.AUTHOR: author})
+    if not result:
+        raise ValueError(f"Manuscript not found for Title: {title}, Author: {author}")
+    return result
+
