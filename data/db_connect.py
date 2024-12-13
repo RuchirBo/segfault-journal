@@ -29,20 +29,10 @@ def connect_db():
                 raise ValueError('You must set your password '
                                  + 'to use Mongo in the cloud.')
             print("Connecting to Mongo in the cloud.")
-            try:
-                client = pm.MongoClient(
-                    f'mongodb+srv://segfaulter:{password}'
-                    '@swe.fcpo7.mongodb.net/'
-                    '?retryWrites=true'
-                    '&w=majority'
-                    '&appName=SWE',
-                    serverSelectionTimeoutMS=5000
-                )
-                client.admin.command('ping')
-                print("Successfully connected to MongoDB!")
-            except Exception as e:
-                print(f"Connection error: {e}")
-                raise
+            client = pm.MongoClient(f'mongodb+srv://segfaulter:{password}'
+                                    + '@swe.fcpo7.mongodb.net/'
+                                    + '?retryWrites=true'
+                                    + '&w=majority&appName=SWE')
         else:
             print("Connecting to Mongo locally.")
             client = pm.MongoClient()
