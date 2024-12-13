@@ -57,7 +57,7 @@ def read():
 
 def read_one(key: str) -> dict:
     # This should take a key and return the page dictionary
-    # for that key. Return an empty dictionary if key not found.
+    # for that key. Returns None if key not found.
     return dbc.fetch_one(TEXT_COLLECT, {KEY: key})
 
 
@@ -70,6 +70,7 @@ def create(title: str, text: str, key: str):
     if (exists(key)):
         raise ValueError(f'This is a duplicate{key=}')
     text = {
+        KEY: key,
         TITLE: title,
         TEXT: text,
     }
