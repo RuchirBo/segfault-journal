@@ -184,6 +184,16 @@ def create_manuscript(manuscript: dict):
     MANUSCRIPTS.append(manuscript)
 
 
+def update_manuscript(old_manuscript: dict, new_manuscript: dict):
+    for manu in MANUSCRIPTS:
+        if manu[flds.TITLE] == old_manuscript[flds.TITLE] and manu[flds.AUTHOR] == old_manuscript[flds.AUTHOR] and manu[flds.REFEREES] == old_manuscript[flds.REFEREES]:
+            manu[flds.TITLE] = new_manuscript[flds.TITLE]
+            manu[flds.AUTHOR] = new_manuscript[flds.AUTHOR]
+            # manu[flds.REFEREE] = new_manuscript[flds.REFEREE]
+        else:
+            raise ValueError(f"Manuscript not found: {old_manuscript[flds.TITLE]}")
+
+
 def get_all_manuscripts():
     return MANUSCRIPTS
 

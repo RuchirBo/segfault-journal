@@ -7,11 +7,20 @@ REFEREES = 'referees'
 TEST_FLD_NM = TITLE
 TEST_FLD_DISP_NM = 'Title'
 
+TEST_FLD_DISP_AUTHOR = 'Person'
+TEST_FLD_DISP_REFEREE = 'Referee'
+
 
 FIELDS = {
     TITLE: {
         DISP_NAME: TEST_FLD_DISP_NM,
     },
+    AUTHOR: {
+        DISP_NAME: TEST_FLD_DISP_AUTHOR,
+    },
+    # REFEREE: {
+    #     DISP_NAME: TEST_FLD_DISP_REFEREE,
+    # },
 }
 
 
