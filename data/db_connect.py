@@ -31,9 +31,9 @@ def connect_db():
                     tls=True,
                     tlsAllowInvalidCertificates=True,
                     serverSelectionTimeoutMS=5000,
-                    connectTimeoutMS=30000, 
-                    socketTimeoutMS=None, 
-                    connect=False, 
+                    connectTimeoutMS=30000,
+                    socketTimeoutMS=None,
+                    connect=False,
                     maxPoolsize=1
                 )
                 client.admin.command('ping')
