@@ -2,6 +2,10 @@
 This module interfaces to our user data.
 """
 
+import data.db_connect as dbc
+
+TEXT_COLLECT = "text"
+
 # fields
 KEY = 'key'
 TITLE = 'title'
@@ -9,6 +13,9 @@ TEXT = 'text'
 EMAIL = 'email'
 
 TEST_KEY = 'HomePage'
+TEST_TITLE = "Home Page"
+TEST_TEXT = "This is a journal about building API servers."
+
 SUBM_KEY = 'SubmissionsPage'
 DEL_KEY = 'DeletePage'
 UPD_KEY = 'UpdatePage'
@@ -34,6 +41,8 @@ text_dict = {
     }
 }
 
+client = dbc.connect_db()
+
 
 def read():
     """
@@ -42,17 +51,14 @@ def read():
         - Returns a dictionary of users keyed on user email.
         - Each user email must be the key for another dictionary.
     """
-    text = text_dict
+    text = dbc.read_dict(TEXT_COLLECT, KEY)
     return text
 
 
 def read_one(key: str) -> dict:
     # This should take a key and return the page dictionary
     # for that key. Return an empty dictionary if key not found.
-    result = {}
-    if key in text_dict:
-        result = text_dict[key]
-    return result
+    return dbc.fetch_one(TEXT_COLLECT, {KEY: key})
 
 
 def create(title: str, text: str, key: str):
@@ -61,26 +67,24 @@ def create(title: str, text: str, key: str):
        - Adds a new entry to the text_dict
        - The entry includes a title and text
     """
-    if key in text_dict:
+    if (exists(key)):
         raise ValueError(f'This is a duplicate{key=}')
-    text_dict[key] = {
+    text = {
         TITLE: title,
         TEXT: text,
     }
+    dbc.create(TEXT_COLLECT, text)
     return key
 
 
-def delete(_id):
+def delete(key: str):
     """
     Our contract:
         - Deletes an entry from text_dict
     """
-    text = read()
-    if _id in text:
-        del text[_id]
-        return _id
-    else:
-        return None
+    result = dbc.delete(TEXT_COLLECT, {KEY: key})
+    if result is None:
+        raise ValueError(f"No key found with {key=}")
 
 
 def update(key: str, title: str = None, text: str = None):
@@ -89,15 +93,24 @@ def update(key: str, title: str = None, text: str = None):
         - Updates the title or text of an entry in text_dict
         - Only updates if the key is in the text_dict
     """
-    if key not in text_dict:
+    if not exists(key):
         raise ValueError(
-            f"Key '{key}' not found in text_dict."
+            f"Key '{key}' not found in collection"
         )
-    if title is not None:
-        text_dict[key][TITLE] = title
-    if text is not None:
-        text_dict[key][TEXT] = text
-    return key
+    dbc.update(
+        TEXT_COLLECT,
+        {KEY: key},
+        {
+            "$set": {
+                TITLE: title,
+                TEXT: text
+            }
+        },
+    )
+
+
+def exists(key: str):
+    return read_one(key) is not None
 
 
 def main():
