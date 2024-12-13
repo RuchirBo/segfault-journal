@@ -260,7 +260,7 @@ class Manuscripts(Resource):
         return {'manuscripts': manuscripts}
 
 
-MANU_CREATE_FLDS = api.model('AddNewManuscriptEntry', {
+MANU_CREATE_FLDS = api.model('ManuscriptEntry', {
     flds.TITLE: fields.String,
     flds.AUTHOR: fields.String,
     flds.REFEREES: fields.List(fields.String),
@@ -294,4 +294,37 @@ class ManuscriptsCreate(Resource):
                                    f'{err=}')
         return {
             MESSAGE: 'Manuscript added!',
+        }
+
+
+MANU_UPDATE_FIELDS = api.model('UpdateManuscriptEntry', {
+    'old_manuscript': fields.Nested(MANU_CREATE_FLDS),
+    'new_manuscript': fields.Nested(MANU_CREATE_FLDS)
+})
+
+
+@api.route(f'{MANU_EP}/update')
+class ManuscriptsUpdate(Resource):
+    """
+    Update a manuscript in the journal db.
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'Not acceptable')
+    @api.expect(MANU_UPDATE_FIELDS)
+    def put(self):
+        """
+        Update a manuscript.
+        """
+        try:
+            old_manuscript = request.json.get("old_manuscript")
+            new_manuscript = request.json.get("new_manuscript")
+            if not old_manuscript or not new_manuscript:
+                raise wz.NotAcceptable('Both the old and new manuscript \
+                                       must be provided.')
+            manu.update_manuscript(old_manuscript, new_manuscript)
+        except Exception as err:
+            raise wz.NotAcceptable(f'Could not update manuscript: '
+                                   f'{err=}')
+        return {
+            MESSAGE: 'Manuscript updated!',
         }
