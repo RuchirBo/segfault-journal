@@ -94,10 +94,19 @@ def read_dict(collection, key, db=SEGFAULT_DB, no_id=True) -> dict:
     return recs_as_dict
 
 
+# def delete(collection, filt, db=SEGFAULT_DB):
+#     """
+#     Delete a document from the collection.
+#     """
+#     print(f'{filt=}')
+#     del_result = client[db][collection].delete_one(filt)
+#     return del_result.deleted_count
+
 def delete(collection, filt, db=SEGFAULT_DB):
     """
-    Delete a document from the collection.
+    Delete documents from the collection.
+    If the filter is empty, it deletes all documents in the collection.
     """
     print(f'{filt=}')
-    del_result = client[db][collection].delete_one(filt)
+    del_result = client[db][collection].delete_many(filt)
     return del_result.deleted_count
