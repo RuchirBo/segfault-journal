@@ -177,13 +177,6 @@ def get_valid_actions_by_state(state: str):
     print(f'{valid_actions=}')
     return valid_actions
 
-
-#MANUSCRIPTS = [{
-#    flds.TITLE: 'First Title',
-#    flds.AUTHOR: 'First Person',
-#    flds.REFEREES: [],
-#}]
-
 def create_manuscript(manuscript: dict):
     all_fields = [flds.TITLE, flds.AUTHOR, flds.REFEREES]
     for key in all_fields:
@@ -196,22 +189,23 @@ def create_manuscript(manuscript: dict):
 def update_manuscript(old_manuscript: dict, new_manuscript: dict):
     old_manu = dbc.fetch_one(collection = MANU_COLLECT, filt={
         flds.TITLE: old_manuscript[flds.TITLE],
-        flds.AUTHOR: old_manuscript[flds.AUTHOR],
-        flds.REFEREES: old_manuscript[flds.REFEREES]
+        flds.AUTHOR: old_manuscript[flds.AUTHOR]
     })
     
     if not old_manu:
         raise ValueError(f"Manuscript not found: {old_manuscript[flds.TITLE]}")
 
     result = dbc.update(
-        MANU_COLLECT,
-        old_manu,  
-        {
-            "$set": new_manuscript 
-        }
+        collection=MANU_COLLECT,
+        filters={
+            flds.TITLE: old_manuscript[flds.TITLE],
+            flds.AUTHOR: old_manuscript[flds.AUTHOR]
+        },
+        update_dict={"$set": new_manuscript}
     )
-    if not result:
-        raise ValueError(f"Manuscript not found: {old_manuscript[flds.TITLE]}")
+    
+    if result.matched_count == 0:
+        raise ValueError(f"Manuscript not updated: {old_manuscript[flds.TITLE]}")
 
     return result
 
@@ -233,3 +227,7 @@ def delete_manuscript(title: str, author: str):
         raise ValueError(f"Manuscript not found for Title: {title}, Author: {author}")
     return result
 
+def clear_all_manuscripts():
+    deleted_count = dbc.delete(MANU_COLLECT, {})  # Passing an empty filter {} deletes all documents.
+    print(f"Deleted {deleted_count} manuscripts.")
+    return deleted_count
