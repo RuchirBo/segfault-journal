@@ -1,7 +1,7 @@
 #!/bin/bash
 # This shell script deploys a new version to a server.
 
-PROJ_DIR=segfaul-journal
+PROJ_DIR=segfault-journal
 VENV=myvirtualenv
 PA_DOMAIN="segfualt.pythonanywhere.com"
 PA_USER='segfault'
