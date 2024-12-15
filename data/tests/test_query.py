@@ -5,7 +5,7 @@ import data.manuscripts.fields as flds
 
 
 TEST_SAMPLE_MANU = {
-    flds.TITLE: 'Test Title',
+    flds.TITLE: 'Testing Title',
     flds.AUTHOR: 'Test Person',
     flds.REFEREES: [],
 }
@@ -26,7 +26,7 @@ TEST_NEW_VALID_MANU = {
 
 TEST_OLD_INVALID_MANU = {
     flds.TITLE: 'Non-existent Title',
-    flds.AUTHOR: 'Non-existent Person',
+    flds.AUTHOR: 'Non-existent Author',
     flds.REFEREES: [],
 }
 
@@ -112,31 +112,33 @@ def test_withdrawn_state_no_actions():
             mqry.handle_action(mqry.WITHDRAWN, action,manu=mqry.SAMPLE_MANU)
 
 
+
 def test_create_manuscript_valid():
-    mqry.MANUSCRIPTS.clear()
-    mqry.create_manuscript(TEST_SAMPLE_MANU)
-    assert TEST_SAMPLE_MANU in mqry.MANUSCRIPTS, f"Manuscript was not succesfully added"
+    result = mqry.create_manuscript(TEST_SAMPLE_MANU)
+    assert result == "Manuscript created successfully."
+    retrieved_manuscript = mqry.get_manuscript_by_title(TEST_SAMPLE_MANU[flds.TITLE])
+    assert retrieved_manuscript[flds.TITLE] == TEST_SAMPLE_MANU[flds.TITLE]
+    assert retrieved_manuscript[flds.AUTHOR] == TEST_SAMPLE_MANU[flds.AUTHOR]
+    assert retrieved_manuscript[flds.REFEREES] == TEST_SAMPLE_MANU[flds.REFEREES]
+    mqry.delete_manuscript(TEST_SAMPLE_MANU[flds.TITLE], TEST_SAMPLE_MANU[flds.AUTHOR])
 
 
 def test_create_manuscript_invalid():
-    mqry.MANUSCRIPTS.clear()
     with pytest.raises(ValueError, match="Missing required field for manuscript: referees"):
         mqry.create_manuscript(TEST_SAMPLE_INVALID_MANU)
 
 
 def test_update_manuscript_valid():
-    mqry.MANUSCRIPTS.clear()
     mqry.create_manuscript(TEST_SAMPLE_MANU)
-    mqry.update_manuscript(TEST_SAMPLE_MANU, TEST_NEW_VALID_MANU)
-    updated_manuscript_found = False
-    for manu in mqry.MANUSCRIPTS:
-        if manu[flds.TITLE] == TEST_NEW_VALID_MANU[flds.TITLE]:
-            updated_manuscript_found = True
-    assert updated_manuscript_found
+    mqry.update_manuscript(TEST_SAMPLE_MANU, TEST_NEW_VALID_MANU)   
+    retrieved_manuscript = mqry.get_manuscript_by_title(TEST_NEW_VALID_MANU[flds.TITLE])
+    assert retrieved_manuscript[flds.TITLE] == TEST_NEW_VALID_MANU[flds.TITLE]
+    assert retrieved_manuscript[flds.AUTHOR] == TEST_NEW_VALID_MANU[flds.AUTHOR]
+    assert retrieved_manuscript[flds.REFEREES] == TEST_NEW_VALID_MANU[flds.REFEREES]
+    mqry.delete_manuscript(TEST_SAMPLE_MANU[flds.TITLE], TEST_SAMPLE_MANU[flds.AUTHOR])
+
 
 def test_update_manuscript_invalid():
-    mqry.MANUSCRIPTS.clear()
-    mqry.create_manuscript(TEST_SAMPLE_MANU)
     with pytest.raises(ValueError, match=f"Manuscript not found: {TEST_OLD_INVALID_MANU[flds.TITLE]}"):
         mqry.update_manuscript(TEST_OLD_INVALID_MANU, TEST_NEW_VALID_MANU)
 
@@ -149,29 +151,15 @@ def test_get_all_manuscripts():
 
 
 def test_get_manuscript_by_title():
-    mqry.MANUSCRIPTS.clear()
-    manuscript = {
-        flds.TITLE: 'First Title',
-        flds.AUTHOR: 'First Person',
-        flds.REFEREES: [],
-    }
-    mqry.MANUSCRIPTS.append(manuscript)
-
-    manu = mqry.get_manuscript_by_title(TEST_TITLE)
-    assert isinstance(manu, dict)
-    assert manu[flds.TITLE] == TEST_TITLE
+    with pytest.raises(ValueError, match="No matching manuscript for Testing Title"):
+        mqry.get_manuscript_by_title("Testing Title")
 
 
 def test_delete_manuscript_valid():
-    mqry.MANUSCRIPTS.clear()
-    mqry.create_manuscript(TEST_SAMPLE_MANU)
-    assert TEST_SAMPLE_MANU in mqry.MANUSCRIPTS, "Manuscript not added"
-    mqry.delete_manuscript(TEST_SAMPLE_MANU[flds.TITLE], TEST_SAMPLE_MANU[flds.AUTHOR])
-    assert TEST_SAMPLE_MANU not in mqry.MANUSCRIPTS, "Manuscript not deleted"
+    with pytest.raises(ValueError):
+        mqry.delete_manuscript(TEST_SAMPLE_MANU[flds.TITLE], TEST_SAMPLE_MANU[flds.AUTHOR])
 
 
 def test_delete_manuscript_invalid():
-    mqry.MANUSCRIPTS.clear()
-    mqry.create_manuscript(TEST_SAMPLE_MANU)
-    with pytest.raises(ValueError, match="Manuscript not found"):
+    with pytest.raises(ValueError, match="Manuscript not found for Title: Non-existent Title, Author: Non-existent Author"):
         mqry.delete_manuscript(TEST_OLD_INVALID_MANU[flds.TITLE], TEST_OLD_INVALID_MANU[flds.AUTHOR])

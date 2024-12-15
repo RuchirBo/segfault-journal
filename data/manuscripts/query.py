@@ -194,20 +194,25 @@ def create_manuscript(manuscript: dict):
 
 
 def update_manuscript(old_manuscript: dict, new_manuscript: dict):
-    old_manu = {
+    old_manu = dbc.fetch_one(collection = MANU_COLLECT, filt={
         flds.TITLE: old_manuscript[flds.TITLE],
         flds.AUTHOR: old_manuscript[flds.AUTHOR],
-        flds.REFEREES: old_manuscript[flds.REFEREES] 
-    }
+        flds.REFEREES: old_manuscript[flds.REFEREES]
+    })
+    
+    if not old_manu:
+        raise ValueError(f"Manuscript not found: {old_manuscript[flds.TITLE]}")
+
     result = dbc.update(
         MANU_COLLECT,
-        old_manu,
+        old_manu,  
         {
-            "$set": new_manuscript
-        },
+            "$set": new_manuscript 
+        }
     )
     if not result:
         raise ValueError(f"Manuscript not found: {old_manuscript[flds.TITLE]}")
+
     return result
 
 
