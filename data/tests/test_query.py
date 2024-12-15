@@ -148,10 +148,10 @@ def test_get_all_manuscripts():
 
 
 def test_get_manuscript_by_title():
-     manuscript = mqry.get_manuscript_by_title("Testing Title")
+     manuscript = mqry.get_manuscript_by_title("New Title")
      assert manuscript is not None, "Expected manuscript to be returned, but got None"
-     assert manuscript[flds.TITLE] == "Testing Title", f"Expected title 'Testing Title', but got {manuscript[flds.TITLE]}"
-     assert manuscript[flds.AUTHOR] == "Test Person", f"Expected author 'Test Person', but got {manuscript[flds.AUTHOR]}"
+     assert manuscript[flds.TITLE] == "New Title", f"Expected title 'New Title', but got {manuscript[flds.TITLE]}"
+     assert manuscript[flds.AUTHOR] == "New Person", f"Expected author 'New Person', but got {manuscript[flds.AUTHOR]}"
 
 
 def test_get_manuscript_by_title_invalid():
