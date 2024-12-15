@@ -121,18 +121,38 @@ def test_create_manuscript_valid():
     assert retrieved_manuscript[flds.AUTHOR] == TEST_SAMPLE_MANU[flds.AUTHOR]
     assert retrieved_manuscript[flds.REFEREES] == TEST_SAMPLE_MANU[flds.REFEREES]
 
-
 def test_create_manuscript_invalid():
     with pytest.raises(ValueError, match="Missing required field for manuscript: referees"):
         mqry.create_manuscript(TEST_SAMPLE_INVALID_MANU)
 
+def test_get_manuscript_by_title():
+     manuscript = mqry.get_manuscript_by_title("Testing Title")
+     assert manuscript is not None, "Expected manuscript to be returned, but got None"
+     assert manuscript[flds.TITLE] == "Testing Title", f"Expected title 'Testing Title', but got {manuscript[flds.TITLE]}"
+     assert manuscript[flds.AUTHOR] == "Test Person", f"Expected author 'Test Person', but got {manuscript[flds.AUTHOR]}"
 
-# def test_update_manuscript_valid():
-#     mqry.update_manuscript(TEST_SAMPLE_MANU, TEST_NEW_VALID_MANU)   
-#     retrieved_manuscript = mqry.get_manuscript_by_title(TEST_NEW_VALID_MANU[flds.TITLE])
-#     assert retrieved_manuscript[flds.TITLE] == TEST_NEW_VALID_MANU[flds.TITLE]
-#     assert retrieved_manuscript[flds.AUTHOR] == TEST_NEW_VALID_MANU[flds.AUTHOR]
-#     assert retrieved_manuscript[flds.REFEREES] == TEST_NEW_VALID_MANU[flds.REFEREES]
+
+def test_get_manuscript_by_title_invalid():
+    with pytest.raises(ValueError, match="No matching manuscript for Not Here"):
+        mqry.get_manuscript_by_title("Not Here")
+        
+
+def test_delete_manuscript_valid():
+    mqry.delete_manuscript(TEST_SAMPLE_MANU[flds.TITLE], TEST_SAMPLE_MANU[flds.AUTHOR])
+
+
+def test_delete_manuscript_invalid():
+    with pytest.raises(ValueError, match="Manuscript not found for Title: Non-existent Title, Author: Non-existent Author"):
+        mqry.delete_manuscript(TEST_OLD_INVALID_MANU[flds.TITLE], TEST_OLD_INVALID_MANU[flds.AUTHOR])
+
+def test_update_manuscript_valid():
+    mqry.create_manuscript(TEST_SAMPLE_MANU)
+    mqry.update_manuscript(TEST_SAMPLE_MANU, TEST_NEW_VALID_MANU)   
+    print(mqry.get_all_manuscripts())
+    retrieved_manuscript = mqry.get_manuscript_by_title(TEST_NEW_VALID_MANU[flds.TITLE])
+    assert retrieved_manuscript[flds.TITLE] == TEST_NEW_VALID_MANU[flds.TITLE]
+    assert retrieved_manuscript[flds.AUTHOR] == TEST_NEW_VALID_MANU[flds.AUTHOR]
+    assert retrieved_manuscript[flds.REFEREES] == TEST_NEW_VALID_MANU[flds.REFEREES]
 
 
 def test_update_manuscript_invalid():
@@ -146,23 +166,6 @@ def test_get_all_manuscripts():
     for script in manu:
         assert isinstance(script, dict)
 
-
-def test_get_manuscript_by_title():
-     manuscript = mqry.get_manuscript_by_title("Testing Title")
-     assert manuscript is not None, "Expected manuscript to be returned, but got None"
-     assert manuscript[flds.TITLE] == "Testing Title", f"Expected title 'Testing Title', but got {manuscript[flds.TITLE]}"
-     assert manuscript[flds.AUTHOR] == "Test Person", f"Expected author 'Test Person', but got {manuscript[flds.AUTHOR]}"
-
-
-def test_get_manuscript_by_title_invalid():
-    with pytest.raises(ValueError, match="No matching manuscript for Not Here"):
-        mqry.get_manuscript_by_title("Not Here")
-
-
-def test_delete_manuscript_valid():
-    mqry.delete_manuscript(TEST_SAMPLE_MANU[flds.TITLE], TEST_SAMPLE_MANU[flds.AUTHOR])
-
-
-def test_delete_manuscript_invalid():
-    with pytest.raises(ValueError, match="Manuscript not found for Title: Non-existent Title, Author: Non-existent Author"):
-        mqry.delete_manuscript(TEST_OLD_INVALID_MANU[flds.TITLE], TEST_OLD_INVALID_MANU[flds.AUTHOR])
+def test_clear_all_manuscripts():
+    mqry.clear_all_manuscripts()
+    print(mqry.get_all_manuscripts())
