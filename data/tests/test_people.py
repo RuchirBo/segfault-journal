@@ -44,6 +44,8 @@ TEMP_EMAIL3 = 'temp3person@temp.org'
 TEMP_EMAIL4 = 'temp4person@temp.org'
 BOB_EMAIL = 'bob.ross@nyu.edu'
 
+TEST_UPDATE_NAME = "John Two Smith"
+
 
 def test_create_person():
     print("CREATING:", ppl.read())
@@ -203,17 +205,15 @@ def test_get_person_roles(temp2_person):
     assert roles == VALID_ROLES
 
 
-@pytest.mark.skip(
-        "Skipping this test because we can't access"
-        " user's information other than email"
-)
+# @pytest.mark.skip(
+#         "Skipping this test because we can't access"
+#         " user's information other than email"
+# )
 def test_update(temp_person):
-    ppl.update_users(
-        "John Smith",
-        "test affiliation",
-        temp_person,
-        temp_person
-    )
+    ppl.update_users(TEST_UPDATE_NAME, 'UBuffalo', temp_person, VALID_ROLES)
+    updated_rec = ppl.read_one(temp_person)
+    assert updated_rec[ppl.NAME] == TEST_UPDATE_NAME
+
 
 
 def test_invalid_update():
