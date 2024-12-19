@@ -3,7 +3,7 @@
 
 PROJ_DIR=segfault-journal
 VENV=myvirtualenv
-PA_DOMAIN="segfualt.pythonanywhere.com"
+PA_DOMAIN="segfault.pythonanywhere.com"
 PA_USER='segfault'
 echo "Project dir = $PROJ_DIR"
 echo "PA domain = $PA_DOMAIN"
