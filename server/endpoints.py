@@ -389,7 +389,7 @@ class ReceiveAction(Resource):
         """
         try:
             # manu_id = request.json.get(manu.MANU_ID)
-            title = request.json.get(flds.TITLE)
+            # title = request.json.get(flds.TITLE)
             curr_state = request.json.get(manu.CURR_STATE)
             action = request.json.get(manu.ACTION)
             kwargs = {}
