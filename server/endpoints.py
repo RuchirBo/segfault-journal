@@ -365,3 +365,38 @@ class ManuscriptsDelete(Resource):
         return {
             MESSAGE: 'Manuscript deleted!',
         }
+
+
+MANU_ACTION_FLDS = api.model('ManuscriptAction', {
+    manu.MANU_ID: fields.String,
+    manu.CURR_STATE: fields.String,
+    manu.ACTION: fields.String,
+    manu.REFEREE: fields.String,
+})
+
+
+@api.route(f'{MANU_EP}/receive_action')
+class ReceiveAction(Resource):
+    """
+    Receive an action for a manuscript.
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'Not acceptable')
+    @api.expect(MANU_ACTION_FLDS)
+    def put(self):
+        """
+        Receive an action for a manuscript.
+        """
+        try:
+            manu_id = request.json.get(manu.MANU_ID)
+            curr_state = request.json.get(manu.CURR_STATE)
+            action = request.json.get(manu.ACTION)
+            kwargs = {}
+            kwargs[manu.REFEREE] = request.json.get(manu.REFEREE)
+            ret = manu.handle_action(manu_id, curr_state, action, **kwargs)
+        except Exception as err:
+            raise wz.NotAcceptable(f'Bad action: ' f'{err=}')
+        return {
+            MESSAGE: 'Action received!',
+            RETURN: ret,
+        }
