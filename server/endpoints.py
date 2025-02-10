@@ -388,7 +388,8 @@ class ReceiveAction(Resource):
         Receive an action for a manuscript.
         """
         try:
-            manu_id = request.json.get(flds.TITLE)
+            # manu_id = request.json.get(manu.MANU_ID)
+            title = request.json.get(flds.TITLE)
             curr_state = request.json.get(manu.CURR_STATE)
             action = request.json.get(manu.ACTION)
             kwargs = {}
