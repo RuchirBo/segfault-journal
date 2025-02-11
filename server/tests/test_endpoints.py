@@ -12,6 +12,8 @@ from unittest.mock import patch
 import pytest
 from data.people import NAME
 import server.endpoints as ep
+import data.manuscripts.query as manu
+import data.manuscripts.fields as flds
 
 TEST_CLIENT = ep.app.test_client()
 
@@ -105,4 +107,15 @@ def test_update_person_success(mock_update_users):
         }
     )
     assert resp.status_code == 200
-    
+
+
+@patch('data.query.handle_action', autospec=True,
+       return_value='SOME STRING')
+def test_handle_action(mock_read):
+    resp = TEST_CLIENT.put(f'{ep.MANU_EP}/receive_action',
+                           json={
+                               flds.TITLE: 'some title',
+                               manu.CURR_STATE: 'some state',
+                               manu.ACTION: 'some action',
+                           })
+    assert resp.status_code == OK
