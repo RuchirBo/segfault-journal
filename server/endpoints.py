@@ -413,3 +413,35 @@ class Text(Resource):
         if text is None:
             raise wz.NotAcceptable(f"No text found for key: {key}")
         return text
+
+
+TEXT_CREATE_FLDS = api.model('AddNewTextEntry', {
+    txt.KEY: fields.String,
+    txt.TITLE: fields.String,
+    txt.TEXT: fields.String,
+})
+
+
+@api.route(f'{TEXT_EP}/create')
+class TextCreate(Resource):
+    """
+    Add a new text page to the journal db.
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'Not acceptable')
+    @api.expect(TEXT_CREATE_FLDS)
+    def put(self):
+        """
+        Add a text.
+        """
+        try:
+            key = request.json.get(txt.KEY)
+            title = request.json.get(txt.TITLE)
+            text = request.json.get(txt.TEXT)
+            txt.create(key, title, text)
+        except Exception as err:
+            raise wz.NotAcceptable(f'Could not add text page: '
+                                   f'{err=}')
+        return {
+            MESSAGE: 'Text page added!',
+        }

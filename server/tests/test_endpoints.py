@@ -131,4 +131,14 @@ def test_get_text_success(mock_read_one):
     assert resp.status_code == OK
     assert resp.get_json() == mock_text
     mock_read_one.assert_called_once_with(test_key)
-    
+
+
+@patch("data.text.create")
+def test_create_text_success(mock_create_text):
+    payload = {"key": "some_key",
+                "title": "some_title",
+                "text": "This is some text"}
+    resp = TEST_CLIENT.put(f"{ep.TEXT_EP}/create", json=payload)
+    assert resp.status_code == OK
+    assert resp.get_json() == {"Message":'Text page added!'}
+
