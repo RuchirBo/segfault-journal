@@ -119,3 +119,16 @@ def test_handle_action(mock_read):
                                manu.ACTION: 'some action',
                            })
     assert resp.status_code == OK
+
+
+@patch("data.text.read_one")
+def test_get_text_success(mock_read_one):
+    test_key = "some_key"
+    mock_text = {"text": "this is some text"}
+    mock_read_one.return_value = mock_text
+
+    resp = TEST_CLIENT.get(f"{ep.TEXT_EP}/{test_key}/")
+    assert resp.status_code == OK
+    assert resp.get_json() == mock_text
+    mock_read_one.assert_called_once_with(test_key)
+    

@@ -13,6 +13,7 @@ import werkzeug.exceptions as wz
 import data.people as ppl
 import data.manuscripts.query as manu
 import data.manuscripts.fields as flds
+import data.text as txt
 
 
 app = Flask(__name__)
@@ -36,6 +37,7 @@ TITLE_RESP = "Title"
 RETURN = 'return'
 TITLE = 'Segfault Journal Bimonthly'
 MANU_EP = '/manuscripts'
+TEXT_EP = '/text'
 
 
 @api.route(HELLO_EP)
@@ -402,3 +404,12 @@ class ReceiveAction(Resource):
             MESSAGE: 'Action received!',
             RETURN: ret,
         }
+
+
+@api.route(f"{TEXT_EP}/<string:key>/")
+class Text(Resource):
+    def get(self, key):
+        text = txt.read_one(key)
+        if text is None:
+            raise wz.NotAcceptable(f"No text found for key: {key}")
+        return text
