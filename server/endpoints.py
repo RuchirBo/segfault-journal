@@ -445,3 +445,30 @@ class TextCreate(Resource):
         return {
             MESSAGE: 'Text page added!',
         }
+
+
+@api.route(f"{TEXT_EP}/<string:key>/update")
+class TextUpdate(Resource):
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_FOUND, 'Text entry not found')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'Not acceptable')
+    def put(self, key):
+        try:
+            text_data = txt.read_one(key)
+            if not text_data:
+                raise wz.NotFound(f"No text found for key: {key}")
+
+            title = request.json.get(txt.TITLE, text_data.get(txt.TITLE))
+            text = request.json.get(txt.TEXT, text_data.get(txt.TEXT))
+
+            if title is None and text is None:
+                raise wz.NotAcceptable("No changes were submitted")
+
+            txt.update(key, title, text)
+        except Exception as err:
+            raise wz.NotAcceptable(f'Could not update text: {err=}')
+
+        return {
+            MESSAGE: 'Text updated successfully!',
+            RETURN: txt.read_one(key)
+        }, HTTPStatus.OK
