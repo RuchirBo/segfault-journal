@@ -142,3 +142,23 @@ def test_create_text_success(mock_create_text):
     assert resp.status_code == OK
     assert resp.get_json() == {"Message":'Text page added!'}
 
+
+@patch("data.text.read_one", return_value={"key": "some_key", "title": "Old Title", "text": "Old text"})
+@patch("data.text.update")
+def test_update_text_success(mock_update, mock_read_one):
+    payload = {"title": "New Title", "text": "Updated text"}
+    resp = TEST_CLIENT.put(f"{ep.TEXT_EP}/some_key/update", json=payload)
+    assert resp.status_code == OK
+    assert resp.get_json()["Message"] == "Text updated successfully!"
+    assert mock_read_one.call_count == 2
+    mock_read_one.assert_called_with("some_key")
+    mock_update.assert_called_once_with("some_key", "New Title", "Updated text")
+
+
+@patch("data.text.read_one", return_value=None)
+def test_update_text_failure(mock_read_one):
+    payload = {"title": "New Title", "text": "Updated text"}
+    resp = TEST_CLIENT.put(f"{ep.TEXT_EP}/nonexistent_key/update", json=payload)
+    assert resp.status_code == NOT_FOUND
+    assert "No text found for key" in resp.get_json()["message"]
+    mock_read_one.assert_called_once_with("nonexistent_key")

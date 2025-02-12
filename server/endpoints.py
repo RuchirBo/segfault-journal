@@ -465,8 +465,11 @@ class TextUpdate(Resource):
                 raise wz.NotAcceptable("No changes were submitted")
 
             txt.update(key, title, text)
+        except wz.NotFound as err:
+            return {"message": str(err)}, HTTPStatus.NOT_FOUND
         except Exception as err:
-            raise wz.NotAcceptable(f'Could not update text: {err=}')
+            return {"message": f"Could not update text: {err}"},
+        HTTPStatus.NOT_ACCEPTABLE
 
         return {
             MESSAGE: 'Text updated successfully!',
