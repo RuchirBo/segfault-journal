@@ -142,7 +142,7 @@ PEOPLE_UPDATE_FIELDS = api.model('UpdatePersonEntry', {
 })
 
 
-@api.route(f'{PEOPLE_EP}/update')
+@api.route(f'{PEOPLE_EP}/update/<string:email>')
 class PeopleUpdate(Resource):
     """
     Update a person in the journal db.
@@ -150,14 +150,13 @@ class PeopleUpdate(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'Not acceptable')
     @api.expect(PEOPLE_UPDATE_FIELDS)
-    def put(self):
+    def put(self, email):
         """
         Update a person.
         """
         try:
             name = request.json.get(ppl.NAME)
             affiliation = request.json.get(ppl.AFFILIATION)
-            email = request.json.get(ppl.EMAIL)
             roles = request.json.get(ppl.ROLES)
             ppl.update_users(name, affiliation, email, roles)
         except Exception as err:
@@ -177,6 +176,7 @@ class PeopleDelete(Resource):
     def delete(self, email):
         try:
             person = ppl.read_one(email)
+            print(f"{person=}")
             if not person:
                 raise wz.NotFound(f"No such person: {email}")
             ppl.delete_person(email)
