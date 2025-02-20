@@ -98,7 +98,7 @@ def test_delete_person_success(mock_delete_person, mock_read_one):
 @patch("data.people.update_users")
 def test_update_person_success(mock_update_users):
     resp = TEST_CLIENT.put(
-        "/people/update",
+        "/people/update/theresa@nyu.edu",
         json={
             "name": "Theresa Updated",
             "email": "theresa@nyu.edu",
