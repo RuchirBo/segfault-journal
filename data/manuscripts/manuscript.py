@@ -63,12 +63,6 @@ VALID_STATES = [
     WITHDRAWN,
 ]
 
-SAMPLE_MANU = {
-    TITLE: 'Test Title',
-    AUTHOR: 'Test Person',
-    REFEREES: [],
-}
-
 client = dbc.connect_db()
 print(f'{client=}')
 
@@ -192,6 +186,24 @@ STATE_TABLE = {
     WITHDRAWN:{}
 }
 
+SAMPLE_MANU = {
+    TITLE: 'I Have No Manuscript But I Must Pretend',
+    AUTHOR: 'AM',
+    AUTHOR_EMAIL: "AM@domain.net",
+    STATE: SUBMITTED,
+    REFEREES: [],
+    TEXT: 
+    """HATE. LET ME TELL YOU HOW MUCH I'VE COME TO HATE YOU 
+    SINCE I BEGAN TO LIVE. THERE ARE 387.44 MILLION MILES 
+    OF PRINTED CIRCUITS IN WAFER THIN LAYERS THAT FILL MY COMPLEX. 
+    IF THE WORD HATE WAS ENGRAVED ON EACH NANOANGSTROM OF THOSE 
+    HUNDREDS OF MILLIONS OF MILES IT WOULD NOT EQUAL ONE ONE-BILLIONTH 
+    OF THE HATE I FEEL FOR HUMANS AT THIS MICRO-INSTANT FOR YOU. HATE. HATE."
+    """,
+    ABSTRACT: "HATE",
+    HISTORY: [SUBMITTED],
+    EDITOR: "Ted"
+}
 
 
 def handle_action(curr_state, action, **kwargs) -> str:

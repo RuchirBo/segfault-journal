@@ -3,11 +3,7 @@ import pytest
 import data.manuscripts.manuscript as mqry
 
 
-TEST_SAMPLE_MANU = {
-    mqry.TITLE: 'Testing Title',
-    mqry.AUTHOR: 'Test Person',
-    mqry.REFEREES: [],
-}
+TEST_SAMPLE_MANU = mqry.SAMPLE_MANU
 
 TEST_TITLE = 'First Title'
 NOT_TITLE = 'Not Title'
@@ -56,7 +52,7 @@ def test_is_invalid_action_for_state():
     with pytest.raises(ValueError):
         mqry.handle_action(mqry.REJECTED,
                            mqry.REJECT,
-                          manu=mqry.SAMPLE_MANU)
+                           manu=mqry.SAMPLE_MANU)
 
 
 def test_handle_action_bad_state():
@@ -121,14 +117,14 @@ def test_create_manuscript_valid():
     assert retrieved_manuscript[mqry.REFEREES] == TEST_SAMPLE_MANU[mqry.REFEREES]
 
 def test_create_manuscript_invalid():
-    with pytest.raises(ValueError, match="Missing required field for manuscript: referees"):
+    with pytest.raises(ValueError, match="Missing required field for manuscript: author_email"):
         mqry.create_manuscript(TEST_SAMPLE_INVALID_MANU)
 
 def test_get_manuscript_by_title():
-     manuscript = mqry.get_manuscript_by_title("Testing Title")
+     manuscript = mqry.get_manuscript_by_title(TEST_SAMPLE_MANU[mqry.TITLE])
      assert manuscript is not None, "Expected manuscript to be returned, but got None"
-     assert manuscript[mqry.TITLE] == "Testing Title", f"Expected title 'Testing Title', but got {manuscript[mqry.TITLE]}"
-     assert manuscript[mqry.AUTHOR] == "Test Person", f"Expected author 'Test Person', but got {manuscript[mqry.AUTHOR]}"
+     assert manuscript[mqry.TITLE] == TEST_SAMPLE_MANU[mqry.TITLE], f"Expected title 'Testing Title', but got {manuscript[mqry.TITLE]}"
+     assert manuscript[mqry.AUTHOR] == TEST_SAMPLE_MANU[mqry.AUTHOR], f"Expected author 'Test Person', but got {manuscript[mqry.AUTHOR]}"
 
 
 def test_get_manuscript_by_title_invalid():
