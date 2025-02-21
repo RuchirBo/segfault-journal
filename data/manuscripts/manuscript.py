@@ -1,7 +1,14 @@
 TITLE = 'title'
 DISP_NAME = 'disp_name'
 AUTHOR = 'author'
+AUTHOR_EMAIL = 'author_email'
+STATE = 'state'
 REFEREES = 'referees'
+TEXT = 'text'
+ABSTRACT = 'abstract'
+HISTORY = 'history'
+EDITOR = 'editor'
+
 
 TEST_FLD_NM = TITLE
 TEST_FLD_DISP_NM = 'Title'
