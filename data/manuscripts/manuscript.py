@@ -1,5 +1,4 @@
 TITLE = 'title'
-DISP_NAME = 'disp_name'
 AUTHOR = 'author'
 AUTHOR_EMAIL = 'author_email'
 STATE = 'state'
@@ -9,7 +8,7 @@ ABSTRACT = 'abstract'
 HISTORY = 'history'
 EDITOR = 'editor'
 
-
+DISP_NAME = 'disp_name'
 TEST_FLD_NM = TITLE
 TEST_FLD_DISP_NM = 'Title'
 
@@ -211,10 +210,13 @@ def get_valid_actions_by_state(state: str):
     return valid_actions
 
 def create_manuscript(manuscript: dict):
-    all_fields = [TITLE, AUTHOR, REFEREES]
+    all_fields = [TITLE, AUTHOR, AUTHOR_EMAIL, TEXT, ABSTRACT, EDITOR]
     for key in all_fields:
         if key not in manuscript:
             raise ValueError(f"Missing required field for manuscript: {key}")
+    manuscript[STATE] = SUBMITTED
+    manuscript[REFEREES] = []
+    manuscript[HISTORY] = [SUBMITTED]
     dbc.create(MANU_COLLECT, manuscript)
     return f"Manuscript created successfully."
 
