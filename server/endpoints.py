@@ -332,6 +332,19 @@ class ManuscriptsUpdate(Resource):
         }
 
 
+@api.route(f"{MANU_EP}/<string:title>")
+class GetManuscriptByTitle(Resource):
+    """
+    Retrieve a specific manuscript by title for frontend.
+    """
+    def get(self, title):
+        try:
+            manuscript = manu.get_manuscript_by_title(title)
+            return manuscript
+        except ValueError as err:
+            raise wz.NotFound(str(err))
+
+
 MANU_DELETE_FIELDS = api.model('DeleteManuscriptEntry', {
     flds.TITLE: fields.String,
     flds.AUTHOR: fields.String,

@@ -162,3 +162,20 @@ def test_update_text_failure(mock_read_one):
     assert resp.status_code == NOT_FOUND
     assert "No text found for key" in resp.get_json()["message"]
     mock_read_one.assert_called_once_with("nonexistent_key")
+
+
+@patch("data.manuscripts.query.get_manuscript_by_title",
+ return_value={"title": "Sample Manuscript"})
+def test_get_manuscript_by_title_success(mock_get):
+    resp = TEST_CLIENT.get(f"{ep.MANU_EP}/Sample Manuscript")
+    assert resp.status_code == OK
+    assert resp.get_json() == {"title": "Sample Manuscript"}
+    mock_get.assert_called_once_with("Sample Manuscript")
+
+
+@patch("data.manuscripts.query.get_manuscript_by_title", 
+side_effect=ValueError("Manuscript not found"))
+def test_get_manuscript_by_title_failure(mock_get):
+    resp = TEST_CLIENT.get(f"{ep.MANU_EP}/Nonexistent Manuscript")
+    assert resp.status_code == NOT_FOUND
+    assert "Manuscript not found" in resp.get_json()["message"]

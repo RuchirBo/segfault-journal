@@ -2,6 +2,7 @@
 TITLE = 'title'
 DISP_NAME = 'disp_name'
 AUTHOR = 'author'
+AUTHOR_EMAIL = 'author_email'
 REFEREES = 'referees'
 
 TEST_FLD_NM = TITLE
