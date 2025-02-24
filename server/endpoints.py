@@ -11,8 +11,9 @@ from flask_cors import CORS
 import werkzeug.exceptions as wz
 
 import data.people as ppl
-import data.manuscripts.query as manu
-import data.manuscripts.fields as flds
+# import data.manuscripts.query as manu
+# import data.manuscripts.fields as flds
+import data.manuscripts.manuscript as manu
 import data.text as txt
 
 
@@ -263,9 +264,9 @@ class Manuscripts(Resource):
 
 
 MANU_CREATE_FLDS = api.model('ManuscriptEntry', {
-    flds.TITLE: fields.String,
-    flds.AUTHOR: fields.String,
-    flds.REFEREES: fields.List(fields.String),
+    manu.TITLE: fields.String,
+    manu.AUTHOR: fields.String,
+    manu.REFEREES: fields.List(fields.String),
 })
 
 
@@ -282,13 +283,13 @@ class ManuscriptsCreate(Resource):
         Add a manuscript.
         """
         try:
-            title = request.json.get(flds.TITLE)
-            author = request.json.get(flds.AUTHOR)
-            referees = request.json.get(flds.REFEREES, [])
+            title = request.json.get(manu.TITLE)
+            author = request.json.get(manu.AUTHOR)
+            referees = request.json.get(manu.REFEREES, [])
             manuscript = {
-                flds.TITLE: title,
-                flds.AUTHOR: author,
-                flds.REFEREES: referees,
+                manu.TITLE: title,
+                manu.AUTHOR: author,
+                manu.REFEREES: referees,
             }
             manu.create_manuscript(manuscript)
         except Exception as err:
@@ -346,8 +347,8 @@ class GetManuscriptByTitle(Resource):
 
 
 MANU_DELETE_FIELDS = api.model('DeleteManuscriptEntry', {
-    flds.TITLE: fields.String,
-    flds.AUTHOR: fields.String,
+    manu.TITLE: fields.String,
+    manu.AUTHOR: fields.String,
 })
 
 
@@ -364,8 +365,8 @@ class ManuscriptsDelete(Resource):
             del_manuscript = request.get_json()
             if not del_manuscript:
                 raise ValueError('Missing valid manuscript to delete.')
-            title = del_manuscript.get(flds.TITLE)
-            author = del_manuscript.get(flds.AUTHOR)
+            title = del_manuscript.get(manu.TITLE)
+            author = del_manuscript.get(manu.AUTHOR)
 
             if not title or not author:
                 raise wz.NotAcceptable('Both title and author \
@@ -383,10 +384,10 @@ class ManuscriptsDelete(Resource):
 
 
 MANU_ACTION_FLDS = api.model('ManuscriptAction', {
-    flds.TITLE: fields.String,
+    manu.TITLE: fields.String,
     manu.CURR_STATE: fields.String,
     manu.ACTION: fields.String,
-    flds.REFEREES: fields.String,
+    manu.REFEREES: fields.String,
 })
 
 
@@ -408,7 +409,7 @@ class ReceiveAction(Resource):
             curr_state = request.json.get(manu.CURR_STATE)
             action = request.json.get(manu.ACTION)
             kwargs = {}
-            kwargs[flds.REFEREES] = request.json.get(flds.REFEREES)
+            kwargs[manu.REFEREES] = request.json.get(manu.REFEREES)
             ret = manu.handle_action(curr_state, action, **kwargs)
             # ret = manu.handle_action(manu_id, curr_state, action, **kwargs)
         except Exception as err:

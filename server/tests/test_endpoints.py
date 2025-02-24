@@ -12,8 +12,9 @@ from unittest.mock import patch
 import pytest
 from data.people import NAME
 import server.endpoints as ep
-import data.manuscripts.query as manu
-import data.manuscripts.fields as flds
+# import data.manuscripts.query as manu
+# import data.manuscripts.fields as flds
+import data.manuscripts.manuscript as manu
 
 TEST_CLIENT = ep.app.test_client()
 
@@ -109,14 +110,15 @@ def test_update_person_success(mock_update_users):
     assert resp.status_code == 200
 
 
-@patch('data.manuscripts.query.handle_action', autospec=True,
+@patch('data.manuscripts.manuscript.handle_action', autospec=True,
        return_value='SOME STRING')
 def test_handle_action(mock_read):
     resp = TEST_CLIENT.put(f'{ep.MANU_EP}/receive_action',
                            json={
-                               flds.TITLE: 'some title',
+                               manu.TITLE: 'some title',
                                manu.CURR_STATE: 'some state',
                                manu.ACTION: 'some action',
+                               manu.REFEREES: ['some referees']
                            })
     assert resp.status_code == OK
 
@@ -164,7 +166,7 @@ def test_update_text_failure(mock_read_one):
     mock_read_one.assert_called_once_with("nonexistent_key")
 
 
-@patch("data.manuscripts.query.get_manuscript_by_title",
+@patch("data.manuscripts.manuscript.get_manuscript_by_title",
  return_value={"title": "Sample Manuscript"})
 def test_get_manuscript_by_title_success(mock_get):
     resp = TEST_CLIENT.get(f"{ep.MANU_EP}/Sample Manuscript")
@@ -173,7 +175,7 @@ def test_get_manuscript_by_title_success(mock_get):
     mock_get.assert_called_once_with("Sample Manuscript")
 
 
-@patch("data.manuscripts.query.get_manuscript_by_title", 
+@patch("data.manuscripts.manuscript.get_manuscript_by_title", 
 side_effect=ValueError("Manuscript not found"))
 def test_get_manuscript_by_title_failure(mock_get):
     resp = TEST_CLIENT.get(f"{ep.MANU_EP}/Nonexistent Manuscript")
