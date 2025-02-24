@@ -266,7 +266,11 @@ class Manuscripts(Resource):
 MANU_CREATE_FLDS = api.model('ManuscriptEntry', {
     manu.TITLE: fields.String,
     manu.AUTHOR: fields.String,
-    manu.REFEREES: fields.List(fields.String),
+    manu.AUTHOR_EMAIL: fields.String,
+    manu.TEXT: fields.String,
+    manu.ABSTRACT: fields.String,
+    manu.EDITOR: fields.String
+    # manu.REFEREES: fields.List(fields.String),
 })
 
 
@@ -285,11 +289,19 @@ class ManuscriptsCreate(Resource):
         try:
             title = request.json.get(manu.TITLE)
             author = request.json.get(manu.AUTHOR)
-            referees = request.json.get(manu.REFEREES, [])
+            author_email = request.json.get(manu.AUTHOR_EMAIL)
+            text = request.json.get(manu.TEXT)
+            abstract = request.json.get(manu.ABSTRACT)
+            editor = request.json.get(manu.EDITOR)
+            # referees = request.json.get(manu.REFEREES, [])
             manuscript = {
                 manu.TITLE: title,
                 manu.AUTHOR: author,
-                manu.REFEREES: referees,
+                manu.AUTHOR_EMAIL: author_email,
+                manu.TEXT: text,
+                manu.ABSTRACT: abstract,
+                manu.EDITOR: editor
+                # manu.REFEREES: referees,
             }
             manu.create_manuscript(manuscript)
         except Exception as err:
