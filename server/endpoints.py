@@ -126,8 +126,7 @@ class PeopleCreate(Resource):
             role = request.json.get(ppl.ROLES)
             ret = ppl.create_person(name, affiliation, email, role)
         except Exception as err:
-            raise wz.NotAcceptable(f'Could not add person: '
-                                   f'{err=}')
+            raise wz.NotAcceptable(f'{str(err)}')
         return {
             MESSAGE: 'Person added!',
             RETURN: ret,
@@ -161,8 +160,7 @@ class PeopleUpdate(Resource):
             roles = request.json.get(ppl.ROLES)
             ppl.update_users(name, affiliation, email, roles)
         except Exception as err:
-            raise wz.NotAcceptable(f'Could not update person: '
-                                   f'{err=}')
+            raise wz.NotAcceptable(f'{str(err)}')
         return {
             MESSAGE: 'Person updated!',
         }
