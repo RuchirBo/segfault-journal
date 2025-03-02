@@ -1,6 +1,7 @@
 import random
 import pytest
 import data.manuscripts.manuscript as mqry
+import data.people as ppl
 
 
 TEST_SAMPLE_MANU = mqry.SAMPLE_MANU
@@ -116,6 +117,8 @@ def test_withdrawn_state_no_actions():
 
 
 def test_create_manuscript_valid():
+    if not ppl.exists(TEST_SAMPLE_MANU[mqry.EDITOR]):
+        ppl.create_person("Ted", "AM", TEST_SAMPLE_MANU[mqry.EDITOR], "ED")
     result = mqry.create_manuscript(TEST_SAMPLE_MANU)
     assert result == "Manuscript created successfully."
     retrieved_manuscript = mqry.get_manuscript_by_title(TEST_SAMPLE_MANU[mqry.TITLE])
