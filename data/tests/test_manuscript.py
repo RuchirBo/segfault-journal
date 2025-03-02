@@ -9,6 +9,10 @@ TEST_SAMPLE_MANU = mqry.SAMPLE_MANU
 TEST_TITLE = 'First Title'
 NOT_TITLE = 'Not Title'
 
+TEST_ED_NAME = "Ted"
+TEST_ED_AFF = 'AM'
+TEST_ED_ROLES = 'ED'
+
 TEST_SAMPLE_INVALID_MANU_MISSING_FIELDS = {
     mqry.TITLE: 'Test Title',
     mqry.AUTHOR: 'Test Person',
@@ -118,7 +122,7 @@ def test_withdrawn_state_no_actions():
 
 def test_create_manuscript_valid():
     if not ppl.exists(TEST_SAMPLE_MANU[mqry.EDITOR]):
-        ppl.create_person("Ted", "AM", TEST_SAMPLE_MANU[mqry.EDITOR], "ED")
+        ppl.create_person(TEST_ED_NAME, TEST_ED_AFF, TEST_SAMPLE_MANU[mqry.EDITOR], TEST_ED_ROLES)
     result = mqry.create_manuscript(TEST_SAMPLE_MANU)
     assert result == "Manuscript created successfully."
     retrieved_manuscript = mqry.get_manuscript_by_title(TEST_SAMPLE_MANU[mqry.TITLE])
