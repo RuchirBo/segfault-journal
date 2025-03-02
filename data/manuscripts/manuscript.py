@@ -1,3 +1,5 @@
+import data.people as ppl
+
 TITLE = 'title'
 AUTHOR = 'author'
 AUTHOR_EMAIL = 'author_email'
@@ -6,7 +8,7 @@ REFEREES = 'referees'
 TEXT = 'text'
 ABSTRACT = 'abstract'
 HISTORY = 'history'
-EDITOR = 'editor'
+EDITOR = 'editor_email'
 
 DISP_NAME = 'disp_name'
 TEST_FLD_NM = TITLE
@@ -188,7 +190,7 @@ STATE_TABLE = {
 
 SAMPLE_MANU = {
     TITLE: 'I Have No Manuscript But I Must Pretend',
-    AUTHOR: 'AM',
+    AUTHOR: 'Allied Mastercomputer',
     AUTHOR_EMAIL: "AM@domain.net",
     STATE: SUBMITTED,
     REFEREES: [],
@@ -202,7 +204,7 @@ SAMPLE_MANU = {
     """,
     ABSTRACT: "HATE",
     HISTORY: [SUBMITTED],
-    EDITOR: "Ted"
+    EDITOR: "ted@domain.net"
 }
 
 
@@ -229,6 +231,10 @@ def create_manuscript(manuscript: dict):
     manuscript[STATE] = SUBMITTED
     manuscript[REFEREES] = []
     manuscript[HISTORY] = [SUBMITTED]
+    if not ppl.is_valid_email(manuscript[EDITOR]):
+        raise ValueError(f'Invalid Editor Email: {manuscript[EDITOR]}')
+    if not ppl.exists(manuscript[EDITOR]):
+        raise ValueError(f'Editor does not exist with email: {manuscript[EDITOR]}')
     dbc.create(MANU_COLLECT, manuscript)
     return f"Manuscript created successfully."
 
