@@ -23,9 +23,11 @@ ROLES = {
 
 MH_ROLES = [CE_CODE, ED_CODE, ME_CODE]
 
+def read() -> dict:
+    return deepcopy(ROLES)
 
 def get_roles() -> dict:
-    return deepcopy(ROLES)
+    return read()
 
 
 def get_noncopy_roles() -> dict:

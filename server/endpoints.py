@@ -15,7 +15,7 @@ import data.people as ppl
 # import data.manuscripts.fields as flds
 import data.manuscripts.manuscript as manu
 import data.text as txt
-
+import data.roles as rls
 
 app = Flask(__name__)
 CORS(app)
@@ -39,6 +39,7 @@ RETURN = 'return'
 TITLE = 'Segfault Journal Bimonthly'
 MANU_EP = '/manuscripts'
 TEXT_EP = '/text'
+ROLES_EP = '/roles'
 
 
 @api.route(HELLO_EP)
@@ -79,6 +80,17 @@ class JournalTitle(Resource):
         Retrieve the journal title
         """
         return {TITLE_RESP: TITLE}
+
+@api.route(ROLES_EP)
+class Roles(Resource):
+    """
+    This class handles reading person roles.
+    """
+    def get(self):
+        """
+        Retrieve the journal person roles.
+        """
+        return rls.read()
 
 
 @api.route(PEOPLE_EP)
