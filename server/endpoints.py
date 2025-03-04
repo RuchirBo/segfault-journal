@@ -81,6 +81,7 @@ class JournalTitle(Resource):
         """
         return {TITLE_RESP: TITLE}
 
+
 @api.route(ROLES_EP)
 class Roles(Resource):
     """
