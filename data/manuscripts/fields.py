@@ -19,9 +19,9 @@ FIELDS = {
     AUTHOR: {
         DISP_NAME: TEST_FLD_DISP_AUTHOR,
     },
-    # REFEREES: {
-    #     DISP_NAME: TEST_FLD_DISP_REFEREE,
-    # },
+    REFEREES: {
+        DISP_NAME: TEST_FLD_DISP_REFEREE,
+    },
 }
 
 

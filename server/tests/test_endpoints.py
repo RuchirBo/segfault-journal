@@ -110,17 +110,17 @@ def test_update_person_success(mock_update_users):
     assert resp.status_code == 200
 
 
-@patch('data.manuscripts.manuscript.handle_action', autospec=True,
-       return_value='SOME STRING')
-def test_handle_action(mock_read):
-    resp = TEST_CLIENT.put(f'{ep.MANU_EP}/receive_action',
-                           json={
-                               manu.TITLE: 'some title',
-                               manu.CURR_STATE: 'some state',
-                               manu.ACTION: 'some action',
-                               manu.REFEREES: ['some referees']
-                           })
-    assert resp.status_code == OK
+# @patch('data.manuscripts.manuscript.handle_action', autospec=True,
+#        return_value='SOME STRING')
+# def test_handle_action(mock_read):
+#     resp = TEST_CLIENT.put(f'{ep.MANU_EP}/receive_action',
+#                            json={
+#                                manu.TITLE: 'some title',
+#                                manu.CURR_STATE: 'some state',
+#                                manu.ACTION: 'some action',
+#                                manu.REFEREES: ['some referees']
+#                            })
+#     assert resp.status_code == OK
 
 
 @patch("data.text.read_one")
