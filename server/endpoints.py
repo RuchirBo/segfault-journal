@@ -15,7 +15,7 @@ import data.people as ppl
 # import data.manuscripts.fields as flds
 import data.manuscripts.manuscript as manu
 import data.text as txt
-
+import data.roles as rls
 
 app = Flask(__name__)
 CORS(app)
@@ -39,6 +39,7 @@ RETURN = 'return'
 TITLE = 'Segfault Journal Bimonthly'
 MANU_EP = '/manuscripts'
 TEXT_EP = '/text'
+ROLES_EP = '/roles'
 
 
 @api.route(HELLO_EP)
@@ -79,6 +80,18 @@ class JournalTitle(Resource):
         Retrieve the journal title
         """
         return {TITLE_RESP: TITLE}
+
+
+@api.route(ROLES_EP)
+class Roles(Resource):
+    """
+    This class handles reading person roles.
+    """
+    def get(self):
+        """
+        Retrieve the journal person roles.
+        """
+        return rls.read()
 
 
 @api.route(PEOPLE_EP)
@@ -398,6 +411,11 @@ MANU_ACTION_FLDS = api.model('ManuscriptAction', {
     manu.CURR_STATE: fields.String,
     manu.ACTION: fields.String,
     manu.REFEREES: fields.String,
+    "forceful_change": fields.String(
+        required=False,
+        default="",
+        description="Only for Editor Move"
+    )
 })
 
 
@@ -410,24 +428,45 @@ class ReceiveAction(Resource):
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'Not acceptable')
     @api.expect(MANU_ACTION_FLDS)
     def put(self):
-        """
-        Receive an action for a manuscript.
-        """
         try:
-            # manu_id = request.json.get(manu.MANU_ID)
-            # title = request.json.get(flds.TITLE)
+            title = request.json.get(manu.TITLE)
             curr_state = request.json.get(manu.CURR_STATE)
             action = request.json.get(manu.ACTION)
-            kwargs = {}
-            kwargs[manu.REFEREES] = request.json.get(manu.REFEREES)
-            ret = manu.handle_action(curr_state, action, **kwargs)
-            # ret = manu.handle_action(manu_id, curr_state, action, **kwargs)
+            referees = request.json.get(manu.REFEREES)
+            if isinstance(referees, str):
+                referees = [referees]
+            manuscript = manu.get_manuscript_by_title(title)
+            if not manuscript:
+                raise wz.NotFound(f"Manuscript '{title}' not found.")
+
+            updated_state = curr_state
+            forceful_change = ""
+            if action == manu.EDITOR_MOVE:
+                forceful_change = request.json.get("forceful_change", "")
+                if not forceful_change:
+                    raise wz.NotAcceptable("'forceful_change' required.")
+            for ref in referees:
+                updated_state = manu.handle_action(
+                    curr_state, action, manu=manuscript,
+                    ref=ref, forceful_change=forceful_change
+                )
+            manuscript[manu.STATE] = updated_state
+            if "_id" in manuscript:
+                del manuscript["_id"]
+            manu.update_manuscript(manuscript, manuscript)
         except Exception as err:
-            raise wz.NotAcceptable(f'Bad action: ' f'{err=}')
+            raise wz.NotAcceptable(f"Bad action: {err}")
         return {
-            MESSAGE: 'Action received!',
-            RETURN: ret,
-        }
+            "message": "Action received!",
+            "title": title,
+            "previous_state": curr_state,
+            "updated_state": updated_state,
+            "action": action,
+            "referees": referees,
+            "forceful_change": (
+                forceful_change if action == manu.EDITOR_MOVE else "N/A"
+            )
+        }, HTTPStatus.OK
 
 
 @api.route(f"{TEXT_EP}/<string:key>/")

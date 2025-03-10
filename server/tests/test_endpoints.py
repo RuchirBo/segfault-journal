@@ -8,6 +8,7 @@ from http.client import (
 )
 
 from unittest.mock import patch
+from http import HTTPStatus
 
 import pytest
 from data.people import NAME
@@ -110,19 +111,6 @@ def test_update_person_success(mock_update_users):
     assert resp.status_code == 200
 
 
-@patch('data.manuscripts.manuscript.handle_action', autospec=True,
-       return_value='SOME STRING')
-def test_handle_action(mock_read):
-    resp = TEST_CLIENT.put(f'{ep.MANU_EP}/receive_action',
-                           json={
-                               manu.TITLE: 'some title',
-                               manu.CURR_STATE: 'some state',
-                               manu.ACTION: 'some action',
-                               manu.REFEREES: ['some referees']
-                           })
-    assert resp.status_code == OK
-
-
 @patch("data.text.read_one")
 def test_get_text_success(mock_read_one):
     test_key = "some_key"
@@ -181,3 +169,41 @@ def test_get_manuscript_by_title_failure(mock_get):
     resp = TEST_CLIENT.get(f"{ep.MANU_EP}/Nonexistent Manuscript")
     assert resp.status_code == NOT_FOUND
     assert "Manuscript not found" in resp.get_json()["message"]
+
+
+@patch("data.manuscripts.manuscript.get_manuscript_by_title", return_value={
+    manu.TITLE: "Test Manuscript",
+    manu.STATE: manu.IN_REF_REV,
+    manu.REFEREES: ["ref1@example.com"],
+})
+@patch("data.manuscripts.manuscript.handle_action", return_value=manu.COPY_EDIT)
+@patch("data.manuscripts.manuscript.update_manuscript")
+def test_receive_action_success(mock_update, mock_handle_action, mock_get_manu):
+    """
+    Test that the /receive_action endpoint correctly updates a manuscript's state
+    when given a valid action.
+    """
+    payload = {
+        manu.TITLE: "Test Manuscript",
+        manu.CURR_STATE: manu.IN_REF_REV,
+        manu.ACTION: manu.ACCEPT,
+        manu.REFEREES: ["ref1@example.com"]
+    }
+
+    resp = TEST_CLIENT.put(f"{ep.MANU_EP}/receive_action", json=payload)
+    resp_json = resp.get_json()
+
+    assert resp.status_code == HTTPStatus.OK
+    assert resp_json["message"] == "Action received!"
+    assert resp_json["title"] == "Test Manuscript"
+    assert resp_json["previous_state"] == manu.IN_REF_REV
+    assert resp_json["updated_state"] == manu.COPY_EDIT
+    assert resp_json["action"] == manu.ACCEPT
+    assert resp_json["referees"] == ["ref1@example.com"]
+    assert resp_json["forceful_change"] == "N/A"
+
+    mock_get_manu.assert_called_once_with("Test Manuscript")
+    mock_handle_action.assert_called_once_with(
+        manu.IN_REF_REV, manu.ACCEPT, manu=mock_get_manu.return_value, ref="ref1@example.com", forceful_change=""
+    )
+    mock_update.assert_called_once_with(mock_get_manu.return_value, mock_get_manu.return_value)

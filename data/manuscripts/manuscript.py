@@ -25,9 +25,9 @@ FIELDS = {
     AUTHOR: {
         DISP_NAME: TEST_FLD_DISP_AUTHOR,
     },
-    # REFEREES: {
-    #     DISP_NAME: TEST_FLD_DISP_REFEREE,
-    # },
+    REFEREES: {
+        DISP_NAME: TEST_FLD_DISP_REFEREE,
+    },
 }
 
 import data.db_connect as dbc
@@ -83,6 +83,7 @@ DONE = 'DON'
 REJECT = 'REJ'
 DELETE_REF = 'DRF'
 TEST_ACTION = ACCEPT
+EDITOR_MOVE = 'EDMOVE'
 
 VALID_ACTIONS = [
     ACCEPT,
@@ -92,7 +93,8 @@ VALID_ACTIONS = [
     WITHDRAW,
     ACCEPT_WITH_REV,
     SUBMIT_REV,
-    DELETE_REF
+    DELETE_REF,
+    EDITOR_MOVE
 ]
 
 def get_actions() -> list:
@@ -103,16 +105,19 @@ def is_valid_action(action: str) -> bool:
 
 def assign_ref(manu: dict, ref: str, extra=None) -> str:
     print(extra)
-    manu[REFEREES].append(ref)
+    if REFEREES not in manu:
+        manu[REFEREES] = []
+    if ref not in manu[REFEREES]:
+        manu[REFEREES].append(ref)
     return IN_REF_REV
 
+
 def delete_ref(manu: dict, ref: str) -> str:
-    if len(manu[REFEREES]) > 0:
-        manu[REFEREES].remove(ref)
-    if len(manu[REFEREES]) > 0:
-        return IN_REF_REV
-    else:
-        return SUBMITTED
+    if REFEREES not in manu or ref not in manu[REFEREES]:
+        return manu[STATE]
+    manu[REFEREES].remove(ref)
+    return IN_REF_REV
+
 
 FUNC = 'FUNC'
 
@@ -139,14 +144,14 @@ STATE_TABLE = {
         ACCEPT_WITH_REV: {
             'FUNC': lambda **kwargs: AUTHOR_REVISIONS,
         },
-        ASSIGN_REF: {
-            FUNC: assign_ref,
-        },
         SUBMIT_REV: {
             'FUNC': lambda **kwargs: IN_REF_REV,
         },
         DELETE_REF: {
             FUNC: delete_ref,
+        },
+        ASSIGN_REF: {
+            FUNC: assign_ref,
         },
         REJECT: {
             FUNC: lambda **kwargs: REJECTED,
@@ -167,7 +172,7 @@ STATE_TABLE = {
     },
     FORMATTING: {
         DONE: {
-            'FUNC': lambda **kwargs: FORMATTING,
+            'FUNC': lambda **kwargs: PUBLISHED,
         },
         **COMMON_ACTIONS,
     },
@@ -212,16 +217,30 @@ def handle_action(curr_state, action, **kwargs) -> str:
     if not is_valid_state(curr_state):
         raise ValueError(f'Invalid state: {curr_state}')
     if not is_valid_action(action):
-        raise ValueError(f'Invalid action: {action}')
-    if curr_state not in STATE_TABLE or action not in STATE_TABLE[curr_state]:
-        raise ValueError(f'Invalid action {action} for state {curr_state}')
+        raise ValueError(f'Invalid action: {action}')  
+    if curr_state in {REJECTED, WITHDRAWN}:
+        raise ValueError("Invalid action")
+    manu = kwargs.get('manu')
+    if not manu:
+        raise ValueError("Manuscript data is required.")
+    forceful_change = kwargs.get('forceful_change', "")
+    if action == EDITOR_MOVE:
+        if not forceful_change or not is_valid_state(forceful_change):
+            raise ValueError(f'Invalid or missing target state for EDMOVE: {forceful_change}')
+        return forceful_change
+    if action in {SUBMIT_REV, ACCEPT, ACCEPT_WITH_REV} and not manu[REFEREES]:
+        raise ValueError("A referee must be assigned.")
+
     return STATE_TABLE[curr_state][action][FUNC](**kwargs)
 
 
 def get_valid_actions_by_state(state: str):
-    valid_actions = STATE_TABLE[state].keys()
+    valid_actions = STATE_TABLE.get(state, {}).keys()
+    if not valid_actions:
+        return []
     print(f'{valid_actions=}')
     return valid_actions
+
 
 def create_manuscript(manuscript: dict):
     all_fields = [TITLE, AUTHOR, AUTHOR_EMAIL, TEXT, ABSTRACT, EDITOR]
@@ -247,6 +266,9 @@ def update_manuscript(old_manuscript: dict, new_manuscript: dict):
     
     if not old_manu:
         raise ValueError(f"Manuscript not found: {old_manuscript[TITLE]}")
+
+    if "_id" in new_manuscript:
+        del new_manuscript["_id"]
 
     result = dbc.update(
         collection=MANU_COLLECT,
