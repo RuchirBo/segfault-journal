@@ -157,6 +157,15 @@ def test_get_manuscript_by_title():
 def test_get_manuscript_by_title_invalid():
     with pytest.raises(ValueError, match="No matching manuscript for Not Here"):
         mqry.get_manuscript_by_title("Not Here")
+
+
+def test_change_manuscript_state_rej():
+    old_manu = mqry.get_manuscript_by_title(TEST_SAMPLE_MANU[mqry.TITLE])
+    print(old_manu)
+    mqry.change_manuscript_state(TEST_SAMPLE_MANU[mqry.TITLE], mqry.REJECT, manu = old_manu)
+    new_manu = mqry.get_manuscript_by_title(TEST_SAMPLE_MANU[mqry.TITLE])
+    assert new_manu[mqry.STATE] == mqry.REJECTED, f"Expected state 'REJ', but got {manu[mqry.STATE]}"
+    assert new_manu[mqry.HISTORY] == [mqry.SUBMITTED, mqry.REJECTED], f"Expected history ['SUB', 'REJ'], but got {manu[mqry.HISTORY]}"
         
 
 def test_delete_manuscript_valid():
