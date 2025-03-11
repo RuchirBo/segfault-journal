@@ -108,7 +108,7 @@ def update_users(new_name: str, affiliation: str,
 
 
 def create_person(name: str, affiliation: str, email: str,
-                  role: str = None):
+                  roles: list = []):
     """
     Our contract:
         - Takes in a new name, affiliation, email, and role(s)
@@ -116,7 +116,6 @@ def create_person(name: str, affiliation: str, email: str,
     """
     if exists(email):
         raise ValueError(f'Adding duplicate {email=}')
-    roles = [role] if role else []
     is_valid_person(name, affiliation, email, roles)
     person = {
         NAME: name,

@@ -11,7 +11,7 @@ NOT_TITLE = 'Not Title'
 
 TEST_ED_NAME = "Ted"
 TEST_ED_AFF = 'AM'
-TEST_ED_ROLES = 'ED'
+TEST_ED_ROLES = ['ED']
 
 TEST_SAMPLE_INVALID_MANU_MISSING_FIELDS = {
     mqry.TITLE: 'Test Title',
