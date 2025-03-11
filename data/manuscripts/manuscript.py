@@ -336,3 +336,11 @@ def clear_all_manuscripts():
     deleted_count = dbc.delete(MANU_COLLECT, {})  # Passing an empty filter {} deletes all documents.
     print(f"Deleted {deleted_count} manuscripts.")
     return deleted_count
+
+def change_manuscript_state(manu_title, action, **kwargs):
+    manu = get_manuscript_by_title(manu_title)
+    curr_state = manu[STATE]
+    new_state = handle_action(curr_state, action, **kwargs)
+    manu[HISTORY].append(new_state)
+    manu[STATE] = new_state
+    update_manuscript({TITLE: manu[TITLE], AUTHOR: manu[AUTHOR]}, manu)
