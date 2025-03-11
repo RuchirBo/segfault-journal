@@ -1,4 +1,5 @@
 import data.people as ppl
+import data.roles as rls
 
 TITLE = 'title'
 AUTHOR = 'author'
@@ -105,17 +106,40 @@ def is_valid_action(action: str) -> bool:
 
 def assign_ref(manu: dict, ref: str, extra=None) -> str:
     print(extra)
+    person = ppl.read_one(ref)
+    if not person:
+        people = ppl.read()
+        for email, details in people.items():
+            if details[ppl.NAME].lower() == ref.lower():
+                person = details
+                ref = email
+                break
+    if not person:
+        raise ValueError(f"Referee {ref} does not exist.")
+    if rls.RE_CODE not in person.get(ppl.ROLES, []):  
+        raise ValueError(f"Person {ref} is not a referee.")
     if REFEREES not in manu:
         manu[REFEREES] = []
+
     if ref not in manu[REFEREES]:
         manu[REFEREES].append(ref)
     return IN_REF_REV
 
 
 def delete_ref(manu: dict, ref: str) -> str:
-    if REFEREES not in manu or ref not in manu[REFEREES]:
+    if REFEREES not in manu or not manu[REFEREES]:
         return manu[STATE]
+    if ref not in manu[REFEREES]:
+        people = ppl.read()
+        for email, details in people.items():
+            if details[ppl.NAME].lower() == ref.lower():
+                ref = email
+                break
+    if ref not in manu[REFEREES]:
+        raise ValueError(f"Referee {ref} is not assigned to this manuscript.")
     manu[REFEREES].remove(ref)
+    if not manu[REFEREES] and manu[STATE] == IN_REF_REV:
+        return SUBMITTED
     return IN_REF_REV
 
 
@@ -226,12 +250,18 @@ def handle_action(curr_state, action, **kwargs) -> str:
     forceful_change = kwargs.get('forceful_change', "")
     if action == EDITOR_MOVE:
         if not forceful_change or not is_valid_state(forceful_change):
-            raise ValueError(f'Invalid or missing target state for EDMOVE: {forceful_change}')
+            raise ValueError(f'Invalid/missing target state for EDMOVE: {forceful_change}')
         return forceful_change
-    if action in {SUBMIT_REV, ACCEPT, ACCEPT_WITH_REV} and not manu[REFEREES]:
-        raise ValueError("A referee must be assigned.")
-
+    referees = manu.get(REFEREES, [])
+    if isinstance(referees, str):
+        referees = [referees]
+    elif not isinstance(referees, list):
+        referees = []
+    if action in {SUBMIT_REV, ACCEPT, ACCEPT_WITH_REV}:
+        if not referees or all(ref.strip() == "" for ref in referees):
+            raise ValueError("Cannot submit a review without an assigned referee.")
     return STATE_TABLE[curr_state][action][FUNC](**kwargs)
+
 
 
 def get_valid_actions_by_state(state: str):

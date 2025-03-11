@@ -2,6 +2,8 @@ import random
 import pytest
 import data.manuscripts.manuscript as mqry
 import data.people as ppl
+from unittest.mock import patch
+import data.roles as rls
 
 
 TEST_SAMPLE_MANU = mqry.SAMPLE_MANU
@@ -94,14 +96,16 @@ def test_handle_action_bad_action():
                            manu=mqry.SAMPLE_MANU)
 
 
-def test_handle_action_valid_return():
+@patch("data.people.read_one", return_value={"email": "tom@gmail.com", "roles": [rls.RE_CODE]})
+@patch("data.people.read", return_value={"tom@gmail.com": {"email": "tom@gmail.com", "roles": [rls.RE_CODE]}})
+def test_handle_action_valid_return(mock_read_one, mock_read):
     for state in mqry.get_states():
         for action in mqry.get_valid_actions_by_state(state):
             print(f'{state=}', f'{action=}')
             new_state = mqry.handle_action(state, action,
-                                          manu=mqry.SAMPLE_MANU,
-                                          ref='Some ref'
-                                          )
+                                           manu=mqry.SAMPLE_MANU,
+                                           ref='tom'
+                                           )
             print(f'{new_state=}')
             assert mqry.is_valid_state(new_state)
 

@@ -204,6 +204,6 @@ def test_receive_action_success(mock_update, mock_handle_action, mock_get_manu):
 
     mock_get_manu.assert_called_once_with("Test Manuscript")
     mock_handle_action.assert_called_once_with(
-        manu.IN_REF_REV, manu.ACCEPT, manu=mock_get_manu.return_value, ref="ref1@example.com", forceful_change=""
+        manu.IN_REF_REV, manu.ACCEPT, ref="ref1@example.com", manu=mock_get_manu.return_value,
     )
     mock_update.assert_called_once_with(mock_get_manu.return_value, mock_get_manu.return_value)

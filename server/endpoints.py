@@ -438,17 +438,16 @@ class ReceiveAction(Resource):
             manuscript = manu.get_manuscript_by_title(title)
             if not manuscript:
                 raise wz.NotFound(f"Manuscript '{title}' not found.")
-
             updated_state = curr_state
-            forceful_change = ""
+            extra_kwargs = {"manu": manuscript}
             if action == manu.EDITOR_MOVE:
                 forceful_change = request.json.get("forceful_change", "")
                 if not forceful_change:
                     raise wz.NotAcceptable("'forceful_change' required.")
+                extra_kwargs["forceful_change"] = forceful_change
             for ref in referees:
                 updated_state = manu.handle_action(
-                    curr_state, action, manu=manuscript,
-                    ref=ref, forceful_change=forceful_change
+                    curr_state, action, ref=ref, **extra_kwargs
                 )
             manuscript[manu.STATE] = updated_state
             if "_id" in manuscript:
@@ -464,7 +463,7 @@ class ReceiveAction(Resource):
             "action": action,
             "referees": referees,
             "forceful_change": (
-                forceful_change if action == manu.EDITOR_MOVE else "N/A"
+                "N/A" if action != manu.EDITOR_MOVE else forceful_change
             )
         }, HTTPStatus.OK
 
