@@ -22,6 +22,9 @@ TEST_SAMPLE_INVALID_MANU_MISSING_FIELDS = {
     mqry.AUTHOR: 'Test Person',
 }
 
+TEST_SAMPLE_INVALID_MANU_INVALID_AUTHOR = dict(mqry.SAMPLE_MANU)
+TEST_SAMPLE_INVALID_MANU_INVALID_AUTHOR[mqry.AUTHOR_EMAIL] = 'notrightperson@nuhuh.net'
+
 TEST_SAMPLE_INVALID_MANU_INVALID_EDITOR_EMAIL = dict(mqry.SAMPLE_MANU)
 TEST_SAMPLE_INVALID_MANU_INVALID_EDITOR_EMAIL[mqry.EDITOR] = 'Ted'
 
@@ -144,15 +147,19 @@ def test_create_manuscript_valid(test_people):
     assert retrieved_manuscript[mqry.AUTHOR] == TEST_SAMPLE_MANU[mqry.AUTHOR]
     assert retrieved_manuscript[mqry.REFEREES] == TEST_SAMPLE_MANU[mqry.REFEREES]
 
-def test_create_manuscript_invalid_missing_fields():
+def test_create_manuscript_invalid_missing_fields(test_people):
     with pytest.raises(ValueError, match="Missing required field for manuscript: author_email"):
         mqry.create_manuscript(TEST_SAMPLE_INVALID_MANU_MISSING_FIELDS)
 
-def test_create_manuscript_invalid_editor_email():
+def test_create_manuscript_invalid_author(test_people):
+    with pytest.raises(ValueError, match="Author does not exist with email: notrightperson@nuhuh.net"):
+        mqry.create_manuscript(TEST_SAMPLE_INVALID_MANU_INVALID_AUTHOR)
+
+def test_create_manuscript_invalid_editor_email(test_people):
     with pytest.raises(ValueError, match="Invalid Editor Email: Ted"):
         mqry.create_manuscript(TEST_SAMPLE_INVALID_MANU_INVALID_EDITOR_EMAIL)
 
-def test_create_manuscript_invalid_editor():
+def test_create_manuscript_invalid_editor(test_people):
     with pytest.raises(ValueError, match="Editor does not exist with email: notgorrister@notrealdomain.net"):
         mqry.create_manuscript(TEST_SAMPLE_INVALID_MANU_INVALID_EDITOR)
 
