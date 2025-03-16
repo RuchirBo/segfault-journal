@@ -11,9 +11,11 @@ TEST_SAMPLE_MANU = mqry.SAMPLE_MANU
 TEST_TITLE = 'First Title'
 NOT_TITLE = 'Not Title'
 
+TEST_AU_ROLES = [rls.AUTHOR_CODE]
+
 TEST_ED_NAME = "Ted"
 TEST_ED_AFF = 'AM'
-TEST_ED_ROLES = ['ED']
+TEST_ED_ROLES = [rls.ED_CODE]
 
 TEST_SAMPLE_INVALID_MANU_MISSING_FIELDS = {
     mqry.TITLE: 'Test Title',
@@ -124,14 +126,17 @@ def test_withdrawn_state_no_actions():
 
 
 @pytest.fixture(scope='function')
-def test_editor():
-    ret = TEST_SAMPLE_MANU[mqry.EDITOR]
+def test_people():
+    ret_author = TEST_SAMPLE_MANU[mqry.AUTHOR_EMAIL]
+    if not ppl.exists(TEST_SAMPLE_MANU[mqry.AUTHOR_EMAIL]):
+        ppl.create_person(TEST_SAMPLE_MANU[mqry.AUTHOR], TEST_ED_AFF, TEST_SAMPLE_MANU[mqry.AUTHOR_EMAIL], TEST_AU_ROLES)
+    ret_editor = TEST_SAMPLE_MANU[mqry.EDITOR]
     if not ppl.exists(TEST_SAMPLE_MANU[mqry.EDITOR]):
         ppl.create_person(TEST_ED_NAME, TEST_ED_AFF, TEST_SAMPLE_MANU[mqry.EDITOR], TEST_ED_ROLES)
-    yield ret
+    yield ret_author, ret_editor
     ppl.delete_person(TEST_SAMPLE_MANU[mqry.EDITOR])
 
-def test_create_manuscript_valid(test_editor):
+def test_create_manuscript_valid(test_people):
     result = mqry.create_manuscript(TEST_SAMPLE_MANU)
     assert result == "Manuscript created successfully."
     retrieved_manuscript = mqry.get_manuscript_by_title(TEST_SAMPLE_MANU[mqry.TITLE])
@@ -180,7 +185,7 @@ def test_delete_manuscript_invalid():
     with pytest.raises(ValueError, match="Manuscript not found for Title: Non-existent Title, Author: Non-existent Author"):
         mqry.delete_manuscript(TEST_OLD_INVALID_MANU[mqry.TITLE], TEST_OLD_INVALID_MANU[mqry.AUTHOR])
 
-def test_update_manuscript_valid(test_editor):
+def test_update_manuscript_valid(test_people):
     mqry.create_manuscript(TEST_SAMPLE_MANU)
     mqry.update_manuscript(TEST_SAMPLE_MANU, TEST_NEW_VALID_MANU)   
     print(mqry.get_all_manuscripts())

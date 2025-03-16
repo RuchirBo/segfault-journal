@@ -273,13 +273,17 @@ def get_valid_actions_by_state(state: str):
 
 
 def create_manuscript(manuscript: dict):
-    all_fields = [TITLE, AUTHOR, AUTHOR_EMAIL, TEXT, ABSTRACT, EDITOR]
+    all_fields = [TITLE, AUTHOR_EMAIL, TEXT, ABSTRACT, EDITOR]
     for key in all_fields:
         if key not in manuscript:
             raise ValueError(f"Missing required field for manuscript: {key}")
     manuscript[STATE] = SUBMITTED
     manuscript[REFEREES] = []
     manuscript[HISTORY] = [SUBMITTED]
+    if not ppl.exists(manuscript[AUTHOR_EMAIL]):
+        raise ValueError(f'Author does not exist with email: {manuscript[AUTHOR_EMAIL]}')
+    author = ppl.read_one(manuscript[AUTHOR_EMAIL])
+    manuscript[AUTHOR] = author[ppl.NAME]
     if not ppl.is_valid_email(manuscript[EDITOR]):
         raise ValueError(f'Invalid Editor Email: {manuscript[EDITOR]}')
     if not ppl.exists(manuscript[EDITOR]):
