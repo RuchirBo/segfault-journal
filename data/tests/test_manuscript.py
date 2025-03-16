@@ -137,6 +137,7 @@ def test_people():
     if not ppl.exists(TEST_SAMPLE_MANU[mqry.EDITOR]):
         ppl.create_person(TEST_ED_NAME, TEST_ED_AFF, TEST_SAMPLE_MANU[mqry.EDITOR], TEST_ED_ROLES)
     yield ret_author, ret_editor
+    ppl.delete_person(TEST_SAMPLE_MANU[mqry.AUTHOR_EMAIL])
     ppl.delete_person(TEST_SAMPLE_MANU[mqry.EDITOR])
 
 def test_create_manuscript_valid(test_people):
