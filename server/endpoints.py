@@ -17,13 +17,13 @@ import data.manuscripts.manuscript as manu
 import data.text as txt
 import data.roles as rls
 
+from .auth import auth_ns
 
 app = Flask(__name__)
 CORS(app)
 api = Api(app)
 
 
-from .auth import auth_ns
 api.add_namespace(auth_ns, path='/auth')
 
 
