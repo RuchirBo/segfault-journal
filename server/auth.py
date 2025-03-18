@@ -3,24 +3,47 @@ from flask_restx import Namespace, Resource, fields
 from werkzeug.security import generate_password_hash, check_password_hash
 import data.db_connect as db_connect
 
-
 auth_ns = Namespace('auth', description="Authentication operations")
 
+register_model = auth_ns.model(
+    'Register',
+    {
+        'email': fields.String(
+            required=True,
+            description="User email"
+        ),
+        'password': fields.String(
+            required=True,
+            description="User password"
+        ),
+        'role': fields.String(
+            required=False,
+            description="Role code"
+        ),
+        'role_key': fields.String(
+            required=False,
+            description="Special key if required by role"
+        ),
+    }
+)
 
-register_model = auth_ns.model('Register', {
-    'email': fields.String(required=True, description="User email"),
-    'password': fields.String(required=True, description="User password"),
-    'role': fields.String(required=False, description="Role code (e.g. 'dev', 'ED', 'RE', 'AU')"),
-    'role_key': fields.String(required=False, description="Special key if required by role"),
-})
-
-
-login_model = auth_ns.model('Login', {
-    'email': fields.String(required=True, description="User email"),
-    'password': fields.String(required=True, description="User password"),
-    'role_key': fields.String(required=False, description="Special key if required by role"),
-})
-
+login_model = auth_ns.model(
+    'Login',
+    {
+        'email': fields.String(
+            required=True,
+            description="User email"
+        ),
+        'password': fields.String(
+            required=True,
+            description="User password"
+        ),
+        'role_key': fields.String(
+            required=False,
+            description="Special key if required by role"
+        ),
+    }
+)
 
 ROLE_KEYS = {
     'dev': 'segfault',
@@ -37,7 +60,7 @@ class Register(Resource):
     @auth_ns.expect(register_model)
     def post(self):
         """
-        Register a new user. 
+        Register a new user.
         Checks if the user already exists in the 'accounts' collection.
         Password is hashed before storage.
         """
