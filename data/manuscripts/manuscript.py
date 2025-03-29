@@ -277,17 +277,26 @@ def create_manuscript(manuscript: dict):
     for key in all_fields:
         if key not in manuscript:
             raise ValueError(f"Missing required field for manuscript: {key}")
+    
     manuscript[STATE] = SUBMITTED
     manuscript[REFEREES] = []
     manuscript[HISTORY] = [SUBMITTED]
+
     if not ppl.exists(manuscript[AUTHOR_EMAIL]):
         raise ValueError(f'Author does not exist with email: {manuscript[AUTHOR_EMAIL]}')
     author = ppl.read_one(manuscript[AUTHOR_EMAIL])
+    if not ppl.has_role(author, rls.AUTHOR_CODE):
+        raise ValueError(f'Given author does not have author role')
     manuscript[AUTHOR] = author[ppl.NAME]
+
     if not ppl.is_valid_email(manuscript[EDITOR]):
         raise ValueError(f'Invalid Editor Email: {manuscript[EDITOR]}')
     if not ppl.exists(manuscript[EDITOR]):
         raise ValueError(f'Editor does not exist with email: {manuscript[EDITOR]}')
+    editor = ppl.read_one(manuscript[EDITOR])
+    if not ppl.has_role(editor, rls.ED_CODE):
+        raise ValueError(f'Given editor does not have editor role')
+    
     dbc.create(MANU_COLLECT, manuscript)
     return f"Manuscript created successfully."
 
