@@ -31,6 +31,12 @@ TEST_SAMPLE_INVALID_MANU_INVALID_EDITOR_EMAIL[mqry.EDITOR] = 'Ted'
 TEST_SAMPLE_INVALID_MANU_INVALID_EDITOR = dict(mqry.SAMPLE_MANU)
 TEST_SAMPLE_INVALID_MANU_INVALID_EDITOR[mqry.EDITOR] = 'notgorrister@notrealdomain.net'
 
+TEST_SAMPLE_INVALID_MANU_AUTHOR_ROLE = dict(mqry.SAMPLE_MANU)
+TEST_SAMPLE_INVALID_MANU_AUTHOR_ROLE[mqry.AUTHOR_EMAIL] = mqry.SAMPLE_MANU[mqry.EDITOR]
+
+TEST_SAMPLE_INVALID_MANU_EDITOR_ROLE = dict(mqry.SAMPLE_MANU)
+TEST_SAMPLE_INVALID_MANU_EDITOR_ROLE[mqry.EDITOR] = mqry.SAMPLE_MANU[mqry.AUTHOR_EMAIL]
+
 
 TEST_NEW_VALID_MANU = {
     mqry.TITLE: 'New Title',
@@ -163,6 +169,14 @@ def test_create_manuscript_invalid_editor_email(test_people):
 def test_create_manuscript_invalid_editor(test_people):
     with pytest.raises(ValueError, match="Editor does not exist with email: notgorrister@notrealdomain.net"):
         mqry.create_manuscript(TEST_SAMPLE_INVALID_MANU_INVALID_EDITOR)
+
+def test_create_manuscript_invalid_author_role(test_people):
+    with pytest.raises(ValueError, match='Given author does not have author role'):
+        mqry.create_manuscript(TEST_SAMPLE_INVALID_MANU_AUTHOR_ROLE)
+
+def test_create_manuscript_invalid_editor_role(test_people):
+    with pytest.raises(ValueError, match='Given editor does not have editor role'):
+        mqry.create_manuscript(TEST_SAMPLE_INVALID_MANU_EDITOR_ROLE)
 
 def test_get_manuscript_by_title():
      manuscript = mqry.get_manuscript_by_title(TEST_SAMPLE_MANU[mqry.TITLE])
