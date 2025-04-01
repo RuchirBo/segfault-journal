@@ -66,6 +66,19 @@ VALID_STATES = [
     WITHDRAWN,
 ]
 
+STATE_DESCRIPTIONS = {
+    "SUB": "Manuscript has been submitted.",
+    "REV": "Referees are reviewing.",
+    "CED": "The copy editing.",
+    "AUREVIEW": "Awaiting author review.",
+    "FORM": "Undergoing formatting.",
+    "PUB": "Manuscript published.",
+    "REJ": "Manuscript rejected.",
+    "WITHDRAW": "Author has withdrawn.",
+    "AUTHREVISION": "Author is revising.",
+    "EDREV": "Awaiting editor review."
+}
+
 client = dbc.connect_db()
 print(f'{client=}')
 

@@ -7,6 +7,7 @@ from http import HTTPStatus
 from flask import Flask, request  # , request
 from flask_restx import Resource, Api, fields  # Namespace, fields
 from flask_cors import CORS
+from data.manuscripts.manuscript import STATE_DESCRIPTIONS
 
 import werkzeug.exceptions as wz
 
@@ -277,6 +278,8 @@ class PersonRoles(Resource):
 class Manuscripts(Resource):
     def get(self):
         manuscripts = manu.get_all_manuscripts()
+        for manuscript in manuscripts:
+            manuscript["state_description"] = STATE_DESCRIPTIONS.get(manuscript["state"])
         return {'manuscripts': manuscripts}
 
 
