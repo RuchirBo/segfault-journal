@@ -2,8 +2,14 @@ from flask import request
 from flask_restx import Namespace, Resource, fields
 from werkzeug.security import generate_password_hash, check_password_hash
 import data.db_connect as db_connect
+import jwt
+from datetime import datetime, timedelta
+from flask import current_app
+
 
 auth_ns = Namespace('auth', description="Authentication operations")
+
+SECRET_KEY = "dummy_secret_key"
 
 register_model = auth_ns.model(
     'Register',
@@ -98,7 +104,7 @@ class Login(Resource):
     def post(self):
         """
         Login a user by verifying their email and password.
-        Returns a success message if the credentials match.
+        Returns a success message and a JWT token if the credentials match.
         """
         data = request.json
         email = data.get('email')
@@ -120,4 +126,11 @@ class Login(Resource):
             if role_key != ROLE_KEYS[user_role]:
                 auth_ns.abort(403, f"Invalid key for role '{user_role}'")
 
-        return {"message": "Logged in successfully."}, 200
+        payload = {
+            'email': email,
+            'role': user_role,
+            'exp': datetime.utcnow() + timedelta(hours=2)
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+
+        return {"message": "Logged in successfully.", "token": token}, 200
