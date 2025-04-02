@@ -4,7 +4,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import data.db_connect as db_connect
 import jwt
 from datetime import datetime, timedelta
-from flask import current_app
 
 
 auth_ns = Namespace('auth', description="Authentication operations")
