@@ -279,8 +279,9 @@ class Manuscripts(Resource):
     def get(self):
         manuscripts = manu.get_all_manuscripts()
         for manuscript in manuscripts:
-            manuscript["state_description"] = STATE_DESCRIPTIONS.get
-            (manuscript["state"])
+            curr_desc = STATE_DESCRIPTIONS.get(manuscript["state"])
+            manuscript["state_description"] = curr_desc
+        print(manuscripts)
         return {'manuscripts': manuscripts}
 
 
@@ -415,7 +416,7 @@ class ManuscriptsDelete(Resource):
 
 MANU_ACTION_FLDS = api.model('ManuscriptAction', {
     manu.TITLE: fields.String,
-    manu.CURR_STATE: fields.String,
+    # manu.CURR_STATE: fields.String,
     manu.ACTION: fields.String,
     manu.REFEREES: fields.String,
     "forceful_change": fields.String(
@@ -437,7 +438,7 @@ class ReceiveAction(Resource):
     def put(self):
         try:
             title = request.json.get(manu.TITLE)
-            curr_state = request.json.get(manu.CURR_STATE)
+            # curr_state = request.json.get(manu.CURR_STATE)
             action = request.json.get(manu.ACTION)
             referees = request.json.get(manu.REFEREES)
             if isinstance(referees, str):
@@ -445,21 +446,26 @@ class ReceiveAction(Resource):
             manuscript = manu.get_manuscript_by_title(title)
             if not manuscript:
                 raise wz.NotFound(f"Manuscript '{title}' not found.")
-            updated_state = curr_state
-            extra_kwargs = {"manu": manuscript}
+            curr_state = manuscript[manu.STATE]
+            extra_kwargs = {"manu": manuscript, "ref": referees}
             if action == manu.EDITOR_MOVE:
                 forceful_change = request.json.get("forceful_change", "")
                 if not forceful_change:
                     raise wz.NotAcceptable("'forceful_change' required.")
                 extra_kwargs["forceful_change"] = forceful_change
-            for ref in referees:
-                updated_state = manu.handle_action(
-                    curr_state, action, ref=ref, **extra_kwargs
-                )
-            manuscript[manu.STATE] = updated_state
+            # if len(referees) != 0:
+            #     for ref in referees:
+            #         updated_state = manu.change_manuscript_state(
+            #           manuscript[manu.TITLE], action, ref=ref, **extra_kwargs
+            #         )
+            # else:
+            updated_state = manu.change_manuscript_state(
+                manuscript[manu.TITLE], action, **extra_kwargs
+            )
+            # manuscript[manu.STATE] = updated_state
             if "_id" in manuscript:
                 del manuscript["_id"]
-            manu.update_manuscript(manuscript, manuscript)
+            # manu.update_manuscript(manuscript, manuscript)
         except Exception as err:
             raise wz.NotAcceptable(f"Bad action: {err}")
         return {

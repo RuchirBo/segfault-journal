@@ -176,16 +176,15 @@ def test_get_manuscript_by_title_failure(mock_get):
     manu.STATE: manu.IN_REF_REV,
     manu.REFEREES: ["ref1@example.com"],
 })
-@patch("data.manuscripts.manuscript.handle_action", return_value=manu.COPY_EDIT)
-@patch("data.manuscripts.manuscript.update_manuscript")
-def test_receive_action_success(mock_update, mock_handle_action, mock_get_manu):
+@patch("data.manuscripts.manuscript.change_manuscript_state", return_value=manu.COPY_EDIT)
+def test_receive_action_success(mock_change_manuscript_state, mock_get_manu):
     """
     Test that the /receive_action endpoint correctly updates a manuscript's state
     when given a valid action.
     """
     payload = {
         manu.TITLE: "Test Manuscript",
-        manu.CURR_STATE: manu.IN_REF_REV,
+        # manu.CURR_STATE: manu.IN_REF_REV,
         manu.ACTION: manu.ACCEPT,
         manu.REFEREES: ["ref1@example.com"]
     }
@@ -203,7 +202,6 @@ def test_receive_action_success(mock_update, mock_handle_action, mock_get_manu):
     assert resp_json["forceful_change"] == "N/A"
 
     mock_get_manu.assert_called_once_with("Test Manuscript")
-    mock_handle_action.assert_called_once_with(
-        manu.IN_REF_REV, manu.ACCEPT, ref="ref1@example.com", manu=mock_get_manu.return_value,
+    mock_change_manuscript_state.assert_called_once_with(
+        "Test Manuscript", manu.ACCEPT, manu=mock_get_manu.return_value, ref=["ref1@example.com"], 
     )
-    mock_update.assert_called_once_with(mock_get_manu.return_value, mock_get_manu.return_value)

@@ -370,3 +370,4 @@ def change_manuscript_state(manu_title, action, **kwargs):
     manu[HISTORY].append(new_state)
     manu[STATE] = new_state
     update_manuscript({TITLE: manu[TITLE], AUTHOR: manu[AUTHOR]}, manu)
+    return new_state
