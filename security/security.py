@@ -9,9 +9,8 @@ LOGIN = 'login'
 
 PEOPLE = 'people'
 
-security_records = {}
 
-temp_records = {
+security_records = {
      PEOPLE: {
          CREATE: {
              USER_LIST: ['ejc369@nyu.edu'],
@@ -22,12 +21,7 @@ temp_records = {
      },
  }
 
+
 def read() -> dict:
-     global security_records
-     # dbc.read()
-     security_recs = temp_records
-     return security_records
-
-
-
-
+    # dbc.read()
+    return security_records
