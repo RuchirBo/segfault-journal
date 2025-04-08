@@ -278,7 +278,7 @@ def handle_action(curr_state, action, **kwargs) -> str:
 
 
 def get_valid_actions_by_state(state: str):
-    valid_actions = STATE_TABLE.get(state, {}).keys()
+    valid_actions = list(STATE_TABLE.get(state, {}).keys())
     if not valid_actions:
         return []
     print(f'{valid_actions=}')

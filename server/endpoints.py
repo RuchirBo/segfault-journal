@@ -414,6 +414,21 @@ class ManuscriptsDelete(Resource):
         }
 
 
+@api.route(f"{MANU_EP}/actions/<string:state>")
+class GetValidActions(Resource):
+    """
+    Retrieve all valid actions from a state.
+    """
+    def get(self, state):
+        try:
+            if not manu.is_valid_state(state):
+                raise wz.NotFound(f"Invalid State: {state}")
+            acts = manu.get_valid_actions_by_state(state)
+            return {"valid_actions": acts}
+        except ValueError as err:
+            raise wz.NotFound(str(err))
+
+
 MANU_ACTION_FLDS = api.model('ManuscriptAction', {
     manu.TITLE: fields.String,
     # manu.CURR_STATE: fields.String,
