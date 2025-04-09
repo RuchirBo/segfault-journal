@@ -2,8 +2,8 @@ from flask import request
 from flask_restx import Namespace, Resource, fields
 from werkzeug.security import generate_password_hash, check_password_hash
 import data.db_connect as db_connect
-import jwt
-from datetime import datetime, timedelta
+# import jwt
+# from datetime import datetime, timedelta
 from security.security import COLLECT_NAME, PEOPLE
 
 auth_ns = Namespace('auth', description="Authentication operations")
@@ -127,12 +127,12 @@ class Login(Resource):
             if role_key != ROLE_KEYS[user_role]:
                 auth_ns.abort(403, f"Invalid key for role '{user_role}'")
 
-        payload = {
-            'email': email,
-            'role': user_role,
-            'exp': datetime.utcnow() + timedelta(hours=2)
-        }
-        #token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        # payload = {
+        #     'email': email,
+        #     'role': user_role,
+        #     'exp': datetime.utcnow() + timedelta(hours=2)
+        # }
+        # token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         token = "segfault_dummy_val"
 
         return {"message": "Logged in successfully.", "token": token}, 200

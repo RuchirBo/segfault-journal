@@ -1,3 +1,5 @@
+import data.db_connect as db_connect
+
 COLLECT_NAME = 'security'
 CREATE = 'create'
 READ = 'read'
@@ -25,3 +27,8 @@ security_records = {
 def read() -> dict:
     # dbc.read()
     return security_records
+
+def delete_acc(email: str):
+    query = {'type': PEOPLE, 'email': email}
+    db_connect.connect_db()
+    return db_connect.delete_one(COLLECT_NAME, query)

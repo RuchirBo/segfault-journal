@@ -110,3 +110,12 @@ def delete(collection, filt, db=SEGFAULT_DB):
     print(f'{filt=}')
     del_result = client[db][collection].delete_many(filt)
     return del_result.deleted_count
+
+
+def delete_one(collection, filt, db=SEGFAULT_DB):
+    """
+    Delete a single entry in a db collection.
+    """
+    print(f"{filt=}")
+    del_result = client[db][collection].delete_one(filt)
+    return del_result.deleted_count
