@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import data.db_connect as db_connect
 import jwt
 from datetime import datetime, timedelta
-
+from security.security import COLLECT_NAME, PEOPLE
 
 auth_ns = Namespace('auth', description="Authentication operations")
 
@@ -64,11 +64,6 @@ ROLE_KEYS = {
 class Register(Resource):
     @auth_ns.expect(register_model)
     def post(self):
-        """
-        Register a new user.
-        Checks if the user already exists in the 'accounts' collection.
-        Password is hashed before storage.
-        """
         data = request.json
         email = data.get('email')
         password = data.get('password')
@@ -77,7 +72,12 @@ class Register(Resource):
 
         db_connect.connect_db()
 
-        existing_user = db_connect.fetch_one('accounts', {'email': email})
+        query = {
+            'type': PEOPLE,
+            'email': email,
+        }
+        existing_user = db_connect.fetch_one(COLLECT_NAME, query)
+
         if existing_user:
             auth_ns.abort(400, "User with that email already exists.")
 
@@ -88,12 +88,13 @@ class Register(Resource):
         hashed_password = generate_password_hash(password)
 
         user_doc = {
+            'type': PEOPLE,
             'email': email,
             'password': hashed_password,
             'role': role
         }
 
-        db_connect.create('accounts', user_doc)
+        db_connect.create(COLLECT_NAME, user_doc)
         return {"message": "User registered successfully."}, 201
 
 
@@ -101,10 +102,6 @@ class Register(Resource):
 class Login(Resource):
     @auth_ns.expect(login_model)
     def post(self):
-        """
-        Login a user by verifying their email and password.
-        Returns a success message and a JWT token if the credentials match.
-        """
         data = request.json
         email = data.get('email')
         password = data.get('password')
@@ -112,7 +109,12 @@ class Login(Resource):
 
         db_connect.connect_db()
 
-        user = db_connect.fetch_one('accounts', {'email': email})
+        query = {
+            'type': PEOPLE,
+            'email': email,
+        }
+        user = db_connect.fetch_one(COLLECT_NAME, query)
+
         if not user:
             auth_ns.abort(401, "Invalid email or password.")
 
@@ -130,6 +132,7 @@ class Login(Resource):
             'role': user_role,
             'exp': datetime.utcnow() + timedelta(hours=2)
         }
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        #token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        token = "segfault_dummy_val"
 
         return {"message": "Logged in successfully.", "token": token}, 200
