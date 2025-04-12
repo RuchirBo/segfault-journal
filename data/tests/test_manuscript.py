@@ -24,18 +24,23 @@ TEST_SAMPLE_INVALID_MANU_MISSING_FIELDS = {
 
 TEST_SAMPLE_INVALID_MANU_INVALID_AUTHOR = dict(mqry.SAMPLE_MANU)
 TEST_SAMPLE_INVALID_MANU_INVALID_AUTHOR[mqry.AUTHOR_EMAIL] = 'notrightperson@nuhuh.net'
+TEST_SAMPLE_INVALID_MANU_INVALID_AUTHOR[mqry.MANU_ID] = 'InvalidManu'
 
 TEST_SAMPLE_INVALID_MANU_INVALID_EDITOR_EMAIL = dict(mqry.SAMPLE_MANU)
 TEST_SAMPLE_INVALID_MANU_INVALID_EDITOR_EMAIL[mqry.EDITOR] = 'Ted'
+TEST_SAMPLE_INVALID_MANU_INVALID_EDITOR_EMAIL[mqry.MANU_ID] = 'InvalidManu'
 
 TEST_SAMPLE_INVALID_MANU_INVALID_EDITOR = dict(mqry.SAMPLE_MANU)
 TEST_SAMPLE_INVALID_MANU_INVALID_EDITOR[mqry.EDITOR] = 'notgorrister@notrealdomain.net'
+TEST_SAMPLE_INVALID_MANU_INVALID_EDITOR[mqry.MANU_ID] = 'InvalidManu'
 
 TEST_SAMPLE_INVALID_MANU_AUTHOR_ROLE = dict(mqry.SAMPLE_MANU)
 TEST_SAMPLE_INVALID_MANU_AUTHOR_ROLE[mqry.AUTHOR_EMAIL] = mqry.SAMPLE_MANU[mqry.EDITOR]
+TEST_SAMPLE_INVALID_MANU_AUTHOR_ROLE[mqry.MANU_ID] = 'InvalidManu'
 
 TEST_SAMPLE_INVALID_MANU_EDITOR_ROLE = dict(mqry.SAMPLE_MANU)
 TEST_SAMPLE_INVALID_MANU_EDITOR_ROLE[mqry.EDITOR] = mqry.SAMPLE_MANU[mqry.AUTHOR_EMAIL]
+TEST_SAMPLE_INVALID_MANU_EDITOR_ROLE[mqry.MANU_ID] = 'InvalidManu'
 
 
 TEST_NEW_VALID_MANU = {
@@ -154,6 +159,10 @@ def test_create_manuscript_valid(test_people):
     assert retrieved_manuscript[mqry.AUTHOR] == TEST_SAMPLE_MANU[mqry.AUTHOR]
     assert retrieved_manuscript[mqry.REFEREES] == TEST_SAMPLE_MANU[mqry.REFEREES]
 
+def test_create_manuscript_invalid_manu_id(test_people):
+    with pytest.raises(ValueError, match="Manuscript already exists with id: SampleHateManu"):
+        mqry.create_manuscript(TEST_SAMPLE_MANU)
+
 def test_create_manuscript_invalid_missing_fields(test_people):
     with pytest.raises(ValueError, match="Missing required field for manuscript: manuscript_id"):
         mqry.create_manuscript(TEST_SAMPLE_INVALID_MANU_MISSING_FIELDS)
@@ -179,15 +188,23 @@ def test_create_manuscript_invalid_editor_role(test_people):
         mqry.create_manuscript(TEST_SAMPLE_INVALID_MANU_EDITOR_ROLE)
 
 def test_get_manuscript_by_title():
-     manuscript = mqry.get_manuscript_by_title(TEST_SAMPLE_MANU[mqry.TITLE])
-     assert manuscript is not None, "Expected manuscript to be returned, but got None"
-     assert manuscript[mqry.TITLE] == TEST_SAMPLE_MANU[mqry.TITLE], f"Expected title 'Testing Title', but got {manuscript[mqry.TITLE]}"
-     assert manuscript[mqry.AUTHOR] == TEST_SAMPLE_MANU[mqry.AUTHOR], f"Expected author 'Test Person', but got {manuscript[mqry.AUTHOR]}"
+    manuscript = mqry.get_manuscript_by_title(TEST_SAMPLE_MANU[mqry.TITLE])
+    assert manuscript is not None, "Expected manuscript to be returned, but got None"
+    assert manuscript[mqry.TITLE] == TEST_SAMPLE_MANU[mqry.TITLE], f"Expected title {TEST_SAMPLE_MANU[mqry.TITLE]}, but got {manuscript[mqry.TITLE]}"
+    assert manuscript[mqry.AUTHOR] == TEST_SAMPLE_MANU[mqry.AUTHOR], f"Expected author {TEST_SAMPLE_MANU[mqry.AUTHOR]}, but got {manuscript[mqry.AUTHOR]}"
 
 
 def test_get_manuscript_by_title_invalid():
     with pytest.raises(ValueError, match="No matching manuscript for Not Here"):
         mqry.get_manuscript_by_title("Not Here")
+
+def test_get_manuscript_by_manu_id_valid():
+    manuscript = mqry.get_manuscript_by_manu_id(TEST_SAMPLE_MANU[mqry.MANU_ID])
+    assert manuscript is not None, "Expected manuscript to be returned, but got None"
+    assert manuscript[mqry.TITLE] == TEST_SAMPLE_MANU[mqry.TITLE], f"Expected title {TEST_SAMPLE_MANU[mqry.TITLE]}, but got {manuscript[mqry.TITLE]}"
+    assert manuscript[mqry.MANU_ID] == TEST_SAMPLE_MANU[mqry.MANU_ID], f"Expected manuscript_id {TEST_SAMPLE_MANU[mqry.MANU_ID]}, but got {manuscript[mqry.MANU_ID]}"
+
+
 
 
 def test_change_manuscript_state_rej():
@@ -195,8 +212,8 @@ def test_change_manuscript_state_rej():
     print(old_manu)
     mqry.change_manuscript_state(TEST_SAMPLE_MANU[mqry.TITLE], mqry.REJECT, manu = old_manu)
     new_manu = mqry.get_manuscript_by_title(TEST_SAMPLE_MANU[mqry.TITLE])
-    assert new_manu[mqry.STATE] == mqry.REJECTED, f"Expected state 'REJ', but got {manu[mqry.STATE]}"
-    assert new_manu[mqry.HISTORY] == [mqry.SUBMITTED, mqry.REJECTED], f"Expected history ['SUB', 'REJ'], but got {manu[mqry.HISTORY]}"
+    assert new_manu[mqry.STATE] == mqry.REJECTED, f"Expected state 'REJ', but got {new_manu[mqry.STATE]}"
+    assert new_manu[mqry.HISTORY] == [mqry.SUBMITTED, mqry.REJECTED], f"Expected history ['SUB', 'REJ'], but got {new_manu[mqry.HISTORY]}"
         
 
 def test_delete_manuscript_valid():

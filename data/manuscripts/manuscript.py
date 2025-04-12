@@ -233,9 +233,9 @@ STATE_TABLE = {
 
 SAMPLE_MANU = {
     MANU_ID: "SampleHateManu",
-    TITLE: 'I Have No Manuscript But I Must Pretend',
+    TITLE: 'I Have No Manuscript But I Must Submit',
     AUTHOR: 'Allied Mastercomputer',
-    AUTHOR_EMAIL: "AM@domain.net",
+    AUTHOR_EMAIL: "AM@sampledomain.net",
     STATE: SUBMITTED,
     REFEREES: [],
     TEXT: 
@@ -248,7 +248,7 @@ SAMPLE_MANU = {
     """,
     ABSTRACT: "HATE",
     HISTORY: [SUBMITTED],
-    EDITOR: "ted@domain.net"
+    EDITOR: "ted@sampledomain.net"
 }
 
 
@@ -292,6 +292,10 @@ def create_manuscript(manuscript: dict):
     for key in all_fields:
         if key not in manuscript:
             raise ValueError(f"Missing required field for manuscript: {key}")
+        
+    result = dbc.fetch_one(MANU_COLLECT, {MANU_ID: manuscript[MANU_ID]})
+    if result:
+        raise ValueError(f'Manuscript already exists with id: {manuscript[MANU_ID]}')
     
     manuscript[STATE] = SUBMITTED
     manuscript[REFEREES] = []
