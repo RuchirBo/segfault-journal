@@ -10,6 +10,7 @@ TEXT = 'text'
 ABSTRACT = 'abstract'
 HISTORY = 'history'
 EDITOR = 'editor_email'
+MANU_ID = 'manuscript_id'
 
 DISP_NAME = 'disp_name'
 TEST_FLD_NM = TITLE
@@ -231,6 +232,7 @@ STATE_TABLE = {
 }
 
 SAMPLE_MANU = {
+    MANU_ID: "SampleHateManu",
     TITLE: 'I Have No Manuscript But I Must Pretend',
     AUTHOR: 'Allied Mastercomputer',
     AUTHOR_EMAIL: "AM@domain.net",
@@ -286,7 +288,7 @@ def get_valid_actions_by_state(state: str):
 
 
 def create_manuscript(manuscript: dict):
-    all_fields = [TITLE, AUTHOR_EMAIL, TEXT, ABSTRACT, EDITOR]
+    all_fields = [MANU_ID, TITLE, AUTHOR_EMAIL, TEXT, ABSTRACT, EDITOR]
     for key in all_fields:
         if key not in manuscript:
             raise ValueError(f"Missing required field for manuscript: {key}")
@@ -349,6 +351,13 @@ def get_manuscript_by_title(title):
     result = dbc.fetch_one(MANU_COLLECT, {TITLE: title})
     if not result:
         raise ValueError(f"No matching manuscript for {title}")
+    return result
+
+
+def get_manuscript_by_manu_id(manu_id):
+    result = dbc.fetch_one(MANU_COLLECT, {MANU_ID: manu_id})
+    if not result:
+        raise ValueError(f"No matching manuscript for {manu_id}")
     return result
 
 

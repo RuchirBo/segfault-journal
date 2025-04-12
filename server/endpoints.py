@@ -286,6 +286,7 @@ class Manuscripts(Resource):
 
 
 MANU_CREATE_FLDS = api.model('ManuscriptEntry', {
+    manu.MANU_ID: fields.String,
     manu.TITLE: fields.String,
     manu.AUTHOR_EMAIL: fields.String,
     manu.TEXT: fields.String,
@@ -308,6 +309,7 @@ class ManuscriptsCreate(Resource):
         Add a manuscript.
         """
         try:
+            manu_id = request.json.get(manu.MANU_ID)
             title = request.json.get(manu.TITLE)
             author_email = request.json.get(manu.AUTHOR_EMAIL)
             text = request.json.get(manu.TEXT)
@@ -315,6 +317,7 @@ class ManuscriptsCreate(Resource):
             editor = request.json.get(manu.EDITOR)
             # referees = request.json.get(manu.REFEREES, [])
             manuscript = {
+                manu.MANU_ID: manu_id,
                 manu.TITLE: title,
                 manu.AUTHOR_EMAIL: author_email,
                 manu.TEXT: text,

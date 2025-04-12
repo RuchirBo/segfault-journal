@@ -155,7 +155,7 @@ def test_create_manuscript_valid(test_people):
     assert retrieved_manuscript[mqry.REFEREES] == TEST_SAMPLE_MANU[mqry.REFEREES]
 
 def test_create_manuscript_invalid_missing_fields(test_people):
-    with pytest.raises(ValueError, match="Missing required field for manuscript: author_email"):
+    with pytest.raises(ValueError, match="Missing required field for manuscript: manuscript_id"):
         mqry.create_manuscript(TEST_SAMPLE_INVALID_MANU_MISSING_FIELDS)
 
 def test_create_manuscript_invalid_author(test_people):
