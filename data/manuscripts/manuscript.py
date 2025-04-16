@@ -322,12 +322,11 @@ def create_manuscript(manuscript: dict):
 
 def update_manuscript(old_manuscript: dict, new_manuscript: dict):
     old_manu = dbc.fetch_one(collection = MANU_COLLECT, filt={
-        TITLE: old_manuscript[TITLE],
-        AUTHOR: old_manuscript[AUTHOR]
+        MANU_ID: old_manuscript[MANU_ID],
     })
     
     if not old_manu:
-        raise ValueError(f"Manuscript not found: {old_manuscript[TITLE]}")
+        raise ValueError(f"Manuscript not found: {old_manuscript[MANU_ID]}")
 
     if "_id" in new_manuscript:
         del new_manuscript["_id"]
@@ -335,14 +334,13 @@ def update_manuscript(old_manuscript: dict, new_manuscript: dict):
     result = dbc.update(
         collection=MANU_COLLECT,
         filters={
-            TITLE: old_manuscript[TITLE],
-            AUTHOR: old_manuscript[AUTHOR]
+            MANU_ID: old_manuscript[MANU_ID]
         },
         update_dict={"$set": new_manuscript}
     )
     
     if result.matched_count == 0:
-        raise ValueError(f"Manuscript not updated: {old_manuscript[TITLE]}")
+        raise ValueError(f"Manuscript not updated: {old_manuscript[MANU_ID]}")
 
     return result
 
@@ -365,10 +363,10 @@ def get_manuscript_by_manu_id(manu_id):
     return result
 
 
-def delete_manuscript(title: str, author: str):
-    result = dbc.delete(MANU_COLLECT, {TITLE: title, AUTHOR: author})
+def delete_manuscript(manu_id):
+    result = dbc.delete(MANU_COLLECT, {MANU_ID: manu_id})
     if not result:
-        raise ValueError(f"Manuscript not found for Title: {title}, Author: {author}")
+        raise ValueError(f"No matching manuscript for {manu_id}")
     return result
 
 def clear_all_manuscripts():
@@ -382,5 +380,5 @@ def change_manuscript_state(manu_title, action, **kwargs):
     new_state = handle_action(curr_state, action, **kwargs)
     manu[HISTORY].append(new_state)
     manu[STATE] = new_state
-    update_manuscript({TITLE: manu[TITLE], AUTHOR: manu[AUTHOR]}, manu)
+    update_manuscript({MANU_ID: manu[MANU_ID]}, manu)
     return new_state

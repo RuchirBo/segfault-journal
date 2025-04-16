@@ -44,12 +44,14 @@ TEST_SAMPLE_INVALID_MANU_EDITOR_ROLE[mqry.MANU_ID] = 'InvalidManu'
 
 
 TEST_NEW_VALID_MANU = {
+    mqry.MANU_ID: 'New ManuID',
     mqry.TITLE: 'New Title',
     mqry.AUTHOR: 'New Person',
     mqry.REFEREES: [],
 }
 
 TEST_OLD_INVALID_MANU = {
+    mqry.MANU_ID: 'Non-existent ManuID',
     mqry.TITLE: 'Non-existent Title',
     mqry.AUTHOR: 'Non-existent Author',
     mqry.REFEREES: [],
@@ -217,12 +219,12 @@ def test_change_manuscript_state_rej():
         
 
 def test_delete_manuscript_valid():
-    mqry.delete_manuscript(TEST_SAMPLE_MANU[mqry.TITLE], TEST_SAMPLE_MANU[mqry.AUTHOR])
+    mqry.delete_manuscript(TEST_SAMPLE_MANU[mqry.MANU_ID])
 
 
 def test_delete_manuscript_invalid():
-    with pytest.raises(ValueError, match="Manuscript not found for Title: Non-existent Title, Author: Non-existent Author"):
-        mqry.delete_manuscript(TEST_OLD_INVALID_MANU[mqry.TITLE], TEST_OLD_INVALID_MANU[mqry.AUTHOR])
+    with pytest.raises(ValueError, match="No matching manuscript for Non-existent ManuID"):
+        mqry.delete_manuscript(TEST_OLD_INVALID_MANU[mqry.MANU_ID])
 
 def test_update_manuscript_valid(test_people):
     mqry.create_manuscript(TEST_SAMPLE_MANU)
@@ -235,7 +237,7 @@ def test_update_manuscript_valid(test_people):
 
 
 def test_update_manuscript_invalid():
-    with pytest.raises(ValueError, match=f"Manuscript not found: {TEST_OLD_INVALID_MANU[mqry.TITLE]}"):
+    with pytest.raises(ValueError, match=f"Manuscript not found: {TEST_OLD_INVALID_MANU[mqry.MANU_ID]}"):
         mqry.update_manuscript(TEST_OLD_INVALID_MANU, TEST_NEW_VALID_MANU)
 
 
