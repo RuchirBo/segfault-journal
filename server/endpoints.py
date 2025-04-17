@@ -380,9 +380,15 @@ class GetManuscriptByTitle(Resource):
             raise wz.NotFound(str(err))
 
 
-MANU_DELETE_FIELDS = api.model('DeleteManuscriptEntry', {
-    manu.MANU_ID: fields.String(required=True, description='Unique manuscript identifier'),
-})
+MANU_DELETE_FIELDS = api.model(
+    'DeleteManuscriptEntry',
+    {
+        manu.MANU_ID: fields.String(
+            required=True,
+            description='Unique manuscript identifier'
+        ),
+    }
+)
 
 
 @api.route(f'{MANU_EP}/delete')
@@ -398,14 +404,12 @@ class ManuscriptsDelete(Resource):
         body = request.get_json() or {}
         manu_id = body.get(manu.MANU_ID)
         if not manu_id:
-            raise wz.NotAcceptable('`manuscript_id` is required for deletion')
-
+            raise wz.NotAcceptable('manuscript_id is required for deletion')
         try:
-            deleted_count = manu.delete_manuscript(manu_id)
+            manu.delete_manuscript(manu_id)
         except ValueError as e:
             raise wz.NotFound(str(e))
-
-        return { MESSAGE: 'Manuscript deleted!' }, HTTPStatus.OK
+        return {MESSAGE: 'Manuscript deleted!'}, HTTPStatus.OK
 
 
 @api.route(f"{MANU_EP}/actions/<string:state>")
