@@ -321,26 +321,24 @@ def create_manuscript(manuscript: dict):
 
 
 def update_manuscript(old_manuscript: dict, new_manuscript: dict):
-    old_manu = dbc.fetch_one(collection = MANU_COLLECT, filt={
-        MANU_ID: old_manuscript[MANU_ID],
-    })
-    
-    if not old_manu:
-        raise ValueError(f"Manuscript not found: {old_manuscript[MANU_ID]}")
+    """
+    Lookup & update by manuscript_id instead of title+author.
+    """
+    manu_id = old_manuscript.get(MANU_ID)
+    existing = dbc.fetch_one(MANU_COLLECT, {MANU_ID: manu_id})
+    if not existing:
+        raise ValueError(f"Manuscript not found: {manu_id}")
 
     if "_id" in new_manuscript:
         del new_manuscript["_id"]
 
     result = dbc.update(
         collection=MANU_COLLECT,
-        filters={
-            MANU_ID: old_manuscript[MANU_ID]
-        },
+        filters={MANU_ID: manu_id},
         update_dict={"$set": new_manuscript}
     )
-    
     if result.matched_count == 0:
-        raise ValueError(f"Manuscript not updated: {old_manuscript[MANU_ID]}")
+        raise ValueError(f"Manuscript not updated: {manu_id}")
 
     return result
 
@@ -363,16 +361,18 @@ def get_manuscript_by_manu_id(manu_id):
     return result
 
 
-def delete_manuscript(manu_id):
+def delete_manuscript(manu_id: str):
     result = dbc.delete(MANU_COLLECT, {MANU_ID: manu_id})
-    if not result:
+    if result == 0:
         raise ValueError(f"No matching manuscript for {manu_id}")
     return result
 
+
 def clear_all_manuscripts():
-    deleted_count = dbc.delete(MANU_COLLECT, {})  # Passing an empty filter {} deletes all documents.
+    deleted_count = dbc.delete(MANU_COLLECT, {})
     print(f"Deleted {deleted_count} manuscripts.")
     return deleted_count
+
 
 def change_manuscript_state(manu_title, action, **kwargs):
     manu = get_manuscript_by_title(manu_title)
