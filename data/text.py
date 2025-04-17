@@ -114,7 +114,7 @@ def update(key: str, title: str = None, text: str = None):
 
 
 def exists(key: str):
-    return read_one(key) is not None
+    return dbc.fetch_one(TEXT_COLLECT, {KEY: key}) is not None
 
 
 def main():
