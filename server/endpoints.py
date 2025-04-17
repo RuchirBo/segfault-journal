@@ -381,40 +381,31 @@ class GetManuscriptByTitle(Resource):
 
 
 MANU_DELETE_FIELDS = api.model('DeleteManuscriptEntry', {
-    manu.TITLE: fields.String,
-    manu.AUTHOR: fields.String,
+    manu.MANU_ID: fields.String(required=True, description='Unique manuscript identifier'),
 })
 
 
 @api.route(f'{MANU_EP}/delete')
 class ManuscriptsDelete(Resource):
     """
-    Delete a manuscript from the journal db.
+    Delete a manuscript from the journal db by its manuscript_id.
     """
     @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'Not acceptable')
+    @api.response(HTTPStatus.NOT_FOUND, 'Not found')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'Bad request')
     @api.expect(MANU_DELETE_FIELDS)
     def delete(self):
+        body = request.get_json() or {}
+        manu_id = body.get(manu.MANU_ID)
+        if not manu_id:
+            raise wz.NotAcceptable('`manuscript_id` is required for deletion')
+
         try:
-            del_manuscript = request.get_json()
-            if not del_manuscript:
-                raise ValueError('Missing valid manuscript to delete.')
-            title = del_manuscript.get(manu.TITLE)
-            author = del_manuscript.get(manu.AUTHOR)
+            deleted_count = manu.delete_manuscript(manu_id)
+        except ValueError as e:
+            raise wz.NotFound(str(e))
 
-            if not title or not author:
-                raise wz.NotAcceptable('Both title and author \
-                                       are required for manuscript \
-                                       to be deleted.')
-
-            manu.delete_manuscript(title, author)
-
-        except Exception as err:
-            raise wz.NotAcceptable(f'Could not delete manuscript: '
-                                   f'{err=}')
-        return {
-            MESSAGE: 'Manuscript deleted!',
-        }
+        return { MESSAGE: 'Manuscript deleted!' }, HTTPStatus.OK
 
 
 @api.route(f"{MANU_EP}/actions/<string:state>")

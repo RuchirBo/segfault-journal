@@ -58,7 +58,10 @@ def read():
 def read_one(key: str) -> dict:
     # This should take a key and return the page dictionary
     # for that key. Returns None if key not found.
-    return dbc.fetch_one(TEXT_COLLECT, {KEY: key})
+    doc = dbc.fetch_one(TEXT_COLLECT, {KEY: key})
+    if doc is not None:
+        return doc
+    return text_dict.get(key)
 
 
 def create(title: str, text: str, key: str):
