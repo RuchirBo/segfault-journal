@@ -347,6 +347,15 @@ def get_all_manuscripts():
     return dbc.read(MANU_COLLECT)
 
 
+def get_all_valid_manuscripts():
+    valid = []
+    manus = get_all_manuscripts()
+    for m in manus:
+        if m[STATE] != WITHDRAWN and m[STATE] != REJECTED:
+            valid.append(m)
+    return valid
+
+
 def get_manuscript_by_title(title):
     result = dbc.fetch_one(MANU_COLLECT, {TITLE: title})
     if not result:

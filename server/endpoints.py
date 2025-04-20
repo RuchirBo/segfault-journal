@@ -285,6 +285,17 @@ class Manuscripts(Resource):
         return {'manuscripts': manuscripts}
 
 
+@api.route(f"{MANU_EP}/valid")
+class ManuscriptsValid(Resource):
+    def get(self):
+        manuscripts = manu.get_all_valid_manuscripts()
+        for manuscript in manuscripts:
+            curr_desc = STATE_DESCRIPTIONS.get(manuscript["state"])
+            manuscript["state_description"] = curr_desc
+        print(manuscripts)
+        return {'manuscripts': manuscripts}
+
+
 MANU_CREATE_FLDS = api.model('ManuscriptEntry', {
     manu.MANU_ID: fields.String,
     manu.TITLE: fields.String,
