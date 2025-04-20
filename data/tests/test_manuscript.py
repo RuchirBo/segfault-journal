@@ -153,6 +153,7 @@ def test_people():
     ppl.delete_person(TEST_SAMPLE_MANU[mqry.AUTHOR_EMAIL])
     ppl.delete_person(TEST_SAMPLE_MANU[mqry.EDITOR])
 
+
 def test_create_manuscript_valid(test_people):
     result = mqry.create_manuscript(TEST_SAMPLE_MANU)
     assert result == "Manuscript created successfully."
@@ -207,8 +208,6 @@ def test_get_manuscript_by_manu_id_valid():
     assert manuscript[mqry.MANU_ID] == TEST_SAMPLE_MANU[mqry.MANU_ID], f"Expected manuscript_id {TEST_SAMPLE_MANU[mqry.MANU_ID]}, but got {manuscript[mqry.MANU_ID]}"
 
 
-
-
 def test_change_manuscript_state_rej():
     old_manu = mqry.get_manuscript_by_title(TEST_SAMPLE_MANU[mqry.TITLE])
     print(old_manu)
@@ -216,7 +215,21 @@ def test_change_manuscript_state_rej():
     new_manu = mqry.get_manuscript_by_title(TEST_SAMPLE_MANU[mqry.TITLE])
     assert new_manu[mqry.STATE] == mqry.REJECTED, f"Expected state 'REJ', but got {new_manu[mqry.STATE]}"
     assert new_manu[mqry.HISTORY] == [mqry.SUBMITTED, mqry.REJECTED], f"Expected history ['SUB', 'REJ'], but got {new_manu[mqry.HISTORY]}"
-        
+
+
+def test_get_all_manuscripts():
+    manu = mqry.get_all_manuscripts()
+    assert isinstance(manu, list)
+    for script in manu:
+        assert isinstance(script, dict)
+
+
+def test_get_all_manuscripts_valid():
+    manus = mqry.get_all_valid_manuscripts()
+    for script in manus:
+        assert script[mqry.STATE] != mqry.WITHDRAWN, f"Found withdrawn manuscript with id {script[mqry.MANU_ID]}"
+        assert script[mqry.STATE] != mqry.REJECTED, f"Found rejected manuscript with id {script[mqry.MANU_ID]}"
+
 
 def test_delete_manuscript_valid():
     mqry.delete_manuscript(TEST_SAMPLE_MANU[mqry.MANU_ID])
@@ -225,6 +238,7 @@ def test_delete_manuscript_valid():
 def test_delete_manuscript_invalid():
     with pytest.raises(ValueError, match="No matching manuscript for Non-existent ManuID"):
         mqry.delete_manuscript(TEST_OLD_INVALID_MANU[mqry.MANU_ID])
+
 
 def test_update_manuscript_valid(test_people):
     mqry.create_manuscript(TEST_SAMPLE_MANU)
@@ -241,11 +255,6 @@ def test_update_manuscript_invalid():
         mqry.update_manuscript(TEST_OLD_INVALID_MANU, TEST_NEW_VALID_MANU)
 
 
-def test_get_all_manuscripts():
-    manu = mqry.get_all_manuscripts()
-    assert isinstance(manu, list)
-    for script in manu:
-        assert isinstance(script, dict)
 
 def test_clear_all_manuscripts():
     mqry.clear_all_manuscripts()
