@@ -590,6 +590,7 @@ class TextUpdate(Resource):
             RETURN: txt.read_one(key)
         }, HTTPStatus.OK
 
+
 def format_output(result):
     # Assuming result.stdout is in bytes, you may want to decode it to a string
     return result.stdout.decode('utf-8') if result.stdout else "No output"
@@ -605,4 +606,3 @@ class ErrorLog(Resource):
         result = subprocess.run(f'tail {ELOG_LOC}', shell=True,
                                 stdout=subprocess.PIPE)
         return {ELOG_KEY: format_output(result)}
-
