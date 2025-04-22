@@ -120,6 +120,8 @@ def is_valid_action(action: str) -> bool:
 
 def assign_ref(manu: dict, ref: str, extra=None) -> str:
     print(extra)
+    #print("Assign ref is called.")
+    #print(ref)
     person = ppl.read_one(ref)
     if not person:
         people = ppl.read()

@@ -17,6 +17,7 @@ import data.people as ppl
 import data.manuscripts.manuscript as manu
 import data.text as txt
 import data.roles as rls
+import random
 
 from .auth import auth_ns
 
@@ -465,27 +466,38 @@ class ReceiveAction(Resource):
             # curr_state = request.json.get(manu.CURR_STATE)
             action = request.json.get(manu.ACTION)
             referees = request.json.get(manu.REFEREES)
+            print(referees)
             if isinstance(referees, str):
                 referees = [referees]
             manuscript = manu.get_manuscript_by_title(title)
             if not manuscript:
                 raise wz.NotFound(f"Manuscript '{title}' not found.")
             curr_state = manuscript[manu.STATE]
-            extra_kwargs = {"manu": manuscript, "ref": referees}
+            extra_kwargs = {"manu": manuscript}
             if action == manu.EDITOR_MOVE:
                 forceful_change = request.json.get("forceful_change", "")
                 if not forceful_change:
                     raise wz.NotAcceptable("'forceful_change' required.")
                 extra_kwargs["forceful_change"] = forceful_change
+            if action == manu.ASSIGN_REF:
+                if not referees:
+                    raise wz.NotAcceptable("Must provide at least \
+                    one referee to assign.")
+                chosen_referee = random.choice(referees)
+                # print("Chosen: ", chosen_referee)
+                updated_state = manu.change_manuscript_state(
+                    manuscript[manu.TITLE],
+                    action, ref=chosen_referee, **extra_kwargs)
             # if len(referees) != 0:
             #     for ref in referees:
             #         updated_state = manu.change_manuscript_state(
             #           manuscript[manu.TITLE], action, ref=ref, **extra_kwargs
             #         )
             # else:
-            updated_state = manu.change_manuscript_state(
-                manuscript[manu.TITLE], action, **extra_kwargs
-            )
+            else:
+                updated_state = manu.change_manuscript_state(
+                    manuscript[manu.TITLE],
+                    action, ref=referees, **extra_kwargs)
             # manuscript[manu.STATE] = updated_state
             if "_id" in manuscript:
                 del manuscript["_id"]
