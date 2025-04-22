@@ -51,6 +51,9 @@ ROLES_EP = '/roles'
 ELOG_LOC = '/var/log/segfault.pythonanywhere.com.error.log'
 ELOG_KEY = 'error_log'
 DEV_EP = '/dev'
+USER_KEY = 'number_users'
+ROLES_KEY = "all_roles"
+MANU_KEY = 'number_manuscripts'
 
 
 @api.route(HELLO_EP)
@@ -596,7 +599,7 @@ def format_output(result):
     return result.stdout.decode('utf-8') if result.stdout else "No output"
 
 
-@api.route("/{DEV_EP}}/logs/error")
+@api.route(f"{DEV_EP}/logs/error")
 class ErrorLog(Resource):
     """
     See the most recent portions of error log
@@ -606,3 +609,19 @@ class ErrorLog(Resource):
         result = subprocess.run(f'tail {ELOG_LOC}', shell=True,
                                 stdout=subprocess.PIPE)
         return {ELOG_KEY: format_output(result)}
+
+
+@api.route(f"{DEV_EP}/journal/info")
+class DebugSystemInfo(Resource):
+    def get(self):
+        try:
+            roles = rls.read()
+            users = ppl.get_masthead()
+            manuscripts = manu.get_all_manuscripts()
+            return {
+                USER_KEY: len(users),
+                ROLES_KEY: list(roles.keys()),
+                MANU_KEY: len(manuscripts)
+            }, 200
+        except Exception as e:
+            return {"message": str(e)}, 500
