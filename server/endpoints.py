@@ -48,9 +48,9 @@ TITLE = 'Segfault Journal Bimonthly'
 MANU_EP = '/manuscripts'
 TEXT_EP = '/text'
 ROLES_EP = '/roles'
-ELOG_LOC= '/var/log/segfault.pythonanywhere.com.error.log'
+ELOG_LOC = '/var/log/segfault.pythonanywhere.com.error.log'
 ELOG_KEY = 'error_log'
-
+DEV_EP = '/dev'
 
 
 @api.route(HELLO_EP)
@@ -596,7 +596,7 @@ def format_output(result):
     return result.stdout.decode('utf-8') if result.stdout else "No output"
 
 
-@api.route(f"/servers/logs/error")
+@api.route("/{DEV_EP}}/logs/error")
 class ErrorLog(Resource):
     """
     See the most recent portions of error log
