@@ -8,7 +8,7 @@ from flask import Flask, request  # , request
 from flask_restx import Resource, Api, fields  # Namespace, fields
 from flask_cors import CORS
 from data.manuscripts.manuscript import STATE_DESCRIPTIONS
-
+import subprocess
 import werkzeug.exceptions as wz
 
 import data.people as ppl
@@ -48,6 +48,9 @@ TITLE = 'Segfault Journal Bimonthly'
 MANU_EP = '/manuscripts'
 TEXT_EP = '/text'
 ROLES_EP = '/roles'
+ELOG_LOC= '/var/log/segfault.pythonanywhere.com.error.log'
+ELOG_KEY = 'error_log'
+
 
 
 @api.route(HELLO_EP)
@@ -586,3 +589,20 @@ class TextUpdate(Resource):
             MESSAGE: 'Text updated successfully!',
             RETURN: txt.read_one(key)
         }, HTTPStatus.OK
+
+def format_output(result):
+    # Assuming result.stdout is in bytes, you may want to decode it to a string
+    return result.stdout.decode('utf-8') if result.stdout else "No output"
+
+
+@api.route(f"/servers/logs/error")
+class ErrorLog(Resource):
+    """
+    See the most recent portions of error log
+    """
+    @api.response(HTTPStatus.OK.value, 'Success')
+    def get(self):
+        result = subprocess.run(f'tail {ELOG_LOC}', shell=True,
+                                stdout=subprocess.PIPE)
+        return {ELOG_KEY: format_output(result)}
+
