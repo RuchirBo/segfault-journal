@@ -43,11 +43,8 @@ TEST_SAMPLE_INVALID_MANU_EDITOR_ROLE[mqry.EDITOR] = mqry.SAMPLE_MANU[mqry.AUTHOR
 TEST_SAMPLE_INVALID_MANU_EDITOR_ROLE[mqry.MANU_ID] = 'InvalidManu'
 
 
-TEST_NEW_VALID_MANU = {
-    mqry.TITLE: 'New Title',
-    mqry.AUTHOR: 'New Person',
-    mqry.REFEREES: [],
-}
+TEST_NEW_VALID_MANU = dict(mqry.SAMPLE_MANU)
+TEST_NEW_VALID_MANU[mqry.TITLE] = "I Have No Manuscript But I Must Update"
 
 TEST_OLD_INVALID_MANU = {
     mqry.MANU_ID: 'Non-existent ManuID',
@@ -173,7 +170,7 @@ def test_people():
 
 
 def test_create_manuscript_valid(test_people):
-    retrieved_manuscript = mqry.get_manuscript_by_title(TEST_SAMPLE_MANU[mqry.TITLE])
+    retrieved_manuscript = mqry.get_manuscript_by_manu_id(TEST_SAMPLE_MANU[mqry.MANU_ID])
     assert retrieved_manuscript[mqry.TITLE] == TEST_SAMPLE_MANU[mqry.TITLE]
     assert retrieved_manuscript[mqry.AUTHOR] == TEST_SAMPLE_MANU[mqry.AUTHOR]
     assert retrieved_manuscript[mqry.REFEREES] == TEST_SAMPLE_MANU[mqry.REFEREES]
@@ -225,10 +222,10 @@ def test_get_manuscript_by_manu_id_valid(test_people):
 
 
 def test_change_manuscript_state_rej(test_people):
-    old_manu = mqry.get_manuscript_by_title(TEST_SAMPLE_MANU[mqry.TITLE])
+    old_manu = mqry.get_manuscript_by_manu_id(TEST_SAMPLE_MANU[mqry.MANU_ID])
     print(old_manu)
     mqry.change_manuscript_state(TEST_SAMPLE_MANU[mqry.TITLE], mqry.REJECT, manu = old_manu)
-    new_manu = mqry.get_manuscript_by_title(TEST_SAMPLE_MANU[mqry.TITLE])
+    new_manu = mqry.get_manuscript_by_manu_id(TEST_SAMPLE_MANU[mqry.MANU_ID])
     assert new_manu[mqry.STATE] == mqry.REJECTED, f"Expected state 'REJ', but got {new_manu[mqry.STATE]}"
     assert new_manu[mqry.HISTORY] == [mqry.SUBMITTED, mqry.REJECTED], f"Expected history ['SUB', 'REJ'], but got {new_manu[mqry.HISTORY]}"
 
@@ -247,8 +244,9 @@ def test_get_all_manuscripts_valid():
         assert script[mqry.STATE] != mqry.REJECTED, f"Found rejected manuscript with id {script[mqry.MANU_ID]}"
 
 
-# def test_delete_manuscript_valid():
-#     mqry.delete_manuscript(TEST_SAMPLE_MANU[mqry.MANU_ID])
+def test_delete_manuscript_valid():
+    with pytest.raises(ValueError, match="No matching manuscript for SampleHateManu"):
+        mqry.get_manuscript_by_manu_id(TEST_SAMPLE_MANU[mqry.MANU_ID])
 
 
 def test_delete_manuscript_invalid():
@@ -259,7 +257,8 @@ def test_delete_manuscript_invalid():
 def test_update_manuscript_valid(test_people):
     mqry.update_manuscript(TEST_SAMPLE_MANU, TEST_NEW_VALID_MANU)   
     print(mqry.get_all_manuscripts())
-    retrieved_manuscript = mqry.get_manuscript_by_title(TEST_NEW_VALID_MANU[mqry.TITLE])
+
+    retrieved_manuscript = mqry.get_manuscript_by_manu_id(TEST_SAMPLE_MANU[mqry.MANU_ID])
     assert retrieved_manuscript[mqry.TITLE] == TEST_NEW_VALID_MANU[mqry.TITLE]
     assert retrieved_manuscript[mqry.AUTHOR] == TEST_NEW_VALID_MANU[mqry.AUTHOR]
     assert retrieved_manuscript[mqry.REFEREES] == TEST_NEW_VALID_MANU[mqry.REFEREES]
@@ -270,7 +269,7 @@ def test_update_manuscript_invalid():
         mqry.update_manuscript(TEST_OLD_INVALID_MANU, TEST_NEW_VALID_MANU)
 
 
-
-def test_clear_all_manuscripts():
-    mqry.clear_all_manuscripts()
-    print(mqry.get_all_manuscripts())
+@patch('data.manuscripts.manuscript.dbc.delete', return_value=5)
+def test_clear_all_manuscripts(mock_delete):
+    result = mqry.clear_all_manuscripts()
+    assert result == 5
