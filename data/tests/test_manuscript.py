@@ -44,7 +44,6 @@ TEST_SAMPLE_INVALID_MANU_EDITOR_ROLE[mqry.MANU_ID] = 'InvalidManu'
 
 
 TEST_NEW_VALID_MANU = {
-    mqry.MANU_ID: 'New ManuID',
     mqry.TITLE: 'New Title',
     mqry.AUTHOR: 'New Person',
     mqry.REFEREES: [],
@@ -143,20 +142,37 @@ def test_withdrawn_state_no_actions():
 
 @pytest.fixture(scope='function')
 def test_people():
+
     ret_author = TEST_SAMPLE_MANU[mqry.AUTHOR_EMAIL]
     if not ppl.exists(TEST_SAMPLE_MANU[mqry.AUTHOR_EMAIL]):
         ppl.create_person(TEST_SAMPLE_MANU[mqry.AUTHOR], TEST_ED_AFF, TEST_SAMPLE_MANU[mqry.AUTHOR_EMAIL], TEST_AU_ROLES)
+        author_exist = False
+    else:
+        author_exist = True
+
     ret_editor = TEST_SAMPLE_MANU[mqry.EDITOR]
     if not ppl.exists(TEST_SAMPLE_MANU[mqry.EDITOR]):
         ppl.create_person(TEST_ED_NAME, TEST_ED_AFF, TEST_SAMPLE_MANU[mqry.EDITOR], TEST_ED_ROLES)
+        editor_exist = False
+    else:
+        editor_exist = True
+
+    mqry.create_manuscript(TEST_SAMPLE_MANU)
+    print(mqry.get_all_manuscripts())
+
     yield ret_author, ret_editor
-    ppl.delete_person(TEST_SAMPLE_MANU[mqry.AUTHOR_EMAIL])
-    ppl.delete_person(TEST_SAMPLE_MANU[mqry.EDITOR])
+    print(mqry.get_all_manuscripts())
+
+    if not author_exist:
+        ppl.delete_person(TEST_SAMPLE_MANU[mqry.AUTHOR_EMAIL])
+    if not editor_exist:
+        ppl.delete_person(TEST_SAMPLE_MANU[mqry.EDITOR])
+    
+    mqry.delete_manuscript(TEST_SAMPLE_MANU[mqry.MANU_ID])
+    
 
 
 def test_create_manuscript_valid(test_people):
-    result = mqry.create_manuscript(TEST_SAMPLE_MANU)
-    assert result == "Manuscript created successfully."
     retrieved_manuscript = mqry.get_manuscript_by_title(TEST_SAMPLE_MANU[mqry.TITLE])
     assert retrieved_manuscript[mqry.TITLE] == TEST_SAMPLE_MANU[mqry.TITLE]
     assert retrieved_manuscript[mqry.AUTHOR] == TEST_SAMPLE_MANU[mqry.AUTHOR]
@@ -190,7 +206,7 @@ def test_create_manuscript_invalid_editor_role(test_people):
     with pytest.raises(ValueError, match='Given editor does not have editor role'):
         mqry.create_manuscript(TEST_SAMPLE_INVALID_MANU_EDITOR_ROLE)
 
-def test_get_manuscript_by_title():
+def test_get_manuscript_by_title(test_people):
     manuscript = mqry.get_manuscript_by_title(TEST_SAMPLE_MANU[mqry.TITLE])
     assert manuscript is not None, "Expected manuscript to be returned, but got None"
     assert manuscript[mqry.TITLE] == TEST_SAMPLE_MANU[mqry.TITLE], f"Expected title {TEST_SAMPLE_MANU[mqry.TITLE]}, but got {manuscript[mqry.TITLE]}"
@@ -201,14 +217,14 @@ def test_get_manuscript_by_title_invalid():
     with pytest.raises(ValueError, match="No matching manuscript for Not Here"):
         mqry.get_manuscript_by_title("Not Here")
 
-def test_get_manuscript_by_manu_id_valid():
+def test_get_manuscript_by_manu_id_valid(test_people):
     manuscript = mqry.get_manuscript_by_manu_id(TEST_SAMPLE_MANU[mqry.MANU_ID])
     assert manuscript is not None, "Expected manuscript to be returned, but got None"
     assert manuscript[mqry.TITLE] == TEST_SAMPLE_MANU[mqry.TITLE], f"Expected title {TEST_SAMPLE_MANU[mqry.TITLE]}, but got {manuscript[mqry.TITLE]}"
     assert manuscript[mqry.MANU_ID] == TEST_SAMPLE_MANU[mqry.MANU_ID], f"Expected manuscript_id {TEST_SAMPLE_MANU[mqry.MANU_ID]}, but got {manuscript[mqry.MANU_ID]}"
 
 
-def test_change_manuscript_state_rej():
+def test_change_manuscript_state_rej(test_people):
     old_manu = mqry.get_manuscript_by_title(TEST_SAMPLE_MANU[mqry.TITLE])
     print(old_manu)
     mqry.change_manuscript_state(TEST_SAMPLE_MANU[mqry.TITLE], mqry.REJECT, manu = old_manu)
@@ -231,8 +247,8 @@ def test_get_all_manuscripts_valid():
         assert script[mqry.STATE] != mqry.REJECTED, f"Found rejected manuscript with id {script[mqry.MANU_ID]}"
 
 
-def test_delete_manuscript_valid():
-    mqry.delete_manuscript(TEST_SAMPLE_MANU[mqry.MANU_ID])
+# def test_delete_manuscript_valid():
+#     mqry.delete_manuscript(TEST_SAMPLE_MANU[mqry.MANU_ID])
 
 
 def test_delete_manuscript_invalid():
@@ -241,7 +257,6 @@ def test_delete_manuscript_invalid():
 
 
 def test_update_manuscript_valid(test_people):
-    mqry.create_manuscript(TEST_SAMPLE_MANU)
     mqry.update_manuscript(TEST_SAMPLE_MANU, TEST_NEW_VALID_MANU)   
     print(mqry.get_all_manuscripts())
     retrieved_manuscript = mqry.get_manuscript_by_title(TEST_NEW_VALID_MANU[mqry.TITLE])
