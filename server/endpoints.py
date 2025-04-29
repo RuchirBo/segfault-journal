@@ -398,6 +398,19 @@ class GetManuscriptByTitle(Resource):
             raise wz.NotFound(str(err))
 
 
+@api.route(f"{MANU_EP}/id/<string:id>")
+class GetManuscriptByManuID(Resource):
+    """
+    Retrieve a specific manuscript by its manuscript id for frontend.
+    """
+    def get(self, id):
+        try:
+            manuscript = manu.get_manuscript_by_manu_id(id)
+            return manuscript
+        except ValueError as err:
+            raise wz.NotFound(str(err))
+
+
 MANU_DELETE_FIELDS = api.model(
     'DeleteManuscriptEntry',
     {
@@ -421,6 +434,7 @@ class ManuscriptsDelete(Resource):
     def delete(self):
         body = request.get_json() or {}
         manu_id = body.get(manu.MANU_ID)
+        print(manu_id)
         if not manu_id:
             raise wz.NotAcceptable('manuscript_id is required for deletion')
         try:
