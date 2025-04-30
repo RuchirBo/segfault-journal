@@ -119,42 +119,46 @@ def is_valid_action(action: str) -> bool:
     return action in VALID_ACTIONS
 
 def assign_ref(manu: dict, ref: str, extra=None) -> str:
-    print(extra)
-    #print("Assign ref is called.")
-    #print(ref)
+    """
+    Assign a referee, up to a maximum of 4. Returns new state.
+    """
     person = ppl.read_one(ref)
     if not person:
-        people = ppl.read()
-        for email, details in people.items():
+        for email, details in ppl.read().items():
             if details[ppl.NAME].lower() == ref.lower():
                 person = details
                 ref = email
                 break
     if not person:
         raise ValueError(f"Referee {ref} does not exist.")
-    if rls.RE_CODE not in person.get(ppl.ROLES, []):  
+    if rls.RE_CODE not in person.get(ppl.ROLES, []):
         raise ValueError(f"Person {ref} is not a referee.")
-    if REFEREES not in manu:
+    if REFEREES not in manu or not isinstance(manu[REFEREES], list):
         manu[REFEREES] = []
-
-    if ref not in manu[REFEREES]:
-        manu[REFEREES].append(ref)
-    return IN_REF_REV
+    count = len(manu[REFEREES])
+    if count >= 4:
+        raise ValueError("Cannot assign more than 4 referees.")
+    if ref in manu[REFEREES]:
+        raise ValueError(f"Referee {ref} is already assigned.")
+    manu[REFEREES].append(ref)
+    count += 1
+    if count >= 1:
+        return IN_REF_REV
+    return SUBMITTED
 
 
 def delete_ref(manu: dict, ref: str) -> str:
     if REFEREES not in manu or not manu[REFEREES]:
         return manu[STATE]
     if ref not in manu[REFEREES]:
-        people = ppl.read()
-        for email, details in people.items():
+        for email, details in ppl.read().items():
             if details[ppl.NAME].lower() == ref.lower():
                 ref = email
                 break
     if ref not in manu[REFEREES]:
         raise ValueError(f"Referee {ref} is not assigned to this manuscript.")
     manu[REFEREES].remove(ref)
-    if not manu[REFEREES] and manu[STATE] == IN_REF_REV:
+    if not manu[REFEREES]:
         return SUBMITTED
     return IN_REF_REV
 

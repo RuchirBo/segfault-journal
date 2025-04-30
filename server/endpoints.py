@@ -17,7 +17,7 @@ import data.people as ppl
 import data.manuscripts.manuscript as manu
 import data.text as txt
 import data.roles as rls
-import random
+# import random
 
 from .auth import auth_ns
 
@@ -309,8 +309,8 @@ MANU_CREATE_FLDS = api.model('ManuscriptEntry', {
     manu.AUTHOR_EMAIL: fields.String,
     manu.TEXT: fields.String,
     manu.ABSTRACT: fields.String,
-    manu.EDITOR: fields.String
-    # manu.REFEREES: fields.List(fields.String),
+    manu.EDITOR: fields.String,
+    manu.REFEREES: fields.List(fields.String),
 })
 
 
@@ -463,7 +463,7 @@ MANU_ACTION_FLDS = api.model('ManuscriptAction', {
     manu.TITLE: fields.String,
     # manu.CURR_STATE: fields.String,
     manu.ACTION: fields.String,
-    manu.REFEREES: fields.String,
+    manu.REFEREES: fields.List(fields.String),
     "forceful_change": fields.String(
         required=False,
         default="",
@@ -483,57 +483,44 @@ class ReceiveAction(Resource):
     def put(self):
         try:
             title = request.json.get(manu.TITLE)
-            # curr_state = request.json.get(manu.CURR_STATE)
             action = request.json.get(manu.ACTION)
-            referees = request.json.get(manu.REFEREES)
-            print(referees)
-            if isinstance(referees, str):
-                referees = [referees]
+            refs_in = request.json.get(manu.REFEREES) or []
+            if isinstance(refs_in, str):
+                refs_in = [refs_in]
             manuscript = manu.get_manuscript_by_title(title)
             if not manuscript:
                 raise wz.NotFound(f"Manuscript '{title}' not found.")
-            curr_state = manuscript[manu.STATE]
-            extra_kwargs = {"manu": manuscript}
-            if action == manu.EDITOR_MOVE:
-                forceful_change = request.json.get("forceful_change", "")
-                if not forceful_change:
-                    raise wz.NotAcceptable("'forceful_change' required.")
-                extra_kwargs["forceful_change"] = forceful_change
+            prev_state = manuscript[manu.STATE]
             if action == manu.ASSIGN_REF:
-                if not referees:
-                    raise wz.NotAcceptable("Must provide at least \
-                    one referee to assign.")
-                chosen_referee = random.choice(referees)
-                # print("Chosen: ", chosen_referee)
-                updated_state = manu.change_manuscript_state(
-                    manuscript[manu.TITLE],
-                    action, ref=chosen_referee, **extra_kwargs)
-            # if len(referees) != 0:
-            #     for ref in referees:
-            #         updated_state = manu.change_manuscript_state(
-            #           manuscript[manu.TITLE], action, ref=ref, **extra_kwargs
-            #         )
-            # else:
+                if not refs_in:
+                    raise wz.NotAcceptable("Must provide one referee.")
+                for ref in refs_in:
+                    new_state = manu.assign_ref(manu=manuscript, ref=ref)
+                manuscript[manu.STATE] = new_state
+                if "_id" in manuscript:
+                    del manuscript["_id"]
+                manu.update_manuscript(
+                    {manu.MANU_ID: manuscript[manu.MANU_ID]},
+                    manuscript
+                )
             else:
-                updated_state = manu.change_manuscript_state(
-                    manuscript[manu.TITLE],
-                    action, ref=referees, **extra_kwargs)
-            # manuscript[manu.STATE] = updated_state
-            if "_id" in manuscript:
-                del manuscript["_id"]
-            # manu.update_manuscript(manuscript, manuscript)
+                new_state = manu.change_manuscript_state(
+                    title,
+                    action,
+                    ref=refs_in,
+                    manu=manuscript
+                )
+                manuscript[manu.STATE] = new_state
         except Exception as err:
             raise wz.NotAcceptable(f"Bad action: {err}")
         return {
-            "message": "Action received!",
-            "title": title,
-            "previous_state": curr_state,
-            "updated_state": updated_state,
-            "action": action,
-            "referees": referees,
-            "forceful_change": (
-                "N/A" if action != manu.EDITOR_MOVE else forceful_change
-            )
+            "message":        "Action received!",
+            "title":          title,
+            "previous_state": prev_state,
+            "updated_state":  manuscript[manu.STATE],
+            "action":         action,
+            "referees":       manuscript[manu.REFEREES],
+            "forceful_change": "N/A"
         }, HTTPStatus.OK
 
 
