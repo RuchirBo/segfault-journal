@@ -75,7 +75,7 @@ STATE_DESCRIPTIONS = {
     "FORM": "Undergoing formatting.",
     "PUB": "Manuscript published.",
     "REJ": "Manuscript rejected.",
-    "WITHDRAW": "Author has withdrawn.",
+    "WITH": "Author has withdrawn.",
     "AUTHREVISION": "Author is revising.",
     "EDREV": "Awaiting editor review."
 }
