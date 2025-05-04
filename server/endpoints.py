@@ -460,7 +460,7 @@ class GetValidActions(Resource):
 
 
 MANU_ACTION_FLDS = api.model('ManuscriptAction', {
-    manu.TITLE: fields.String,
+    manu.MANU_ID: fields.String,
     # manu.CURR_STATE: fields.String,
     manu.ACTION: fields.String,
     manu.REFEREES: fields.List(fields.String),
@@ -482,14 +482,14 @@ class ReceiveAction(Resource):
     @api.expect(MANU_ACTION_FLDS)
     def put(self):
         try:
-            title = request.json.get(manu.TITLE)
+            manu_id = request.json.get(manu.MANU_ID)
             action = request.json.get(manu.ACTION)
             refs_in = request.json.get(manu.REFEREES) or []
             if isinstance(refs_in, str):
                 refs_in = [refs_in]
-            manuscript = manu.get_manuscript_by_title(title)
+            manuscript = manu.get_manuscript_by_manu_id(manu_id)
             if not manuscript:
-                raise wz.NotFound(f"Manuscript '{title}' not found.")
+                raise wz.NotFound(f"Manuscript '{manu_id}' not found.")
             prev_state = manuscript[manu.STATE]
             if action == manu.ASSIGN_REF:
                 if not refs_in:
@@ -505,7 +505,7 @@ class ReceiveAction(Resource):
                 )
             else:
                 new_state = manu.change_manuscript_state(
-                    title,
+                    manu_id,
                     action,
                     ref=refs_in,
                     manu=manuscript
@@ -515,7 +515,7 @@ class ReceiveAction(Resource):
             raise wz.NotAcceptable(f"Bad action: {err}")
         return {
             "message":        "Action received!",
-            "title":          title,
+            "id":             manu_id,
             "previous_state": prev_state,
             "updated_state":  manuscript[manu.STATE],
             "action":         action,

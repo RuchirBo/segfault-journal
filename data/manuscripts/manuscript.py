@@ -389,8 +389,8 @@ def clear_all_manuscripts():
     return deleted_count
 
 
-def change_manuscript_state(manu_title, action, **kwargs):
-    manu = get_manuscript_by_title(manu_title)
+def change_manuscript_state(manu_id, action, **kwargs):
+    manu = get_manuscript_by_manu_id(manu_id)
     curr_state = manu[STATE]
     new_state = handle_action(curr_state, action, **kwargs)
     manu[HISTORY].append(new_state)

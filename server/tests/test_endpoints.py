@@ -171,8 +171,8 @@ def test_get_manuscript_by_title_failure(mock_get):
     assert "Manuscript not found" in resp.get_json()["message"]
 
 
-@patch("data.manuscripts.manuscript.get_manuscript_by_title", return_value={
-    manu.TITLE: "Test Manuscript",
+@patch("data.manuscripts.manuscript.get_manuscript_by_manu_id", return_value={
+    manu.MANU_ID: "Test Manu_ID",
     manu.STATE: manu.IN_REF_REV,
     manu.REFEREES: ["ref1@example.com"],
 })
@@ -183,7 +183,7 @@ def test_receive_action_success(mock_change_manuscript_state, mock_get_manu):
     when given a valid action.
     """
     payload = {
-        manu.TITLE: "Test Manuscript",
+        manu.MANU_ID: "Test Manu_ID",
         # manu.CURR_STATE: manu.IN_REF_REV,
         manu.ACTION: manu.ACCEPT,
         manu.REFEREES: ["ref1@example.com"]
@@ -194,14 +194,14 @@ def test_receive_action_success(mock_change_manuscript_state, mock_get_manu):
 
     assert resp.status_code == HTTPStatus.OK
     assert resp_json["message"] == "Action received!"
-    assert resp_json["title"] == "Test Manuscript"
+    assert resp_json["id"] == "Test Manu_ID"
     assert resp_json["previous_state"] == manu.IN_REF_REV
     assert resp_json["updated_state"] == manu.COPY_EDIT
     assert resp_json["action"] == manu.ACCEPT
     assert resp_json["referees"] == ["ref1@example.com"]
     assert resp_json["forceful_change"] == "N/A"
 
-    mock_get_manu.assert_called_once_with("Test Manuscript")
+    mock_get_manu.assert_called_once_with("Test Manu_ID")
     mock_change_manuscript_state.assert_called_once_with(
-        "Test Manuscript", manu.ACCEPT, manu=mock_get_manu.return_value, ref=["ref1@example.com"], 
+        "Test Manu_ID", manu.ACCEPT, manu=mock_get_manu.return_value, ref=["ref1@example.com"], 
     )

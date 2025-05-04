@@ -224,10 +224,18 @@ def test_get_manuscript_by_manu_id_valid(test_people):
 def test_change_manuscript_state_rej(test_people):
     old_manu = mqry.get_manuscript_by_manu_id(TEST_SAMPLE_MANU[mqry.MANU_ID])
     print(old_manu)
-    mqry.change_manuscript_state(TEST_SAMPLE_MANU[mqry.TITLE], mqry.REJECT, manu = old_manu)
+    mqry.change_manuscript_state(TEST_SAMPLE_MANU[mqry.MANU_ID], mqry.REJECT, manu = old_manu)
     new_manu = mqry.get_manuscript_by_manu_id(TEST_SAMPLE_MANU[mqry.MANU_ID])
     assert new_manu[mqry.STATE] == mqry.REJECTED, f"Expected state 'REJ', but got {new_manu[mqry.STATE]}"
     assert new_manu[mqry.HISTORY] == [mqry.SUBMITTED, mqry.REJECTED], f"Expected history ['SUB', 'REJ'], but got {new_manu[mqry.HISTORY]}"
+
+
+def test_change_manuscript_state_withdraw(test_people):
+    old_manu = mqry.get_manuscript_by_manu_id(TEST_SAMPLE_MANU[mqry.MANU_ID])
+    mqry.change_manuscript_state(TEST_SAMPLE_MANU[mqry.MANU_ID], mqry.WITHDRAW, manu = old_manu)
+    new_manu = mqry.get_manuscript_by_manu_id(TEST_SAMPLE_MANU[mqry.MANU_ID])
+    assert new_manu[mqry.STATE] == mqry.WITHDRAWN, f"Expected state 'REJ', but got {new_manu[mqry.STATE]}"
+    assert new_manu[mqry.HISTORY] == [mqry.SUBMITTED, mqry.WITHDRAWN], f"Expected history ['SUB', 'WITH'], but got {new_manu[mqry.HISTORY]}"
 
 
 def test_get_all_manuscripts():
