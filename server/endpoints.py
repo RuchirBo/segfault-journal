@@ -17,7 +17,7 @@ import data.people as ppl
 import data.manuscripts.manuscript as manu
 import data.text as txt
 import data.roles as rls
-# import random
+import random
 
 from .auth import auth_ns
 
