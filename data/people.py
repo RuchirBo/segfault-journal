@@ -231,7 +231,7 @@ def delete_role_from_person(email: str, role: str) -> None:
 
 
 def get_people_by_role(role):
-    all_people = read() 
+    all_people = read()
     return [
         person for person in all_people.values()
         if isinstance(person, dict) and role in person.get("roles", [])
