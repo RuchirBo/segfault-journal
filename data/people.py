@@ -230,6 +230,14 @@ def delete_role_from_person(email: str, role: str) -> None:
 #     add_role_to_person(email, new_role)
 
 
+def get_people_by_role(role):
+    all_people = read() 
+    return [
+        person for person in all_people.values()
+        if isinstance(person, dict) and role in person.get("roles", [])
+    ]
+
+
 def main():
     print(get_masthead())
 

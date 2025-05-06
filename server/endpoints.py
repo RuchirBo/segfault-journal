@@ -225,6 +225,19 @@ class Masthead(Resource):
         return {MASTHEAD: ppl.get_masthead()}
 
 
+@api.route(f"{PEOPLE_EP}/editors")
+class Editors(Resource):
+    """
+    Get all people with the 'Editor' role.
+    """
+    def get(self):
+        try:
+            editors = ppl.get_people_by_role("ED")
+            return {"editors": editors}, 200
+        except Exception as e:
+            return {"message": str(e)}, 500
+
+
 @api.route(f'{PEOPLE_EP}/<string:email>')
 class Person(Resource):
     def get(self, email):
