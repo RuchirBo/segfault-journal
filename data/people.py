@@ -216,19 +216,6 @@ def delete_role_from_person(email: str, role: str) -> None:
     else:
         raise ValueError(f"Role {role} does not exist for {email}")
 
-# Commented Out Because It Seemed Unncessary
-# def update_person_role(
-#         name: str,
-#         affiliation: str,
-#         email: str,
-#         role_to_remove: str,
-#         new_role: str) -> None:
-#     if not rls.is_valid(new_role):
-#         raise ValueError(f"Role does not exist: {new_role}")
-#     if role
-#     delete_role_from_person(email, role_to_remove)
-#     add_role_to_person(email, new_role)
-
 
 def get_people_by_role(role):
     all_people = read()
