@@ -409,34 +409,22 @@ class ManuscriptsUpdate(Resource):
         }
 
 
-@api.route(f"{MANU_EP}/assign_random_editor/<string:manuscript_id>")
-class AssignRandomEditor(Resource):
+@api.route(f"{MANU_EP}/get_random_editor")
+class GetRandomEditor(Resource):
     """
-    Assign a random editor to a manuscript.
+    Get a random editor without assigning them to a manuscript.
     """
-    def put(self, manuscript_id):
+    def get(self):
         try:
             editors = ppl.get_people_by_role("ED")
             if not editors:
                 raise wz.NotFound("No editors available.")
             random_editor = random.choice(editors)
-            manuscript = manu.get_manuscript_by_manu_id(manuscript_id)
-            if not manuscript:
-                raise wz.NotFound(
-                    f"Manuscript with ID {manuscript_id} not found."
-                )
-            manuscript[manu.EDITOR] = random_editor["email"]
-            manu.update_manuscript(
-                {manu.MANU_ID: manuscript[manu.MANU_ID]},
-                manuscript
-            )
             return {
+                "editor_email": random_editor["email"],
                 "message": (
-                    f"Random editor '{random_editor['email']}' assigned to "
-                    f"manuscript {manuscript_id}."
-                ),
-                "manuscript_id": manuscript_id,
-                "assigned_editor": random_editor["email"]
+                    f"Random editor '{random_editor['email']}' selected."
+                )
             }, HTTPStatus.OK
         except Exception as e:
             return {"message": str(e)}, HTTPStatus.INTERNAL_SERVER_ERROR
