@@ -15,6 +15,7 @@ TEST_EMAILS = [
 def create_app():
     app = Flask(__name__)
     app.config["TESTING"] = True
+    app.config['SECRET_KEY'] = 'test-secret-key'
     api = Api(app)
     api.add_namespace(auth_ns, path="/auth")
     return app

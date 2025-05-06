@@ -17,12 +17,23 @@ import data.people as ppl
 import data.manuscripts.manuscript as manu
 import data.text as txt
 import data.roles as rls
-import random
+# import random
 
 from .auth import auth_ns
 
 app = Flask(__name__)
-CORS(app)
+app.secret_key = 'dummy-secret-key'
+
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_SECURE'] = True
+
+CORS(app, supports_credentials=True, resources={
+    r"/*": {
+        "origins": ["http://localhost:3000"],
+        "allow_headers": ["Content-Type", "Authorization"],
+    }
+})
+
 api = Api(app)
 
 

@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, session
 from flask_restx import Namespace, Resource, fields
 from werkzeug.security import generate_password_hash, check_password_hash
 import data.db_connect as db_connect
@@ -7,8 +7,6 @@ import data.db_connect as db_connect
 from security.security import COLLECT_NAME, PEOPLE
 
 auth_ns = Namespace('auth', description="Authentication operations")
-
-SECRET_KEY = "dummy_secret_key"
 
 register_model = auth_ns.model(
     'Register',
@@ -85,7 +83,8 @@ class Register(Resource):
             if role_key != ROLE_KEYS[role]:
                 auth_ns.abort(403, f"Invalid key for role '{role}'")
 
-        hashed_password = generate_password_hash(password)
+        hashed_password = generate_password_hash(
+            password, method='pbkdf2:sha256')
 
         user_doc = {
             'type': PEOPLE,
@@ -126,7 +125,6 @@ class Login(Resource):
         if user_role in ROLE_KEYS:
             if role_key != ROLE_KEYS[user_role]:
                 auth_ns.abort(403, f"Invalid key for role '{user_role}'")
-
         # payload = {
         #     'email': email,
         #     'role': user_role,
@@ -135,4 +133,22 @@ class Login(Resource):
         # token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         token = "segfault_dummy_val"
 
+        session['user'] = {
+            'email': email,
+            'role': user_role
+        }
+
+        print("User logged in, session data:", session)
+
         return {"message": "Logged in successfully.", "token": token}, 200
+
+
+@auth_ns.route('/user')
+class CurrentUser(Resource):
+    def get(self):
+        print("Session data:", session)
+        user = session.get('user')
+        print(user)
+        if not user:
+            auth_ns.abort(401, "Not logged in.")
+        return user, 200
