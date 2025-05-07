@@ -33,7 +33,7 @@ app.config['SESSION_COOKIE_SECURE'] = True
 #         "allow_headers": ["Content-Type", "Authorization"],
 #     }
 # })
-api = Api(app)
+api = Api()
 CORS(app)
 api.init_app(app)
 
