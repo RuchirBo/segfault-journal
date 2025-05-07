@@ -310,7 +310,8 @@ class Manuscripts(Resource):
     def get(self):
         manuscripts = manu.get_all_manuscripts()
         for manuscript in manuscripts:
-            curr_desc = STATE_DESCRIPTIONS.get(manuscript["state"])
+            state = manuscript.get("state")
+            curr_desc = STATE_DESCRIPTIONS.get(manuscript["state"]) if state else None
             manuscript["state_description"] = curr_desc
         print(manuscripts)
         print(curr_desc)
