@@ -311,7 +311,10 @@ class Manuscripts(Resource):
         manuscripts = manu.get_all_manuscripts()
         for manuscript in manuscripts:
             state = manuscript.get("state")
-            curr_desc = STATE_DESCRIPTIONS.get(manuscript["state"]) if state else None
+            if state:
+                curr_desc = STATE_DESCRIPTIONS.get(state)
+            else:
+                curr_desc = None
             manuscript["state_description"] = curr_desc
         print(manuscripts)
         return {'manuscripts': manuscripts}
