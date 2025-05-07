@@ -524,9 +524,9 @@ class ReceiveAction(Resource):
     @api.expect(MANU_ACTION_FLDS)
     def put(self):
         try:
-            manu_id = request.json.get(manu.MANU_ID)
-            action  = request.json.get(manu.ACTION)
-            refs_in = request.json.get(manu.REFEREES) or []
+            manu_id=request.json.get(manu.MANU_ID)
+            action=request.json.get(manu.ACTION)
+            refs_in=request.json.get(manu.REFEREES) or []
             if isinstance(refs_in, str):
                 refs_in = [refs_in]
             manuscript = manu.get_manuscript_by_manu_id(manu_id)
@@ -535,7 +535,7 @@ class ReceiveAction(Resource):
             prev_state = manuscript[manu.STATE]
             if action == manu.ASSIGN_REF:
                 if not refs_in:
-                    raise wz.NotAcceptable("Must provide at least one referee.")
+                    raise wz.NotAcceptable("provide one referee.")
                 for ref in refs_in:
                     new_state = manu.assign_ref(manu=manuscript, ref=ref)
                 manuscript[manu.STATE] = new_state
@@ -549,7 +549,7 @@ class ReceiveAction(Resource):
 
             elif action == manu.DELETE_REF:
                 if not refs_in:
-                    raise wz.NotAcceptable("Must provide at least one referee to remove.")
+                    raise wz.NotAcceptable("provide one referee")
                 for ref in refs_in:
                     new_state = manu.delete_ref(manu=manuscript, ref=ref)
                 manuscript[manu.STATE] = new_state
