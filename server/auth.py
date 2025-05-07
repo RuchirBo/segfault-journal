@@ -48,7 +48,7 @@ class Register(Resource):
         data = request.json
         email = data.get('email')
         password = data.get('password')
-        role = data.get('role', 'AU')
+        role = data.get('role', ' ')
 
         db_connect.connect_db()
         exists = db_connect.fetch_one(
@@ -93,7 +93,7 @@ class Login(Resource):
 
         session['user'] = {
             'email': email,
-            'role': user.get('role', 'AU')
+            'role': user.get('role', ' ')
         }
 
         return {
