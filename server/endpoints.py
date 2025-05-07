@@ -27,12 +27,12 @@ app.secret_key = 'dummy-secret-key'
 app.config['SESSION_COOKIE_SAMESITE'] = 'None'
 app.config['SESSION_COOKIE_SECURE'] = True
 
-# CORS(app, supports_credentials=True, resources={
-#     r"/*": {
-#        # "origins": ["http://localhost:3000"],
-#         "allow_headers": ["Content-Type", "Authorization"],
-#     }
-# })
+CORS(app, supports_credentials=True, resources={
+    r"/*": {
+        "origins": ["http://localhost:3000", "https://quiet-scrubland-27783-7670a565e3e2.herokuapp.com"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }
+})
 api = Api()
 CORS(app)
 api.init_app(app)
