@@ -317,6 +317,7 @@ class Manuscripts(Resource):
                 curr_desc = None
             manuscript["state_description"] = curr_desc
         print(manuscripts)
+        print(curr_desc)
         return {'manuscripts': manuscripts}
 
 
