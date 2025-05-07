@@ -524,9 +524,9 @@ class ReceiveAction(Resource):
     @api.expect(MANU_ACTION_FLDS)
     def put(self):
         try:
-            manu_id=request.json.get(manu.MANU_ID)
-            action=request.json.get(manu.ACTION)
-            refs_in=request.json.get(manu.REFEREES) or []
+            manu_id = request.json.get(manu.MANU_ID)
+            action = request.json.get(manu.ACTION)
+            refs_in = request.json.get(manu.REFEREES) or []
             if isinstance(refs_in, str):
                 refs_in = [refs_in]
             manuscript = manu.get_manuscript_by_manu_id(manu_id)
