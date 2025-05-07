@@ -152,3 +152,10 @@ class CurrentUser(Resource):
         if not user:
             auth_ns.abort(401, "Not logged in.")
         return user, 200
+
+
+@auth_ns.route('/logout')
+class Logout(Resource):
+    def post(self):
+        session.pop('user', None)
+        return {"message": "Logged out successfully."}, 200
