@@ -5,6 +5,7 @@ import data.db_connect as db_connect
 # import jwt
 # from datetime import datetime, timedelta
 from security.security import COLLECT_NAME, PEOPLE
+import data.people as ppl
 
 auth_ns = Namespace('auth', description="Authentication operations")
 
@@ -49,26 +50,17 @@ class Register(Resource):
         email = data.get('email')
         password = data.get('password')
         role = data.get('role', ' ')
+        name = email.split('@')[0]
+        affiliation = ''  
+        roles = [role] if role else []
 
-        db_connect.connect_db()
-        exists = db_connect.fetch_one(
-            COLLECT_NAME,
-            {'type': PEOPLE, 'email': email}
-        )
-        if exists:
+        existing = ppl.exists(email)  
+        if existing:
             auth_ns.abort(400, "User with that email already exists.")
 
-        hashed = generate_password_hash(
-            password,
-            method='pbkdf2:sha256'
-        )
-        user_doc = {
-            'type': PEOPLE,
-            'email': email,
-            'password': hashed,
-            'role': role
-        }
-        db_connect.create(COLLECT_NAME, user_doc)
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+        ppl.create_person(name, affiliation, email, roles)
+
         return {"message": "User registered successfully."}, 201
 
 
@@ -80,20 +72,19 @@ class Login(Resource):
         email = data.get('email')
         password = data.get('password')
 
-        db_connect.connect_db()
-        user = db_connect.fetch_one(
-            COLLECT_NAME,
-            {'type': PEOPLE, 'email': email}
-        )
-        if (not user or
-                not check_password_hash(user.get('password', ''), password)):
+
+        user = ppl.exists(email)  
+        # if (not user or
+        #         not check_password_hash(user.get('password', ''), password)):
+        if(not user):
             auth_ns.abort(401, "Invalid email or password.")
 
         token = "segfault_dummy_val"
 
         session['user'] = {
             'email': email,
-            'role': user.get('role', ' ')
+            'role': ppl.get_person_roles(email)
+            # 'role': user.get('role', ' ')
         }
 
         return {
