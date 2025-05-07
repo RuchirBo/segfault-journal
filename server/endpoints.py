@@ -33,9 +33,9 @@ CORS(app, supports_credentials=True, resources={
         "allow_headers": ["Content-Type", "Authorization"]
     }
 })
-api = Api()
-CORS(app)
-api.init_app(app)
+api = Api(app)
+# CORS(app)
+# api.init_app(app)
 
 api.add_namespace(auth_ns, path='/auth')
 
