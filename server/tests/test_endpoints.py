@@ -75,6 +75,7 @@ def test_remove_role_success(mock_delete_role, mock_read_one):
     mock_read_one.assert_called_once_with("testdoe@example.com")
     mock_delete_role.assert_called_once_with("testdoe@example.com", "Editor")
 
+
 @patch(
     "data.people.read_one",
     return_value={
@@ -94,7 +95,6 @@ def test_delete_person_success(mock_delete_person, mock_read_one):
     }
     mock_read_one.assert_called_once_with("rsh9689@nyu.edu")
     mock_delete_person.assert_called_once_with("rsh9689@nyu.edu")
-
 
 
 @patch("data.people.update_users")
@@ -126,14 +126,21 @@ def test_get_text_success(mock_read_one):
 @patch("data.text.create")
 def test_create_text_success(mock_create_text):
     payload = {"key": "some_key",
-                "title": "some_title",
-                "text": "This is some text"}
+               "title": "some_title",
+               "text": "This is some text"}
     resp = TEST_CLIENT.put(f"{ep.TEXT_EP}/create", json=payload)
     assert resp.status_code == OK
-    assert resp.get_json() == {"Message":'Text page added!'}
+    assert resp.get_json() == {"Message": 'Text page added!'}
 
 
-@patch("data.text.read_one", return_value={"key": "some_key", "title": "Old Title", "text": "Old text"})
+@patch(
+    "data.text.read_one",
+    return_value={
+        "key": "some_key",
+        "title": "Old Title",
+        "text": "Old text"
+    }
+)
 @patch("data.text.update")
 def test_update_text_success(mock_update, mock_read_one):
     payload = {"title": "New Title", "text": "Updated text"}
@@ -142,20 +149,27 @@ def test_update_text_success(mock_update, mock_read_one):
     assert resp.get_json()["Message"] == "Text updated successfully!"
     assert mock_read_one.call_count == 2
     mock_read_one.assert_called_with("some_key")
-    mock_update.assert_called_once_with("some_key", "New Title", "Updated text")
+    mock_update.assert_called_once_with(
+        "some_key",
+        "New Title",
+        "Updated text"
+    )
 
 
 @patch("data.text.read_one", return_value=None)
 def test_update_text_failure(mock_read_one):
     payload = {"title": "New Title", "text": "Updated text"}
-    resp = TEST_CLIENT.put(f"{ep.TEXT_EP}/nonexistent_key/update", json=payload)
+    resp = TEST_CLIENT.put(
+        f"{ep.TEXT_EP}/nonexistent_key/update",
+        json=payload
+    )
     assert resp.status_code == NOT_FOUND
     assert "No text found for key" in resp.get_json()["message"]
     mock_read_one.assert_called_once_with("nonexistent_key")
 
 
 @patch("data.manuscripts.manuscript.get_manuscript_by_title",
- return_value={"title": "Sample Manuscript"})
+       return_value={"title": "Sample Manuscript"})
 def test_get_manuscript_by_title_success(mock_get):
     resp = TEST_CLIENT.get(f"{ep.MANU_EP}/Sample Manuscript")
     assert resp.status_code == OK
@@ -163,8 +177,8 @@ def test_get_manuscript_by_title_success(mock_get):
     mock_get.assert_called_once_with("Sample Manuscript")
 
 
-@patch("data.manuscripts.manuscript.get_manuscript_by_title", 
-side_effect=ValueError("Manuscript not found"))
+@patch("data.manuscripts.manuscript.get_manuscript_by_title",
+       side_effect=ValueError("Manuscript not found"))
 def test_get_manuscript_by_title_failure(mock_get):
     resp = TEST_CLIENT.get(f"{ep.MANU_EP}/Nonexistent Manuscript")
     assert resp.status_code == NOT_FOUND
@@ -176,10 +190,12 @@ def test_get_manuscript_by_title_failure(mock_get):
     manu.STATE: manu.IN_REF_REV,
     manu.REFEREES: ["ref1@example.com"],
 })
-@patch("data.manuscripts.manuscript.change_manuscript_state", return_value=manu.COPY_EDIT)
+@patch("data.manuscripts.manuscript.change_manuscript_state",
+       return_value=manu.COPY_EDIT)
 def test_receive_action_success(mock_change_manuscript_state, mock_get_manu):
     """
-    Test that the /receive_action endpoint correctly updates a manuscript's state
+    Test that the /receive_action endpoint corr
+    ectly updates a manuscript's state
     when given a valid action.
     """
     payload = {
@@ -203,5 +219,34 @@ def test_receive_action_success(mock_change_manuscript_state, mock_get_manu):
 
     mock_get_manu.assert_called_once_with("Test Manu_ID")
     mock_change_manuscript_state.assert_called_once_with(
-        "Test Manu_ID", manu.ACCEPT, manu=mock_get_manu.return_value, ref=["ref1@example.com"], 
+        "Test Manu_ID",
+        manu.ACCEPT,
+        manu=mock_get_manu.return_value,
+        ref=["ref1@example.com"]
     )
+
+
+@patch("data.people.get_people_by_role", return_value=[
+    {"email": "editor1@example.com"},
+    {"email": "editor2@example.com"}
+])
+def test_get_random_editor_success(mock_get_people):
+    resp = TEST_CLIENT.get(f"{ep.MANU_EP}/get_random_editor")
+    resp_json = resp.get_json()
+    assert resp.status_code == HTTPStatus.OK
+    assert "editor_email" in resp_json
+    assert resp_json["editor_email"] in [
+        "editor1@example.com",
+        "editor2@example.com"
+    ]
+    assert "Random editor" in resp_json["message"]
+    mock_get_people.assert_called_once_with("ED")
+
+
+@patch("data.people.get_people_by_role", return_value=[])
+def test_get_random_editor_not_found(mock_get_people):
+    resp = TEST_CLIENT.get(f"{ep.MANU_EP}/get_random_editor")
+    resp_json = resp.get_json()
+    assert resp.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+    assert "No editors available" in resp_json["message"]
+    mock_get_people.assert_called_once_with("ED")
