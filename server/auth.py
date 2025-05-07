@@ -23,10 +23,6 @@ register_model = auth_ns.model(
             required=False,
             description="Role code"
         ),
-        'role_key': fields.String(
-            required=False,
-            description="Special key if required by role"
-        ),
     }
 )
 
@@ -41,21 +37,8 @@ login_model = auth_ns.model(
             required=True,
             description="User password"
         ),
-        'role_key': fields.String(
-            required=False,
-            description="Special key if required by role"
-        ),
     }
 )
-
-ROLE_KEYS = {
-    'dev': 'segfault',
-    'EDITOR': 'EDITOR',
-    'CONSULTING_EDITOR': 'CE',
-    'AUTHOR': 'AUTHOR',
-    'MANAGING_EDTIOR': 'ME',
-    'REFEREE': 'REF',
-}
 
 
 @auth_ns.route('/register')
@@ -66,33 +49,25 @@ class Register(Resource):
         email = data.get('email')
         password = data.get('password')
         role = data.get('role', 'AU')
-        role_key = data.get('role_key', '')
 
         db_connect.connect_db()
-
-        query = {
-            'type': PEOPLE,
-            'email': email,
-        }
-        existing_user = db_connect.fetch_one(COLLECT_NAME, query)
-
-        if existing_user:
+        exists = db_connect.fetch_one(
+            COLLECT_NAME,
+            {'type': PEOPLE, 'email': email}
+        )
+        if exists:
             auth_ns.abort(400, "User with that email already exists.")
 
-        if role in ROLE_KEYS:
-            if role_key != ROLE_KEYS[role]:
-                auth_ns.abort(403, f"Invalid key for role '{role}'")
-
-        hashed_password = generate_password_hash(
-            password, method='pbkdf2:sha256')
-
+        hashed = generate_password_hash(
+            password,
+            method='pbkdf2:sha256'
+        )
         user_doc = {
             'type': PEOPLE,
             'email': email,
-            'password': hashed_password,
+            'password': hashed,
             'role': role
         }
-
         db_connect.create(COLLECT_NAME, user_doc)
         return {"message": "User registered successfully."}, 201
 
@@ -104,51 +79,33 @@ class Login(Resource):
         data = request.json
         email = data.get('email')
         password = data.get('password')
-        role_key = data.get('role_key', '')
 
         db_connect.connect_db()
-
-        query = {
-            'type': PEOPLE,
-            'email': email,
-        }
-        user = db_connect.fetch_one(COLLECT_NAME, query)
-
-        if not user:
+        user = db_connect.fetch_one(
+            COLLECT_NAME,
+            {'type': PEOPLE, 'email': email}
+        )
+        if (not user or
+                not check_password_hash(user.get('password', ''), password)):
             auth_ns.abort(401, "Invalid email or password.")
 
-        stored_password = user.get('password')
-        if not check_password_hash(stored_password, password):
-            auth_ns.abort(401, "Invalid email or password.")
-
-        user_role = user.get('role', 'AU')
-        if user_role in ROLE_KEYS:
-            if role_key != ROLE_KEYS[user_role]:
-                auth_ns.abort(403, f"Invalid key for role '{user_role}'")
-        # payload = {
-        #     'email': email,
-        #     'role': user_role,
-        #     'exp': datetime.utcnow() + timedelta(hours=2)
-        # }
-        # token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         token = "segfault_dummy_val"
 
         session['user'] = {
             'email': email,
-            'role': user_role
+            'role': user.get('role', 'AU')
         }
 
-        print("User logged in, session data:", session)
-
-        return {"message": "Logged in successfully.", "token": token}, 200
+        return {
+            "message": "Logged in successfully.",
+            "token": token
+        }, 200
 
 
 @auth_ns.route('/user')
 class CurrentUser(Resource):
     def get(self):
-        print("Session data:", session)
         user = session.get('user')
-        print(user)
         if not user:
             auth_ns.abort(401, "Not logged in.")
         return user, 200
