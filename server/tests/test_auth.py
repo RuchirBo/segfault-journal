@@ -2,7 +2,7 @@ import pytest
 from flask import Flask
 from flask_restx import Api
 from server.auth import auth_ns
-from security.security import delete_acc
+from security.security import COLLECT_NAME, PEOPLE, delete_acc
 import data.db_connect as db_connect
 
 TEST_EMAILS = [
@@ -36,13 +36,11 @@ def test_valid_register(client):
     data = {
         "email": email,
         "password": "testpassword",
-        "role": "dev",
-        "role_key": "segfault"
+        "role": "dev"
     }
     resp = client.post("/auth/register", json=data)
     assert resp.status_code == 201
     resp_json = resp.get_json()
-    assert "message" in resp_json
     assert resp_json["message"] == "User registered successfully."
     delete_acc(email)
 
@@ -51,8 +49,7 @@ def test_invalid_register_existing_email(client):
     data = {
         "email": email,
         "password": "testpassword",
-        "role": "dev",
-        "role_key": "segfault"
+        "role": "dev"
     }
     resp1 = client.post("/auth/register", json=data)
     assert resp1.status_code == 201
@@ -67,23 +64,20 @@ def test_valid_login(client):
     registration_data = {
         "email": email,
         "password": "testpassword",
-        "role": "dev",
-        "role_key": "segfault"
+        "role": "dev"
     }
     resp_reg = client.post("/auth/register", json=registration_data)
     assert resp_reg.status_code == 201
 
     login_data = {
         "email": email,
-        "password": "testpassword",
-        "role_key": "segfault"
+        "password": "testpassword"
     }
     resp_login = client.post("/auth/login", json=login_data)
     assert resp_login.status_code == 200
     resp_login_json = resp_login.get_json()
-    assert "message" in resp_login_json
-    assert "token" in resp_login_json
-    assert resp_login_json["token"]
+    assert resp_login_json["message"] == "Logged in successfully."
+    assert "token" in resp_login_json and resp_login_json["token"]
     delete_acc(email)
 
 def test_invalid_login_wrong_password(client):
@@ -91,19 +85,43 @@ def test_invalid_login_wrong_password(client):
     registration_data = {
         "email": email,
         "password": "correctpassword",
-        "role": "dev",
-        "role_key": "segfault"
+        "role": "dev"
     }
     resp_reg = client.post("/auth/register", json=registration_data)
     assert resp_reg.status_code == 201
 
     login_data = {
         "email": email,
-        "password": "wrongpassword",
-        "role_key": "segfault"
+        "password": "wrongpassword"
     }
     resp_login = client.post("/auth/login", json=login_data)
     assert resp_login.status_code == 401
     resp_login_json = resp_login.get_json()
     assert "Invalid email or password." in resp_login_json.get("message", "")
+    delete_acc(email)
+
+@pytest.mark.parametrize("role", [
+    None,
+    "dev",
+    "EDITOR",
+    "AUTHOR",
+    "REFEREE"
+])
+def test_register_with_various_roles(client, role):
+    email = f"{role or 'default'}@example.com"
+    delete_acc(email)
+    payload = {
+        "email": email,
+        "password": "pw1234"
+    }
+    if role is not None:
+        payload["role"] = role
+    resp = client.post("/auth/register", json=payload)
+    assert resp.status_code == 201
+    stored = db_connect.fetch_one(
+        COLLECT_NAME,
+        {'type': PEOPLE, 'email': email}
+    )
+    expected = role if role is not None else ' '
+    assert stored["role"] == expected
     delete_acc(email)
