@@ -29,11 +29,11 @@ app.config['SESSION_COOKIE_SECURE'] = True
 
 CORS(app, supports_credentials=True, resources={
     r"/*": {
-        "origins": ["http://localhost:3000"],
+       # "origins": ["http://localhost:3000"],
         "allow_headers": ["Content-Type", "Authorization"],
     }
 })
-api = Api(app)
+api = Api()
 # CORS(app)
 # api.init_app(app)
 
