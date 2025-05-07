@@ -1,10 +1,8 @@
 from flask import request, session
 from flask_restx import Namespace, Resource, fields
-from werkzeug.security import generate_password_hash, check_password_hash
-import data.db_connect as db_connect
-# import jwt
-# from datetime import datetime, timedelta
-from security.security import COLLECT_NAME, PEOPLE
+# from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash
+# from security.security import COLLECT_NAME, PEOPLE
 import data.people as ppl
 
 auth_ns = Namespace('auth', description="Authentication operations")
@@ -51,14 +49,18 @@ class Register(Resource):
         password = data.get('password')
         role = data.get('role', ' ')
         name = email.split('@')[0]
-        affiliation = ''  
+        affiliation = ''
         roles = [role] if role else []
 
-        existing = ppl.exists(email)  
+        existing = ppl.exists(email)
         if existing:
             auth_ns.abort(400, "User with that email already exists.")
 
-        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+        hashed_password = generate_password_hash(
+            password,
+            method='pbkdf2:sha256'
+        )
+        print(hashed_password)
         ppl.create_person(name, affiliation, email, roles)
 
         return {"message": "User registered successfully."}, 201
@@ -71,12 +73,10 @@ class Login(Resource):
         data = request.json
         email = data.get('email')
         password = data.get('password')
+        print(password)
 
-
-        user = ppl.exists(email)  
-        # if (not user or
-        #         not check_password_hash(user.get('password', ''), password)):
-        if(not user):
+        user = ppl.exists(email)
+        if (not user):
             auth_ns.abort(401, "Invalid email or password.")
 
         token = "segfault_dummy_val"
