@@ -308,6 +308,7 @@ class PersonRoles(Resource):
 @api.route(f"{MANU_EP}")
 class Manuscripts(Resource):
     def get(self):
+        curr_desc = ""
         manuscripts = manu.get_all_manuscripts()
         for manuscript in manuscripts:
             state = manuscript.get("state")
