@@ -519,16 +519,13 @@ MANU_ACTION_FLDS = api.model('ManuscriptAction', {
 
 @api.route(f'{MANU_EP}/receive_action')
 class ReceiveAction(Resource):
-    """
-    Receive an action for a manuscript.
-    """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'Not acceptable')
     @api.expect(MANU_ACTION_FLDS)
     def put(self):
         try:
             manu_id = request.json.get(manu.MANU_ID)
-            action = request.json.get(manu.ACTION)
+            action  = request.json.get(manu.ACTION)
             refs_in = request.json.get(manu.REFEREES) or []
             if isinstance(refs_in, str):
                 refs_in = [refs_in]
@@ -538,9 +535,23 @@ class ReceiveAction(Resource):
             prev_state = manuscript[manu.STATE]
             if action == manu.ASSIGN_REF:
                 if not refs_in:
-                    raise wz.NotAcceptable("Must provide one referee.")
+                    raise wz.NotAcceptable("Must provide at least one referee.")
                 for ref in refs_in:
                     new_state = manu.assign_ref(manu=manuscript, ref=ref)
+                manuscript[manu.STATE] = new_state
+
+                if "_id" in manuscript:
+                    del manuscript["_id"]
+                manu.update_manuscript(
+                    {manu.MANU_ID: manuscript[manu.MANU_ID]},
+                    manuscript
+                )
+
+            elif action == manu.DELETE_REF:
+                if not refs_in:
+                    raise wz.NotAcceptable("Must provide at least one referee to remove.")
+                for ref in refs_in:
+                    new_state = manu.delete_ref(manu=manuscript, ref=ref)
                 manuscript[manu.STATE] = new_state
                 if "_id" in manuscript:
                     del manuscript["_id"]
