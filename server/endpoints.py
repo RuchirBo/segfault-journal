@@ -310,7 +310,7 @@ class Manuscripts(Resource):
     def get(self):
         manuscripts = manu.get_all_manuscripts()
         for manuscript in manuscripts:
-            curr_desc = STATE_DESCRIPTIONS.get(manuscript["state"])
+            curr_desc = STATE_DESCRIPTIONS.get(manuscript["STATE"])
             manuscript["state_description"] = curr_desc
         print(manuscripts)
         return {'manuscripts': manuscripts}
