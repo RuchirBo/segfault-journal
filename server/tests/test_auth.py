@@ -18,7 +18,7 @@ def create_app():
     app.config["TESTING"] = True
     app.config['SECRET_KEY'] = 'test-secret-key'
     api = Api(app)
-    api.add_namespace(auth_ns, path="/auths")
+    api.add_namespace(auth_ns, path="/auth")
     return app
 
 @pytest.fixture
@@ -46,7 +46,7 @@ def test_valid_register(client):
         "password": "testpassword",
         "role": "AU"
     }
-    resp = client.post("/auths/registers", json=data)
+    resp = client.post("/auth/register", json=data)
     assert resp.status_code == 201
     resp_json = resp.get_json()
     assert resp_json["message"] == "User registered successfully."
@@ -65,10 +65,10 @@ def test_invalid_register_existing_email(client):
         "role": "AU"
     }
 
-    resp1 = client.post("/auths/registers", json=data)
+    resp1 = client.post("/auth/register", json=data)
     assert resp1.status_code == 201
     
-    resp2 = client.post("/auths/registers", json=data)
+    resp2 = client.post("/auth/register", json=data)
     assert resp2.status_code == 400
     resp2_json = resp2.get_json()
     assert "User with that email already exists." in resp2_json.get("message", "")
@@ -82,13 +82,13 @@ def test_valid_login(client):
         "role": "AU"
     }
 
-    resp_reg = client.post("/auths/registers", json=registration_data)
+    resp_reg = client.post("/auth/register", json=registration_data)
     assert resp_reg.status_code == 201
     login_data = {
         "email": email,
         "password": "testpassword"
     }
-    resp_login = client.post("/auths/logins", json=login_data)
+    resp_login = client.post("/auth/login", json=login_data)
     assert resp_login.status_code == 200
     resp_login_json = resp_login.get_json()
     assert resp_login_json["message"] == "Logged in successfully."
@@ -102,13 +102,13 @@ def test_invalid_login_wrong_password(client):
         "password": "correctpassword",
         "role": "AU"
     }
-    resp_reg = client.post("/auths/registers", json=registration_data)
+    resp_reg = client.post("/auth/register", json=registration_data)
     assert resp_reg.status_code == 201
     login_data = {
         "email": email,
         "password": "wrongpassword"
     }
-    resp_login = client.post("/auths/logins", json=login_data)
+    resp_login = client.post("/auth/login", json=login_data)
     assert resp_login.status_code == 401
     resp_login_json = resp_login.get_json()
     assert "Invalid email or password." in resp_login_json.get("message", "")
@@ -120,7 +120,7 @@ def test_invalid_login_nonexistent_user(client):
         "email": email,
         "password": "anypassword"
     }
-    resp_login = client.post("/auths/logins", json=login_data)
+    resp_login = client.post("/auth/login", json=login_data)
     assert resp_login.status_code == 401
     resp_login_json = resp_login.get_json()
     assert "Invalid email or password." in resp_login_json.get("message", "")
@@ -133,7 +133,7 @@ def test_register_without_role(client):
         "password": "testpassword",
         "role": "AU"  
     }
-    resp = client.post("/auths/registers", json=data)
+    resp = client.post("/auth/register", json=data)
     assert resp.status_code == 201
     resp_json = resp.get_json()
     assert resp_json["message"] == "User registered successfully."
@@ -165,7 +165,7 @@ def test_register_with_various_roles(client, role):
     }
     expected = [role]
 
-    resp = client.post("/auths/registers", json=payload)
+    resp = client.post("/auth/register", json=payload)
     assert resp.status_code == 201
     
     user = ppl.read_one(email)
