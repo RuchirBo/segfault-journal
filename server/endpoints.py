@@ -254,7 +254,10 @@ class Editors(Resource):
     def get(self):
         try:
             editors = ppl.get_people_by_role("ED")
-            return {"editors": editors}, 200
+            managing_editors = ppl.get_people_by_role("ME")
+            consulting_editors = ppl.get_people_by_role("CE")
+            all_editors = editors + managing_editors + consulting_editors
+            return {"editors": all_editors}, 200
         except Exception as e:
             return {"message": str(e)}, 500
 
