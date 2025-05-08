@@ -10,8 +10,7 @@ from data.manuscripts.manuscript import STATE_DESCRIPTIONS
 import subprocess
 import werkzeug.exceptions as wz
 from flask import request, session
-from werkzeug.security import generate_password_hash
-import security.security as sec
+from werkzeug.security import generate_password_hash, check_password_hash
 import data.people as ppl
 import data.manuscripts.manuscript as manu
 import data.text as txt
@@ -770,7 +769,8 @@ class Login(Resource):
         password = data.get('password')
         print(password)
 
-        if not sec.can_login(email, password):
+        user = ppl.read_one(email)
+        if not user or not check_password_hash(user['password'], password):
             auth_ns.abort(401, "Invalid email or password.")
 
         token = "segfault_dummy_val"
