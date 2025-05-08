@@ -1,4 +1,7 @@
 from functools import wraps
+import data.people as ppl
+import data.db_connect as dbc
+from werkzeug.security import check_password_hash
 
 """
 Our record format to meet our requirements (see security.md) will be:
@@ -157,6 +160,13 @@ def needs_recs(fn):
             security_recs = read()
         return fn(*args, **kwargs)
     return wrapper
+
+
+def can_login(email: str, password: str) -> bool:
+    valid_user = ppl.read_one(email)
+    if not valid_user or not check_password_hash(valid_user['password'], password):
+        auth_ns.abort(401, "Invalid email or password.")
+    return valid_user
 
 
 @needs_recs

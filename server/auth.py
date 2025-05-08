@@ -75,6 +75,8 @@ class Login(Resource):
         password = data.get('password')
         print(password)
 
+        # if not sec.can_login(email, password):
+        #     auth_ns.abort(401, "Invalid email or password.")
         user = ppl.read_one(email)
         if not user or not check_password_hash(user['password'], password):
             auth_ns.abort(401, "Invalid email or password.")
@@ -84,7 +86,6 @@ class Login(Resource):
         session['user'] = {
             'email': email,
             'role': ppl.get_person_roles(email)
-            # 'role': user.get('role', ' ')
         }
 
         return {
