@@ -3,17 +3,16 @@ This is the file containing all of the endpoints for our flask app.
 The endpoint called `endpoints` will return all available endpoints.
 """
 from http import HTTPStatus
-
-from flask import Flask, request  # , request
-from flask_restx import Resource, Api, fields  # Namespace, fields
+from flask import Flask
+from flask_restx import Resource, Api, fields, Namespace
 from flask_cors import CORS
 from data.manuscripts.manuscript import STATE_DESCRIPTIONS
 import subprocess
 import werkzeug.exceptions as wz
-
+from flask import request, session
+from werkzeug.security import generate_password_hash
+import security.security as sec
 import data.people as ppl
-# import data.manuscripts.query as manu
-# import data.manuscripts.fields as flds
 import data.manuscripts.manuscript as manu
 import data.text as txt
 import data.roles as rls
@@ -75,6 +74,8 @@ DEV_EP = '/dev'
 USER_KEY = 'number_users'
 ROLES_KEY = "all_roles"
 MANU_KEY = 'number_manuscripts'
+LOGIN_EP = '/login'
+REG_EP = '/register'
 
 
 @api.route(HELLO_EP)
@@ -697,3 +698,105 @@ class DebugSystemInfo(Resource):
             }, 200
         except Exception as e:
             return {"message": str(e)}, 500
+
+
+auth_ns = Namespace('auth', description="Authentication operations")
+
+register_model = auth_ns.model(
+    'Register',
+    {
+        'email': fields.String(
+            required=True,
+            description="User email"
+        ),
+        'password': fields.String(
+            required=True,
+            description="User password"
+        ),
+        'role': fields.String(
+            required=False,
+            description="Role code"
+        ),
+    }
+)
+
+login_model = auth_ns.model(
+    'Login',
+    {
+        'email': fields.String(
+            required=True,
+            description="User email"
+        ),
+        'password': fields.String(
+            required=True,
+            description="User password"
+        ),
+    }
+)
+
+
+@auth_ns.route('/register')
+class Register(Resource):
+    @auth_ns.expect(register_model)
+    def post(self):
+        data = request.json
+        email = data.get('email')
+        password = data.get('password')
+        role = data.get('role', ' ')
+        name = email.split('@')[0]
+        affiliation = ''
+        roles = [role] if role else []
+
+        existing = ppl.exists(email)
+        if existing:
+            auth_ns.abort(400, "User with that email already exists.")
+
+        hashed_password = generate_password_hash(
+            password,
+            method='pbkdf2:sha256'
+        )
+        print(hashed_password)
+        ppl.create_person(name, affiliation, email, hashed_password, roles)
+
+        return {"message": "User registered successfully."}, 201
+
+
+@auth_ns.route('/login')
+class Login(Resource):
+    @auth_ns.expect(login_model)
+    def post(self):
+        data = request.json
+        email = data.get('email')
+        password = data.get('password')
+        print(password)
+
+        if not sec.can_login(email, password):
+            auth_ns.abort(401, "Invalid email or password.")
+
+        token = "segfault_dummy_val"
+
+        session['user'] = {
+            'email': email,
+            'role': ppl.get_person_roles(email)
+        }
+
+        return {
+            "message": "Logged in successfully.",
+            "token": token
+        }, 200
+
+
+@auth_ns.route('/user')
+class CurrentUser(Resource):
+    def get(self):
+        user = session.get('user')
+        if not user:
+            auth_ns.abort(401, "Not logged in.")
+        return user, 200
+
+
+@auth_ns.route('/logout')
+class Logout(Resource):
+    def post(self):
+        session.pop('user', None)
+        return {"message": "Logged out successfully."}, 200
