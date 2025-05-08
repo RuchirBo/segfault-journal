@@ -5,7 +5,7 @@ import data.people as ppl
 import security.security as sec
 # from security.security import PEOPLE, READ, LOGIN_KEY
 
-auth_ns = Namespace('auth', description="Authentication operations")
+auth_ns = Namespace('auths', description="Authentication operations")
 
 register_model = auth_ns.model(
     'Register',
@@ -40,7 +40,7 @@ login_model = auth_ns.model(
 )
 
 
-@auth_ns.route('/register')
+@auth_ns.route('/registers')
 class Register(Resource):
     @auth_ns.expect(register_model)
     def post(self):
@@ -66,7 +66,7 @@ class Register(Resource):
         return {"message": "User registered successfully."}, 201
 
 
-@auth_ns.route('/login')
+@auth_ns.route('/logins')
 class Login(Resource):
     @auth_ns.expect(login_model)
     def post(self):
@@ -94,7 +94,7 @@ class Login(Resource):
         }, 200
 
 
-@auth_ns.route('/user')
+@auth_ns.route('/users')
 class CurrentUser(Resource):
     def get(self):
         user = session.get('user')
@@ -103,7 +103,7 @@ class CurrentUser(Resource):
         return user, 200
 
 
-@auth_ns.route('/logout')
+@auth_ns.route('/logouts')
 class Logout(Resource):
     def post(self):
         session.pop('user', None)
