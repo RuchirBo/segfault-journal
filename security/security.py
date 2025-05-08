@@ -1,5 +1,50 @@
-import data.db_connect as db_connect
 from functools import wraps
+
+"""
+Our record format to meet our requirements (see security.md) will be:
+
+{
+    feature_name1: {
+        create: {
+            user_list: [],
+            checks: {
+                login: True,
+                ip_address: False,
+                dual_factor: False,
+                # etc.
+            },
+        },
+        read: {
+            user_list: [],
+            checks: {
+                login: True,
+                ip_address: False,
+                dual_factor: False,
+                # etc.
+            },
+        },
+        update: {
+            user_list: [],
+            checks: {
+                login: True,
+                ip_address: False,
+                dual_factor: False,
+                # etc.
+            },
+        },
+        delete: {
+            user_list: [],
+            checks: {
+                login: True,
+                ip_address: False,
+                dual_factor: False,
+                # etc.
+            },
+        },
+    },
+    feature_name2: # etc.
+}
+"""
 
 COLLECT_NAME = 'security'
 CREATE = 'create'
@@ -11,31 +56,57 @@ CHECKS = 'checks'
 LOGIN = 'login'
 LOGIN_KEY = 'login_key'
 IP_ADDR = 'ip_address'
+DUAL_FACTOR = 'dual_factor'
+
+
 PEOPLE = 'people'
+TEXTS = 'texts'
+BAD_FEATURE = 'baaaad feature'
+
+PEOPLE_MISSING_ACTION = READ
+GOOD_USER_ID = 'ejc369@nyu.edu'
 
 security_recs = None
 
-security_records = {
-     PEOPLE: {
-         CREATE: {
-             USER_LIST: ['ejc369@nyu.edu'],
-             CHECKS: {
-                 LOGIN: True,
-             },
-         },
-     },
- }
+PEOPLE_CHANGE_PERMISSIONS = {
+    USER_LIST: [GOOD_USER_ID],
+    CHECKS: {
+        LOGIN: True,
+    },
+}
 
+TEST_RECS = {
+    PEOPLE: {
+        CREATE: PEOPLE_CHANGE_PERMISSIONS,
+        DELETE: PEOPLE_CHANGE_PERMISSIONS,
+        UPDATE: PEOPLE_CHANGE_PERMISSIONS,
+    },
+    TEXTS: {
+        CREATE: {
+            USER_LIST: [GOOD_USER_ID],
+            CHECKS: {
+                LOGIN: True,
+            },
+        },
+        DELETE: {
+            USER_LIST: [GOOD_USER_ID],
+            CHECKS: {
+                LOGIN: True,
+                IP_ADDR: True,
+                DUAL_FACTOR: True,
+            },
+        },
+    },
+    BAD_FEATURE: {
+        CREATE: {
+            USER_LIST: [GOOD_USER_ID],
+            CHECKS: {
+                'Bad check': True,
+            },
+        },
+    },
+}
 
-def read() -> dict:
-    global security_recs
-    security_recs = security_records
-    return security_recs
-
-def delete_acc(email: str):
-    query = {'type': PEOPLE, 'email': email}
-    db_connect.connect_db()
-    return db_connect.delete_one(COLLECT_NAME, query)
 
 def is_valid_key(user_id: str, login_key: str):
     """
@@ -53,13 +124,26 @@ def check_login(user_id: str, **kwargs):
 def check_ip(user_id: str, **kwargs):
     if IP_ADDR not in kwargs:
         return False
+    # we would check user's IP address here
+    return True
+
+
+def dual_factor(user_id: str, **kwargs):
     return True
 
 
 CHECK_FUNCS = {
     LOGIN: check_login,
     IP_ADDR: check_ip,
+    DUAL_FACTOR: dual_factor,
 }
+
+
+def read() -> dict:
+    global security_recs
+    # dbc.read()
+    security_recs = TEST_RECS
+    return security_recs
 
 
 def needs_recs(fn):
