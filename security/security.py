@@ -1,4 +1,5 @@
 import data.db_connect as db_connect
+from functools import wraps
 
 COLLECT_NAME = 'security'
 CREATE = 'create'
@@ -12,6 +13,7 @@ LOGIN_KEY = 'login_key'
 IP_ADDR = 'ip_address'
 PEOPLE = 'people'
 
+security_recs = None
 
 security_records = {
      PEOPLE: {
@@ -26,8 +28,9 @@ security_records = {
 
 
 def read() -> dict:
-    # dbc.read()
-    return security_records
+    global security_recs
+    security_recs = security_records
+    return security_recs
 
 def delete_acc(email: str):
     query = {'type': PEOPLE, 'email': email}
@@ -50,5 +53,52 @@ def check_login(user_id: str, **kwargs):
 def check_ip(user_id: str, **kwargs):
     if IP_ADDR not in kwargs:
         return False
-    # we would check user's IP address here
+    return True
+
+
+CHECK_FUNCS = {
+    LOGIN: check_login,
+    IP_ADDR: check_ip,
+}
+
+
+def needs_recs(fn):
+    """
+    Should be used to decorate any function that directly accesses sec recs.
+    """
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        global security_recs
+        if not security_recs:
+            security_recs = read()
+        return fn(*args, **kwargs)
+    return wrapper
+
+
+@needs_recs
+def read_feature(feature_name: str) -> dict:
+    if feature_name in security_recs:
+        return security_recs[feature_name]
+    else:
+        return None
+
+
+@needs_recs
+def is_permitted(feature_name: str, action: str,
+                 user_id: str, **kwargs) -> bool:
+    prot = read_feature(feature_name)
+    if prot is None:
+        return True
+    if action not in prot:
+        return True
+    if USER_LIST in prot[action]:
+        if user_id not in prot[action][USER_LIST]:
+            return False
+    if CHECKS not in prot[action]:
+        return True
+    for check in prot[action][CHECKS]:
+        if check not in CHECK_FUNCS:
+            raise ValueError(f'Bad check passed to is_permitted: {check}')
+        if not CHECK_FUNCS[check](user_id, **kwargs):
+            return False
     return True
