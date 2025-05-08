@@ -1,8 +1,8 @@
 from flask import request, session
 from flask_restx import Namespace, Resource, fields
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash
 import data.people as ppl
-# import security.security as sec
+import security.security as sec
 # from security.security import PEOPLE, READ, LOGIN_KEY
 
 auth_ns = Namespace('auth', description="Authentication operations")
@@ -75,11 +75,11 @@ class Login(Resource):
         password = data.get('password')
         print(password)
 
-        # if not sec.can_login(email, password):
-        #     auth_ns.abort(401, "Invalid email or password.")
-        user = ppl.read_one(email)
-        if not user or not check_password_hash(user['password'], password):
+        if not sec.can_login(email, password):
             auth_ns.abort(401, "Invalid email or password.")
+        # user = ppl.read_one(email)
+        # if not user or not check_password_hash(user['password'], password):
+        #     auth_ns.abort(401, "Invalid email or password.")
 
         token = "segfault_dummy_val"
 
