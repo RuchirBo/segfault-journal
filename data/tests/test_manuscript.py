@@ -17,6 +17,7 @@ TEST_AU_ROLES = [rls.AUTHOR_CODE]  # Ensure AUTHOR role is properly assigned
 TEST_ED_NAME = "Ted"
 TEST_ED_AFF = 'AM'
 TEST_ED_ROLES = [rls.ED_CODE]
+TEST_PASSWORD = 'pass'
 
 TEST_SAMPLE_INVALID_MANU_MISSING_FIELDS = {
     mqry.TITLE: 'Test Title',
@@ -144,7 +145,7 @@ def test_people():
 
     ret_author = TEST_SAMPLE_MANU[mqry.AUTHOR_EMAIL]
     if not ppl.exists(TEST_SAMPLE_MANU[mqry.AUTHOR_EMAIL]):
-        ppl.create_person(TEST_SAMPLE_MANU[mqry.AUTHOR], TEST_ED_AFF, TEST_SAMPLE_MANU[mqry.AUTHOR_EMAIL], TEST_AU_ROLES)
+        ppl.create_person(TEST_SAMPLE_MANU[mqry.AUTHOR], TEST_ED_AFF,TEST_PASSWORD, TEST_SAMPLE_MANU[mqry.AUTHOR_EMAIL], TEST_AU_ROLES)
         author_exist = False
     else:
         author_exist = True
@@ -154,7 +155,7 @@ def test_people():
 
     ret_editor = TEST_SAMPLE_MANU[mqry.EDITOR]
     if not ppl.exists(TEST_SAMPLE_MANU[mqry.EDITOR]):
-        ppl.create_person(TEST_ED_NAME, TEST_ED_AFF, TEST_SAMPLE_MANU[mqry.EDITOR], TEST_ED_ROLES)
+        ppl.create_person(TEST_ED_NAME, TEST_ED_AFF, TEST_PASSWORD,TEST_SAMPLE_MANU[mqry.EDITOR], TEST_ED_ROLES)
         editor_exist = False
     else:
         editor_exist = True
