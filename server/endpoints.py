@@ -31,7 +31,10 @@ CORS(
     supports_credentials=True,
     resources={
         r"/*": {
-            "origins": ['*'],
+            "origins": [
+                "http://localhost:3000",
+                "https://quiet-scrubland-27783-7670a565e3e2.herokuapp.com"
+            ],
             "allow_headers": [
                 "Content-Type",
                 "Authorization"
