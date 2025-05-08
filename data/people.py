@@ -3,7 +3,7 @@ This module interfaces to our user data.
 """
 
 import re
-import data.roles as rls  # importing functions from roles.py
+import data.roles as rls
 import data.db_connect as dbc
 
 PEOPLE_COLLECT = 'people'
@@ -14,15 +14,18 @@ NAME = 'name'
 ROLES = 'roles'
 AFFILIATION = 'affiliation'
 EMAIL = 'email'
+PASSWORD = 'password'
 
 TEST_EMAIL = 'ejc369@nyu.edu'
+TEST_PASSWORD = 'testpassword'
 
 TEST_PERSON_DICT = {
     TEST_EMAIL: {
         NAME: 'Euguene Callahan',
         ROLES: [],
         AFFILIATION: 'NYU',
-        EMAIL: TEST_EMAIL
+        EMAIL: TEST_EMAIL,
+        PASSWORD: TEST_PASSWORD,
     }
 }
 
@@ -108,10 +111,10 @@ def update_users(new_name: str, affiliation: str,
 
 
 def create_person(name: str, affiliation: str, email: str,
-                  roles: list = []):
+                  password: str, roles: list = []):
     """
     Our contract:
-        - Takes in a new name, affiliation, email, and role(s)
+        - Takes in a new name, affiliation, email, password, and role(s)
           to create a new person in the people dictionary
     """
     if exists(email):
@@ -121,6 +124,7 @@ def create_person(name: str, affiliation: str, email: str,
         NAME: name,
         AFFILIATION: affiliation,
         EMAIL: email,
+        PASSWORD: password,
         ROLES: roles,
     }
     dbc.create(PEOPLE_COLLECT, person)

@@ -140,17 +140,12 @@ class People(Resource):
         """
         return ppl.read()
 
-    # def create_person(self, name: str, affiliation: str, email: str):
-    #     return ppl.create_person(name, affiliation, email)
-
-    # def delete_person(self, _id):
-    #     return ppl.delete_person(_id)
-
 
 PEOPLE_CREATE_FLDS = api.model('AddNewPeopleEntry', {
     ppl.NAME: fields.String,
     ppl.EMAIL: fields.String,
     ppl.AFFILIATION: fields.String,
+    ppl.PASSWORD: fields.String,
     ppl.ROLES: fields.List(fields.String),
 })
 
@@ -171,8 +166,9 @@ class PeopleCreate(Resource):
             name = request.json.get(ppl.NAME)
             affiliation = request.json.get(ppl.AFFILIATION)
             email = request.json.get(ppl.EMAIL)
+            password = request.json.get(ppl.PASSWORD)
             roles = request.json.get(ppl.ROLES, [])
-            ret = ppl.create_person(name, affiliation, email, roles)
+            ret = ppl.create_person(name, affiliation, email, password, roles)
         except Exception as err:
             raise wz.NotAcceptable(f'{str(err)}')
         return {

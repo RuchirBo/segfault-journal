@@ -1,7 +1,7 @@
 from flask import request, session
 from flask_restx import Namespace, Resource, fields
-# from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
+
 # from security.security import COLLECT_NAME, PEOPLE
 import data.people as ppl
 
@@ -61,7 +61,7 @@ class Register(Resource):
             method='pbkdf2:sha256'
         )
         print(hashed_password)
-        ppl.create_person(name, affiliation, email, roles)
+        ppl.create_person(name, affiliation, email, hashed_password, roles)
 
         return {"message": "User registered successfully."}, 201
 
@@ -75,8 +75,8 @@ class Login(Resource):
         password = data.get('password')
         print(password)
 
-        user = ppl.exists(email)
-        if (not user):
+        user = ppl.read_one(email)
+        if not user or not check_password_hash(user['password'], password):
             auth_ns.abort(401, "Invalid email or password.")
 
         token = "segfault_dummy_val"

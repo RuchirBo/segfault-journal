@@ -20,6 +20,7 @@ LAST_HYPHEN = "me@myemail-"
 INVALID_CHAR = "me!@myemail"
 INVALID_DOMAIN_UNDERSCORE = "i.like.underscores@but_they_are_not_allowed_here"
 VALID_UNDERSCORE = "temp_person@example.org"
+PASSWORD = 'password'
 # Local-Part is longer than 64 characters
 TOO_LONG_EMAIL = '12345678901234567890123456789012345678901'\
     + '23456789012345678901234+x@example.com'
@@ -49,7 +50,7 @@ TEST_UPDATE_NAME = "John Two Smith"
 
 def test_create_person():
     print("CREATING:", ppl.read())
-    ppl.create_person("John Smith", "NYU", ADD_EMAIL, ['AU'])
+    ppl.create_person("John Smith", "NYU", ADD_EMAIL,PASSWORD, ['AU'])
     assert ppl.exists(ADD_EMAIL)
     ppl.delete_person(ADD_EMAIL)
 
@@ -57,7 +58,7 @@ def test_create_person():
 @pytest.fixture(scope='function')
 def temp_person():
     print(ppl.read())
-    email = ppl.create_person('Joe Smith', 'NYU', TEMP_EMAIL, [TEST_ROLE_CODE])
+    email = ppl.create_person('Joe Smith', 'NYU', TEMP_EMAIL, PASSWORD, [TEST_ROLE_CODE])
     yield email
     try:
         ppl.delete_person(email)
@@ -146,7 +147,7 @@ def test_get_masthead(mock_read):
 
 @pytest.fixture(scope='function')
 def ed_person():
-    ret = ppl.create_person('Jane Smith', 'NYU', TEMP_EMAIL2, [TEST_ED_CODE])
+    ret = ppl.create_person('Jane Smith', 'NYU', TEMP_EMAIL2, PASSWORD, [TEST_ED_CODE])
     yield ret
     ppl.delete_person(ret)
 
@@ -194,7 +195,7 @@ def test_add_role_to_person_invalid_role(temp_person):
 @pytest.fixture(scope='function')
 def temp2_person():
     "Another fixture test to test specficially adding another role"
-    ret = ppl.create_person('Joe Smith', 'NYU', TEMP_EMAIL, [roles.AUTHOR_CODE])
+    ret = ppl.create_person('Joe Smith', 'NYU', TEMP_EMAIL, PASSWORD, [roles.AUTHOR_CODE])
     ppl.add_role_to_person(TEMP_EMAIL, roles.ED_CODE)
     yield ret
     ppl.delete_person(ret)
