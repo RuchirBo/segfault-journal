@@ -165,8 +165,8 @@ def needs_recs(fn):
 def can_login(email: str, password: str) -> bool:
     valid_user = ppl.read_one(email)
     if not valid_user or not check_password_hash(valid_user['password'], password):
-        auth_ns.abort(401, "Invalid email or password.")
-    return valid_user
+        return False
+    return True
 
 
 @needs_recs
