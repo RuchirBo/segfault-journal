@@ -393,7 +393,19 @@ def change_manuscript_state(manu_id, action, **kwargs):
     manu = get_manuscript_by_manu_id(manu_id)
     curr_state = manu[STATE]
     new_state = handle_action(curr_state, action, **kwargs)
-    manu[HISTORY].append(new_state)
+    print(f"Before update, HISTORY: {manu[HISTORY]}")
+
+    if isinstance(manu[HISTORY], list):
+        manu[HISTORY].append(new_state)
+    else:
+        manu[HISTORY] = [new_state] 
+    print(f"After update, HISTORY: {manu[HISTORY]}")
     manu[STATE] = new_state
     update_manuscript({MANU_ID: manu[MANU_ID]}, manu)
+    
     return new_state
+
+
+def exists(manu_id: str) -> bool:
+    return dbc.fetch_one(MANU_COLLECT, {MANU_ID: manu_id}) is not None
+

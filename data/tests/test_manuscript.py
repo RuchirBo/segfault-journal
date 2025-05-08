@@ -12,7 +12,7 @@ TEST_SAMPLE_MANU = mqry.SAMPLE_MANU
 TEST_TITLE = 'First Title'
 NOT_TITLE = 'Not Title'
 
-TEST_AU_ROLES = [rls.AUTHOR_CODE]  # Ensure AUTHOR role is properly assigned
+TEST_AU_ROLES = [rls.AUTHOR_CODE]
 
 TEST_ED_NAME = "Ted"
 TEST_ED_AFF = 'AM'
@@ -61,6 +61,7 @@ def gen_random_not_valid_str() -> str:
     big_int = random.randint(0, BIG_NUM)
     big_int += BIG_NUM
     bad_str = str(big_int)
+    return bad_str
 
 
 def test_is_valid_state():
@@ -139,42 +140,74 @@ def test_withdrawn_state_no_actions():
             mqry.handle_action(mqry.WITHDRAWN, action,manu=mqry.SAMPLE_MANU)
 
 
-# Fix fixture to ensure author and editor roles are correctly assigned
 @pytest.fixture(scope='function')
 def test_people():
+    author_email = TEST_SAMPLE_MANU[mqry.AUTHOR_EMAIL]
+    editor_email = TEST_SAMPLE_MANU[mqry.EDITOR]
+    
+    author_existed = ppl.exists(author_email)
+    editor_existed = ppl.exists(editor_email)
+    
+    if author_existed:
+        original_author = ppl.read_one(author_email)
+        ppl.delete_person(author_email)
+    
+    if editor_existed:
+        original_editor = ppl.read_one(editor_email)
+        ppl.delete_person(editor_email)
+    
+    ppl.create_person(
+        TEST_SAMPLE_MANU[mqry.AUTHOR],
+        TEST_ED_AFF,
+        author_email,
+        TEST_PASSWORD,       
+        TEST_AU_ROLES          
+    )
+    
+    author_person = ppl.read_one(author_email)
+    assert rls.AUTHOR_CODE in author_person.get('roles', []), "Author role wasn't properly assigned"
+    
+    ppl.create_person(
+        TEST_ED_NAME,                 
+        TEST_ED_AFF,                   
+        editor_email,                  
+        TEST_PASSWORD,               
+        TEST_ED_ROLES                   
+    )
+    
+    editor_person = ppl.read_one(editor_email)
+    assert rls.ED_CODE in editor_person.get('roles', []), "Editor role wasn't properly assigned"
 
-    ret_author = TEST_SAMPLE_MANU[mqry.AUTHOR_EMAIL]
-    if not ppl.exists(TEST_SAMPLE_MANU[mqry.AUTHOR_EMAIL]):
-        ppl.create_person(TEST_SAMPLE_MANU[mqry.AUTHOR], TEST_ED_AFF,TEST_PASSWORD, TEST_SAMPLE_MANU[mqry.AUTHOR_EMAIL], TEST_AU_ROLES)
-        author_exist = False
-    else:
-        author_exist = True
+    if not mqry.exists(TEST_SAMPLE_MANU[mqry.MANU_ID]):
+        mqry.create_manuscript(TEST_SAMPLE_MANU)
+    
+    yield author_email, editor_email
+    
+    if mqry.exists(TEST_SAMPLE_MANU[mqry.MANU_ID]):
+        mqry.delete_manuscript(TEST_SAMPLE_MANU[mqry.MANU_ID])
+    
+    ppl.delete_person(author_email)
+    ppl.delete_person(editor_email)
+    
+    if author_existed:
+        ppl.create_person(
+            original_author.get('name', ''),
+            original_author.get('affiliation', ''),
+            original_author.get('email', ''),
+            original_author.get('password', ''),
+            original_author.get('roles', [])
+        )
+    
+    if editor_existed:
+        ppl.create_person(
+            original_editor.get('name', ''),
+            original_editor.get('affiliation', ''),
+            original_editor.get('email', ''),
+            original_editor.get('password', ''),
+            original_editor.get('roles', [])
+        )
 
-    # Ensure the author has the 'AUTHOR' role
-    assert rls.AUTHOR_CODE in TEST_AU_ROLES, "The author role is missing"
 
-    ret_editor = TEST_SAMPLE_MANU[mqry.EDITOR]
-    if not ppl.exists(TEST_SAMPLE_MANU[mqry.EDITOR]):
-        ppl.create_person(TEST_ED_NAME, TEST_ED_AFF, TEST_PASSWORD,TEST_SAMPLE_MANU[mqry.EDITOR], TEST_ED_ROLES)
-        editor_exist = False
-    else:
-        editor_exist = True
-
-    mqry.create_manuscript(TEST_SAMPLE_MANU)
-    print(mqry.get_all_manuscripts())
-
-    yield ret_author, ret_editor
-    print(mqry.get_all_manuscripts())
-
-    if not author_exist:
-        ppl.delete_person(TEST_SAMPLE_MANU[mqry.AUTHOR_EMAIL])
-    if not editor_exist:
-        ppl.delete_person(TEST_SAMPLE_MANU[mqry.EDITOR])
-
-    mqry.delete_manuscript(TEST_SAMPLE_MANU[mqry.MANU_ID])
-
-
-# Fix tests for manuscript creation and validation
 def test_create_manuscript_valid(test_people):
     retrieved_manuscript = mqry.get_manuscript_by_manu_id(TEST_SAMPLE_MANU[mqry.MANU_ID])
     assert retrieved_manuscript[mqry.TITLE] == TEST_SAMPLE_MANU[mqry.TITLE]
@@ -238,8 +271,9 @@ def test_get_manuscript_by_manu_id_valid(test_people):
 
 def test_change_manuscript_state_rej(test_people):
     old_manu = mqry.get_manuscript_by_manu_id(TEST_SAMPLE_MANU[mqry.MANU_ID])
-    print(old_manu)
-    mqry.change_manuscript_state(TEST_SAMPLE_MANU[mqry.MANU_ID], mqry.REJECT, manu = old_manu)
+    print(f"Old Manuscript: {old_manu}")
+    mqry.change_manuscript_state(TEST_SAMPLE_MANU[mqry.MANU_ID], mqry.REJECT, manu=old_manu)
     new_manu = mqry.get_manuscript_by_manu_id(TEST_SAMPLE_MANU[mqry.MANU_ID])
     assert new_manu[mqry.STATE] == mqry.REJECTED, f"Expected state 'REJ', but got {new_manu[mqry.STATE]}"
-    assert new_manu[mqry.HISTORY] == [mqry.REJECT, old_manu[mqry.HISTORY]], f"History mismatch: {new_manu[mqry.HISTORY]}"
+    expected_history = old_manu[mqry.HISTORY] + [mqry.REJECT]
+    assert new_manu[mqry.HISTORY] == expected_history, f"History mismatch: {new_manu[mqry.HISTORY]}"
